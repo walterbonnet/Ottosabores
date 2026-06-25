@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -15,6 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Theme from '../theme';
 import Card from '../components/Card';
 import Header from '../components/Header';
+import SkeletonLoader from '../components/SkeletonLoader';
 import { FESTIVALS, RECIPES } from '../services/mockData';
 import { Festival, Recipe } from '../types';
 import { useGlobalState } from '../services/GlobalStateContext';
@@ -48,11 +49,76 @@ export const FiestasScreen: React.FC = () => {
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [checkedIngredients, setCheckedIngredients] = useState<{ [key: string]: boolean }>({});
   
-  // Tab index inside the details modal: 0 = General/History, 1 = Ingredients/Dishes, 2 = Gallery/Video, 3 = How to get there
-  const [modalActiveTab, setModalActiveTab] = useState<number>(0);
   const [isPlayingVideo, setIsPlayingVideo] = useState<boolean>(false);
+  const [isLoadingDetail, setIsLoadingDetail] = useState<boolean>(false);
+  const [visibleSections, setVisibleSections] = useState<number>(0);
 
   const routes = ['Todas las Rutas', 'Carnes Tradicionales', 'Herencia Guaraní', 'Sabores Naturales'];
+
+  const getFestivalContext = (id: string) => {
+    const data: { [key: string]: { caracteristicas: string; importancia: string } } = {
+      '1': {
+        caracteristicas: 'Exhibición ganadera de búfalos, jineteadas, asados multitudinarios y peñas folclóricas.',
+        importancia: 'Es la fiesta emblema del desarrollo bufalero en Caá Catí, destacando una alternativa productiva sostenible para los campos del norte.'
+      },
+      '2': {
+        caracteristicas: 'Concurso de asadores a la estaca con leña de espinillo, jineteadas y espectáculos de chamamé de primer nivel.',
+        importancia: 'Homenaje al peón rural y a la producción de cordero de excelente calidad en los campos lindantes a los Esteros del Iberá.'
+      },
+      '3': {
+        caracteristicas: 'Cocción comunitaria en hornos de barro tradicionales alimentados a leña, degustación de costillares y cueros crocantes.',
+        importancia: 'Promueve el trabajo de los pequeños productores porcinos del centro de la provincia, conservando métodos de cocción centenarios.'
+      },
+      '4': {
+        caracteristicas: 'Competencia abierta de parrilleros a la orilla del río Paraná, guitarreadas tradicionales y ferias de artesanía criolla.',
+        importancia: 'Reúne la tradición del asado de fin de semana con la imponente belleza de las barrancas del río Paraná.'
+      },
+      '5': {
+        caracteristicas: 'Feria gastronómica de chipá calentito hecho al horno de barro y tatacua, música folclórica y elección de la reina del chipá.',
+        importancia: 'Homenaje al pan sagrado de la cultura guaraní que une a toda la comunidad en torno a la mesa familiar del nordeste.'
+      },
+      '6': {
+        caracteristicas: 'Preparación de tortas fritas en ollas gigantescas al aire libre, guitarreadas espontáneas y rondas de mate cebado.',
+        importancia: 'Celebración de la merienda campesina por excelencia, rescatando el valor del encuentro y la hospitalidad litoraleña.'
+      },
+      '7': {
+        caracteristicas: 'Cocina en vivo de Mbaipy en grandes ollas de hierro a la leña, preparación de Mbejú caliente en sartenes de chapa.',
+        importancia: 'Celebración de la polenta y el pan plano de origen guaraní, fundamentales para combatir el frío invierno del campo correntino.'
+      },
+      '8': {
+        caracteristicas: 'Exposición de raíces gigantes, talleres de cocina con mandioca, ferias agroecológicas y degustación de platos regionales.',
+        importancia: 'Pone en valor el cultivo alimenticio más importante de la región guaranítica, pilar de la soberanía alimentaria correntina.'
+      },
+      '9': {
+        caracteristicas: 'Demostración de extracción manual del almidón de mandioca, elaboración de chipas y panificados tradicionales sin gluten.',
+        importancia: 'Rescata la técnica tradicional de molienda y colado artesanal del almidón, un saber que se transmite de abuelas a nietos.'
+      },
+      '10': {
+        caracteristicas: 'Feria apícola con cata de mieles multiflorales, conferencias sobre apicultura y concursos de cocina dulce con miel de monte.',
+        importancia: 'Impulsa la protección del monte nativo y la biodiversidad a través de la producción sostenible de mieles silvestres.'
+      },
+      '11': {
+        caracteristicas: 'Cosecha de mango fresco de los árboles históricos, ferias de helados, mermeladas, jugos y conservas en almíbar.',
+        importancia: 'Homenaje al paisaje urbano y cultural de Santa Ana, donde el mango representa abundancia y frescura veraniega.'
+      },
+      '12': {
+        caracteristicas: 'Premiación a las sandías más grandes y dulces de la cosecha, desfiles costeros y shows musicales frente al río.',
+        importancia: 'Celebra la sandía primicia de Esquina, símbolo del esfuerzo de los agricultores y del inicio del verano correntino.'
+      },
+      '13': {
+        caracteristicas: 'Cosecha comunitaria del fruto de palmera yatay, talleres de licores artesanales, mermeladas y cestería con hojas de palma.',
+        importancia: 'Promueve la conservación y el uso sustentable de los palmares nativos de yatay, recuperando un sabor silvestre histórico.'
+      },
+      '14': {
+        caracteristicas: 'Cena campestre con platos dulces y salados elaborados con batatas locales, música chamamecera y bailes tradicionales.',
+        importancia: 'Homenaje a la producción familiar batatera de Tres de Abril, un noble cultivo que sustenta la economía rural de la zona.'
+      }
+    };
+    return data[id] || {
+      caracteristicas: 'Feria gastronómica criolla, peñas de música chamamecera y degustación de platos locales.',
+      importancia: 'Rescate de los saberes tradicionales y de las recetas transmitidas de generación en generación en la provincia.'
+    };
+  };
 
   const toggleIngredient = (recipeId: string, index: number) => {
     const key = `${recipeId}-${index}`;
@@ -74,15 +140,250 @@ export const FiestasScreen: React.FC = () => {
 
   const relatedRecipe = selectedFestival ? RECIPES.find(r => r.id === selectedFestival.recetaRelacionada) : undefined;
 
+  useEffect(() => {
+    let timers: any[] = [];
+    if (selectedFestival) {
+      setIsLoadingDetail(true);
+      setVisibleSections(0);
+      
+      const loadTimer = setTimeout(() => {
+        setIsLoadingDetail(false);
+        timers.push(setTimeout(() => setVisibleSections(1), 50));
+        timers.push(setTimeout(() => setVisibleSections(2), 150));
+        timers.push(setTimeout(() => setVisibleSections(3), 250));
+        timers.push(setTimeout(() => setVisibleSections(4), 350));
+        timers.push(setTimeout(() => setVisibleSections(5), 450));
+      }, 500);
+      
+      timers.push(loadTimer);
+    } else {
+      setIsLoadingDetail(false);
+      setVisibleSections(0);
+    }
+    
+    return () => {
+      timers.forEach(t => clearTimeout(t));
+    };
+  }, [selectedFestival]);
+
   const openFestivalDetails = (fest: Festival) => {
     setSelectedFestival(fest);
-    setModalActiveTab(0);
     setIsPlayingVideo(false);
   };
 
   const routesToRender = selectedRoute === 'Todas las Rutas'
     ? ['Carnes Tradicionales', 'Herencia Guaraní', 'Sabores Naturales']
     : [selectedRoute];
+
+  if (selectedFestival) {
+    if (isLoadingDetail) {
+      return (
+        <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+          <View style={[styles.detailHeader, { backgroundColor: colors.surface, borderBottomColor: colors.border, borderBottomWidth: 1 }]}>
+            <Pressable onPress={() => setSelectedFestival(null)} style={styles.backButton}>
+              <Ionicons name="arrow-back" size={24} color={colors.text} />
+            </Pressable>
+            <Text style={[styles.detailHeaderTitle, { color: colors.primary }]} numberOfLines={1}>
+              {selectedFestival?.nombre}
+            </Text>
+          </View>
+          <ScrollView>
+            <SkeletonLoader type="details" />
+          </ScrollView>
+        </SafeAreaView>
+      );
+    }
+
+    const context = getFestivalContext(selectedFestival?.id || '');
+
+    return (
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+        {/* Navigation Header */}
+        <View style={[styles.detailHeader, { backgroundColor: colors.surface, borderBottomColor: colors.border, borderBottomWidth: 1 }]}>
+          <Pressable onPress={() => setSelectedFestival(null)} style={styles.backButton} accessibilityRole="button" accessibilityLabel="Volver a las rutas">
+            <Ionicons name="arrow-back" size={24} color={colors.text} />
+          </Pressable>
+          <Text style={[styles.detailHeaderTitle, { color: colors.primary }]} numberOfLines={1}>
+            {selectedFestival?.nombre}
+          </Text>
+        </View>
+
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.detailScrollContent}>
+          {/* SECCIÓN 1: Hero */}
+          {visibleSections >= 1 && (
+            <View style={styles.heroSection}>
+              <Image source={{ uri: selectedFestival?.galeria?.[0] }} style={styles.heroImage} />
+              <View style={styles.heroOverlay}>
+                <Text style={styles.heroTitle}>{selectedFestival?.nombre}</Text>
+                <View style={styles.heroLocationRow}>
+                  <Ionicons name="location" size={14} color="#FFF" />
+                  <Text style={styles.heroLocationText}>{selectedFestival?.localidad}</Text>
+                </View>
+              </View>
+            </View>
+          )}
+
+          {/* SECCIÓN 2: Contexto */}
+          {visibleSections >= 2 && (
+            <View style={[styles.detailSection, { backgroundColor: colors.surface }]}>
+              <Text style={[styles.sectionTitle, { color: colors.text, borderLeftColor: colors.primary }]}>Contexto & Tradición</Text>
+              
+              <Text style={[styles.contextLabel, { color: colors.primary }]}>Características del Evento</Text>
+              <Text style={[styles.contextText, { color: colors.textSecondary }]}>{context.caracteristicas}</Text>
+
+              <Text style={[styles.contextLabel, { color: colors.primary, marginTop: 12 }]}>Importancia Cultural</Text>
+              <Text style={[styles.contextText, { color: colors.textSecondary }]}>{context.importancia}</Text>
+              
+              <Text style={[styles.contextLabel, { color: colors.primary, marginTop: 12 }]}>Historia General</Text>
+              <Text style={[styles.contextText, { color: colors.textSecondary }]}>{selectedFestival?.historia}</Text>
+            </View>
+          )}
+
+          {/* SECCIÓN 3: Producto Destacado */}
+          {visibleSections >= 3 && (
+            <View style={[styles.detailSection, { backgroundColor: colors.surface }]}>
+              <Text style={[styles.sectionTitle, { color: colors.text, borderLeftColor: colors.primary }]}>Producto Destacado</Text>
+              <View style={[styles.featuredProductCard, { backgroundColor: colors.primary + '0c', borderColor: colors.primary + '25' }]}>
+                <Ionicons name="sparkles" size={24} color={colors.primary} />
+                <View style={styles.featuredProductInfo}>
+                  <Text style={[styles.featuredProductLabel, { color: colors.primary }]}>Sabor e Identidad</Text>
+                  <Text style={[styles.featuredProductName, { color: colors.text }]}>{selectedFestival?.productoDestacado}</Text>
+                  <Text style={[styles.featuredProductDesc, { color: colors.textSecondary }]}>
+                    Este ingrediente es el corazón de la festividad en {selectedFestival?.localidad}, representando una tradición gastronómica única de las rutas del Taragüí.
+                  </Text>
+                </View>
+              </View>
+            </View>
+          )}
+
+          {/* SECCIÓN 4: Receta Tradicional */}
+          {visibleSections >= 4 && (
+            <View style={[styles.detailSection, { backgroundColor: colors.surface }]}>
+              <Text style={[styles.sectionTitle, { color: colors.text, borderLeftColor: colors.primary }]}>Receta Tradicional</Text>
+              {relatedRecipe ? (
+                <View>
+                  {/* Receta Meta Row */}
+                  <View style={[styles.recipeMetaRow, { borderBottomColor: colors.border }]}>
+                    <View style={styles.recipeMetaItem}>
+                      <Ionicons name="time-outline" size={18} color={colors.primary} />
+                      <Text style={[styles.recipeMetaValue, { color: colors.text }]}>{relatedRecipe?.duración}</Text>
+                      <Text style={[styles.recipeMetaLabel, { color: colors.textSecondary }]}>Tiempo</Text>
+                    </View>
+                    <View style={styles.recipeMetaItem}>
+                      <Ionicons name="star-outline" size={18} color={colors.primary} />
+                      <Text style={[styles.recipeMetaValue, { color: colors.text }]}>{relatedRecipe?.dificultad}</Text>
+                      <Text style={[styles.recipeMetaLabel, { color: colors.textSecondary }]}>Dificultad</Text>
+                    </View>
+                  </View>
+
+                  {/* Nombre de la Receta */}
+                  <Text style={[styles.recipeTitleName, { color: colors.text }]}>{relatedRecipe?.nombre}</Text>
+
+                  {/* Ingredientes Checklist */}
+                  <Text style={[styles.recipeSubheading, { color: colors.text }]}>Ingredientes necesarios:</Text>
+                  <Text style={[styles.recipeHelpText, { color: colors.textSecondary }]}>Marcá los ingredientes que ya tenés listos:</Text>
+                  {relatedRecipe?.ingredientes?.map((ing, i) => {
+                    const recipeId = relatedRecipe?.id || '';
+                    const isChecked = !!checkedIngredients[`${recipeId}-${i}`];
+                    return (
+                      <Pressable
+                        key={i}
+                        onPress={() => toggleIngredient(recipeId, i)}
+                        style={[styles.checklistRow, { borderBottomColor: colors.border }, isChecked && styles.checklistRowChecked]}
+                      >
+                        <Ionicons 
+                          name={isChecked ? "checkbox" : "square-outline"} 
+                          size={18} 
+                          color={isChecked ? colors.secondary : colors.textSecondary} 
+                        />
+                        <Text style={[styles.checklistText, { color: colors.text }, isChecked && styles.checklistTextChecked]}>
+                          {ing}
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
+
+                  {/* Pasos de Preparación */}
+                  <Text style={[styles.recipeSubheading, { color: colors.text, marginTop: 18 }]}>Preparación paso a paso:</Text>
+                  {relatedRecipe?.preparación?.map((step, i) => (
+                    <View key={i} style={styles.stepContainer}>
+                      <View style={[styles.stepNumCircle, { backgroundColor: colors.primary }]}>
+                        <Text style={[styles.stepNumText, { color: colors.white }]}>{i + 1}</Text>
+                      </View>
+                      <Text style={[styles.stepText, { color: colors.text }]}>{step}</Text>
+                    </View>
+                  ))}
+
+                  {/* Grandma Tip */}
+                  <View style={[styles.grandmaTipCard, {
+                    backgroundColor: isDarkMode ? 'rgba(223, 177, 91, 0.15)' : 'rgba(223, 177, 91, 0.08)',
+                    borderColor: isDarkMode ? 'rgba(223, 177, 91, 0.3)' : 'rgba(223, 177, 91, 0.25)'
+                  }]}>
+                    <View style={styles.grandmaCardHeader}>
+                      <Ionicons name="flame" size={20} color={colors.accent} />
+                      <Text style={[styles.grandmaCardTitle, { color: isDarkMode ? '#DFB15B' : '#9E7A1C' }]}>El Consejo de la Abuela</Text>
+                    </View>
+                    <Text style={[styles.grandmaCardBody, { color: colors.text }]}>{getGrandmaTip(relatedRecipe?.id || '')}</Text>
+                  </View>
+                </View>
+              ) : (
+                <Text style={{ color: colors.textSecondary, fontStyle: 'italic' }}>No hay receta registrada para este evento.</Text>
+              )}
+            </View>
+          )}
+
+          {/* SECCIÓN 5: Contenido Multimedia */}
+          {visibleSections >= 5 && (
+            <View style={[styles.detailSection, { backgroundColor: colors.surface, marginBottom: 110 }]}>
+              <Text style={[styles.sectionTitle, { color: colors.text, borderLeftColor: colors.primary }]}>Contenido Multimedia</Text>
+              
+              <Text style={[styles.contextLabel, { color: colors.primary }]}>Galería de Fotos</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.galleryScroll}>
+                {selectedFestival?.galeria?.map((img, i) => (
+                  <Image key={i} source={{ uri: img }} style={styles.galleryImageItem} />
+                ))}
+              </ScrollView>
+
+              <Text style={[styles.contextLabel, { color: colors.primary, marginTop: 12 }]}>Video Resumen</Text>
+              {!isPlayingVideo ? (
+                <Pressable style={styles.videoPlayerMock} onPress={() => setIsPlayingVideo(true)}>
+                  <Image source={{ uri: selectedFestival?.video }} style={styles.videoMockThumbnail} />
+                  <View style={styles.videoPlayOverlay}>
+                    <View style={[styles.playButtonCircle, { backgroundColor: colors.primary }]}>
+                      <Ionicons name="play" size={32} color={colors.white} style={{ marginLeft: 4 }} />
+                    </View>
+                    <Text style={[styles.videoPlayText, { color: colors.white }]}>Reproducir Video Resumen</Text>
+                  </View>
+                </Pressable>
+              ) : (
+                <Pressable style={styles.videoPlayingMock} onPress={() => setIsPlayingVideo(false)}>
+                  <Image source={{ uri: selectedFestival?.galeria?.[0] }} style={styles.videoMockThumbnail} />
+                  <View style={styles.videoPlayingOverlay}>
+                    <Ionicons name="pause" size={36} color={colors.white} />
+                    <Text style={[styles.videoPlayingText, { color: colors.white }]}>Reproduciendo... (Toca para pausar)</Text>
+                    <View style={styles.videoProgressOuter}>
+                      <View style={[styles.videoProgressInner, { backgroundColor: colors.primary }]} />
+                    </View>
+                  </View>
+                </Pressable>
+              )}
+
+              {/* Share CTA Button */}
+              <Pressable 
+                onPress={() => {
+                  alert(`¡Enlace de la ${selectedFestival?.nombre} copiado al portapapeles!`);
+                }}
+                style={[styles.shareBtn, { backgroundColor: colors.secondary }]}
+              >
+                <Ionicons name="share-social-outline" size={18} color="#FFF" style={{ marginRight: 8 }} />
+                <Text style={styles.shareBtnText}>Compartir Ruta Gastronómica</Text>
+              </Pressable>
+            </View>
+          )}
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
@@ -205,319 +506,6 @@ export const FiestasScreen: React.FC = () => {
           )}
         </View>
       </ScrollView>
-
-      {/* Expanded Festival Details Modal (Detalle de Fiesta) */}
-      {selectedFestival && (
-        <Modal
-          visible={!!selectedFestival}
-          animationType="slide"
-          transparent={true}
-          onRequestClose={() => setSelectedFestival(null)}
-        >
-          <View style={styles.modalOverlay}>
-            <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
-              <View style={[styles.modalHeader, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-                <Text style={[styles.modalHeaderTitle, { color: colors.primary }]} numberOfLines={1}>
-                  {selectedFestival.nombre}
-                </Text>
-                <Pressable onPress={() => setSelectedFestival(null)} style={styles.closeButton}>
-                  <Ionicons name="close" size={24} color={colors.text} />
-                </Pressable>
-              </View>
-
-              {/* Segmented Modal Tabs */}
-              <View style={[styles.modalTabsRow, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-                {['General', 'Recetas', 'Media', 'Ir'].map((tabLabel, idx) => (
-                  <Pressable
-                    key={idx}
-                    onPress={() => setModalActiveTab(idx)}
-                    style={[
-                      styles.modalTabButton,
-                      modalActiveTab === idx && [styles.modalTabButtonActive, { borderBottomColor: colors.primary }]
-                    ]}
-                  >
-                    <Text style={[styles.modalTabLabel, { color: colors.textSecondary }, modalActiveTab === idx && [styles.modalTabLabelActive, { color: colors.primary }]]}>
-                      {tabLabel}
-                    </Text>
-                  </Pressable>
-                ))}
-              </View>
-
-              <ScrollView 
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={styles.modalScroll}
-              >
-                {/* 1. GENERAL TAB */}
-                {modalActiveTab === 0 && (
-                  <View style={styles.tabContentBlock}>
-                    <Image source={{ uri: selectedFestival.galeria[0] }} style={styles.detailImage} />
-                    <View style={[styles.detailCardBody, { backgroundColor: colors.surface }]}>
-                      <Text style={[styles.detailSectionTitle, { color: colors.text, borderLeftColor: colors.primary }]}>Historia y Tradición</Text>
-                      <Text style={[styles.detailText, { color: colors.textSecondary }]}>{selectedFestival.historia}</Text>
-                      
-                      <View style={[styles.highlightProductBox, {
-                        backgroundColor: isDarkMode ? 'rgba(200, 92, 56, 0.15)' : 'rgba(200, 92, 56, 0.07)',
-                        borderColor: isDarkMode ? 'rgba(200, 92, 56, 0.3)' : 'rgba(200, 92, 56, 0.2)'
-                      }]}>
-                        <Ionicons name="flame" size={24} color={colors.primary} />
-                        <View style={styles.highlightProductInfo}>
-                          <Text style={[styles.highlightProductLabel, { color: colors.primary }]}>Plato Principal Relacionado</Text>
-                          <Text style={[styles.highlightProductValue, { color: colors.text }]}>
-                            {relatedRecipe ? relatedRecipe.nombre : 'Platos tradicionales'}
-                          </Text>
-                        </View>
-                      </View>
-                    </View>
-                  </View>
-                )}
-
-                {/* 2. RECIPES TAB */}
-                {modalActiveTab === 1 && (
-                  <View style={styles.tabContentBlock}>
-                    <View style={[styles.detailCardBody, { backgroundColor: colors.surface }]}>
-                      {relatedRecipe ? (
-                        <>
-                          <Text style={[styles.detailSectionTitle, { color: colors.text, borderLeftColor: colors.primary }]}>Ingredientes Típicos</Text>
-                          <Text style={[styles.tabSubtitle, { color: colors.textSecondary }]}>
-                            Los ingredientes esenciales de la receta tradicional de la fiesta ({relatedRecipe.nombre}):
-                          </Text>
-                          <View style={styles.badgeWrap}>
-                            {relatedRecipe.ingredientes.map((ing, i) => (
-                              <View key={i} style={[styles.detailIngredientBadge, {
-                                backgroundColor: isDarkMode ? 'rgba(46, 111, 64, 0.15)' : 'rgba(46, 111, 64, 0.05)',
-                                borderColor: isDarkMode ? 'rgba(46, 111, 64, 0.3)' : 'rgba(46, 111, 64, 0.2)'
-                              }]}>
-                                <Ionicons name="leaf" size={12} color={colors.secondary} style={{ marginRight: 4 }} />
-                                <Text style={[styles.ingredientBadgeText, { color: colors.secondary }]}>{ing}</Text>
-                              </View>
-                            ))}
-                          </View>
-
-                          <Text style={[styles.detailSectionTitle, { marginTop: Theme.spacing.lg, color: colors.text, borderLeftColor: colors.primary }]}>
-                            Receta Tradicional
-                          </Text>
-                          <Text style={[styles.tabSubtitle, { color: colors.textSecondary }]}>
-                            Accedé a la guía interactiva paso a paso para preparar este plato típico:
-                          </Text>
-
-                          <Card style={[styles.recipeLinkCard, { backgroundColor: colors.surface, borderColor: colors.border }]} elevation="sm" onPress={() => setSelectedRecipe(relatedRecipe)}>
-                            <Image source={{ uri: relatedRecipe.video || 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600' }} style={styles.recipeLinkImage} />
-                            <View style={styles.recipeLinkBody}>
-                              <Text style={[styles.recipeLinkLabel, { color: colors.primary }]}>Ver Receta Completa</Text>
-                              <Text style={[styles.recipeLinkTitle, { color: colors.text }]}>{relatedRecipe.nombre}</Text>
-                              <Text style={[styles.recipeLinkDesc, { color: colors.textSecondary }]} numberOfLines={2}>{relatedRecipe.historia}</Text>
-                              <View style={styles.recipeLinkButton}>
-                                <Text style={[styles.recipeLinkButtonText, { color: colors.primary }]}>Ver Paso a Paso</Text>
-                                <Ionicons name="arrow-forward" size={14} color={colors.primary} />
-                              </View>
-                            </View>
-                          </Card>
-                        </>
-                      ) : (
-                        <View style={styles.emptyContainer}>
-                          <Ionicons name="restaurant-outline" size={48} color={colors.textSecondary} />
-                          <Text style={[styles.emptyText, { color: colors.textSecondary }]}>No hay receta registrada para esta fiesta.</Text>
-                        </View>
-                      )}
-                    </View>
-                  </View>
-                )}
-
-                {/* 3. MULTIMEDIA TAB */}
-                {modalActiveTab === 2 && (
-                  <View style={styles.tabContentBlock}>
-                    <View style={[styles.detailCardBody, { backgroundColor: colors.surface }]}>
-                      <Text style={[styles.detailSectionTitle, { color: colors.text, borderLeftColor: colors.primary }]}>Fotografías de la Edición Anterior</Text>
-                      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.galleryScroll}>
-                        {selectedFestival.galeria.map((img, i) => (
-                          <Image key={i} source={{ uri: img }} style={styles.galleryThumbnail} />
-                        ))}
-                      </ScrollView>
-
-                      <Text style={[styles.detailSectionTitle, { marginTop: Theme.spacing.lg, color: colors.text, borderLeftColor: colors.primary }]}>
-                        Transmisión de Cocina en Vivo (Simulado)
-                      </Text>
-                      <Text style={[styles.tabSubtitle, { color: colors.textSecondary }]}>Reviví el resumen de la última edición:</Text>
-                      
-                      {!isPlayingVideo ? (
-                        <Pressable style={styles.videoPlayerMock} onPress={() => setIsPlayingVideo(true)}>
-                          <Image source={{ uri: selectedFestival.video }} style={styles.videoMockThumbnail} />
-                          <View style={styles.videoPlayOverlay}>
-                            <View style={[styles.playButtonCircle, { backgroundColor: colors.primary }]}>
-                              <Ionicons name="play" size={32} color={colors.white} style={{ marginLeft: 4 }} />
-                            </View>
-                            <Text style={[styles.videoPlayText, { color: colors.white }]}>Reproducir Video Resumen</Text>
-                          </View>
-                        </Pressable>
-                      ) : (
-                        <Pressable style={styles.videoPlayingMock} onPress={() => setIsPlayingVideo(false)}>
-                          <Image source={{ uri: selectedFestival.galeria[0] }} style={styles.videoMockThumbnail} />
-                          <View style={styles.videoPlayingOverlay}>
-                            <Ionicons name="pause" size={36} color={colors.white} />
-                            <Text style={[styles.videoPlayingText, { color: colors.white }]}>Reproduciendo... (Toca para pausar)</Text>
-                            
-                            {/* Simulated Video Progress Bar */}
-                            <View style={styles.videoProgressOuter}>
-                              <View style={[styles.videoProgressInner, { backgroundColor: colors.primary }]} />
-                            </View>
-                          </View>
-                        </Pressable>
-                      )}
-                    </View>
-                  </View>
-                )}
-
-                {/* 4. HOW TO GET THERE TAB */}
-                {modalActiveTab === 3 && (
-                  <View style={styles.tabContentBlock}>
-                    <View style={[styles.detailCardBody, { backgroundColor: colors.surface }]}>
-                      <Text style={[styles.detailSectionTitle, { color: colors.text, borderLeftColor: colors.primary }]}>Cómo Llegar al Evento</Text>
-                      <Text style={[styles.detailText, { color: colors.textSecondary }]}>{selectedFestival.ubicación}</Text>
-                      
-                      {/* Stylized Simulated Route Card */}
-                      <Card style={[styles.routeMockCard, { backgroundColor: colors.background, borderColor: colors.border, borderWidth: isDarkMode ? 1 : 0 }]} elevation="none">
-                        <View style={styles.routeHeader}>
-                          <Ionicons name="navigate-circle" size={32} color={colors.secondary} />
-                          <View style={styles.routeHeaderInfo}>
-                            <Text style={[styles.routeTitle, { color: colors.text }]}>Ruta Recomendada</Text>
-                            <Text style={[styles.routeSubtitle, { color: colors.textSecondary }]}>Desde Corrientes Capital</Text>
-                          </View>
-                        </View>
-                        <View style={[styles.routeDivider, { backgroundColor: colors.border }]} />
-                        <View style={styles.routeStepRow}>
-                          <Ionicons name="car-outline" size={20} color={colors.primary} />
-                          <Text style={[styles.routeStepText, { color: colors.textSecondary }]}>Vehículo particular / Autobús provincial</Text>
-                        </View>
-                        <View style={styles.routeStepRow}>
-                          <Ionicons name="time-outline" size={20} color={colors.primary} />
-                          <Text style={[styles.routeStepText, { color: colors.textSecondary }]}>Frecuencia horaria regular de viajes</Text>
-                        </View>
-                      </Card>
-                    </View>
-                  </View>
-                )}
-              </ScrollView>
-            </View>
-          </View>
-        </Modal>
-      )}
-
-      {/* Recipe Detail Modal with Interactive Checklist nested link */}
-      {selectedRecipe && (
-        <Modal
-          visible={!!selectedRecipe}
-          animationType="slide"
-          transparent={true}
-          onRequestClose={() => setSelectedRecipe(null)}
-        >
-          <View style={styles.modalOverlay}>
-            <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
-              <View style={[styles.modalHeader, { backgroundColor: colors.surface, borderBottomWidth: 1, borderBottomColor: colors.border }]}>
-                <Text style={[styles.modalHeaderTitle, { color: colors.primary }]} numberOfLines={1}>
-                  {selectedRecipe.nombre}
-                </Text>
-                <Pressable onPress={() => setSelectedRecipe(null)} style={styles.closeButton}>
-                  <Ionicons name="close" size={24} color={colors.text} />
-                </Pressable>
-              </View>
-
-              <ScrollView 
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={styles.modalScroll}
-              >
-                <Image source={{ uri: selectedRecipe.video || 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600' }} style={styles.modalImage} />
-                
-                <View style={[styles.modalMetaRow, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-                  <View style={styles.modalMetaItem}>
-                    <Ionicons name="time" size={18} color={colors.primary} />
-                    <Text style={[styles.modalMetaValue, { color: colors.text }]}>{selectedRecipe.duración}</Text>
-                    <Text style={[styles.modalMetaLabel, { color: colors.textSecondary }]}>Tiempo</Text>
-                  </View>
-                  <View style={styles.modalMetaItem}>
-                    <Ionicons name="star" size={18} color={colors.primary} />
-                    <Text style={[styles.modalMetaValue, { color: colors.text }]}>{selectedRecipe.dificultad}</Text>
-                    <Text style={[styles.modalMetaLabel, { color: colors.textSecondary }]}>Dificultad</Text>
-                  </View>
-                  <View style={styles.modalMetaItem}>
-                    <Ionicons name="restaurant" size={18} color={colors.primary} />
-                    <Text style={[styles.modalMetaValue, { color: colors.text }]}>{selectedRecipe.categoría}</Text>
-                    <Text style={[styles.modalMetaLabel, { color: colors.textSecondary }]}>Mesa</Text>
-                  </View>
-                </View>
-
-                {/* History Section */}
-                <View style={[styles.modalSection, { backgroundColor: colors.surface }]}>
-                  <Text style={[styles.modalSectionTitle, { color: colors.text, borderLeftColor: colors.primary }]}>Herencia Cultural</Text>
-                  <Text style={[styles.modalBodyText, { color: colors.textSecondary }]}>{selectedRecipe.historia}</Text>
-                </View>
-
-                {/* Interactive Checklist Section */}
-                <View style={[styles.modalSection, { backgroundColor: colors.surface }]}>
-                  <Text style={[styles.modalSectionTitle, { color: colors.text, borderLeftColor: colors.primary }]}>Ingredientes</Text>
-                  <Text style={[styles.sectionHelpText, { color: colors.textSecondary }]}>
-                    Marcá los ingredientes que ya tenés listos en tu mesa:
-                  </Text>
-                  
-                  {selectedRecipe.ingredientes.map((ing, i) => {
-                    const isChecked = !!checkedIngredients[`${selectedRecipe.id}-${i}`];
-                    return (
-                      <Pressable
-                        key={i}
-                        onPress={() => toggleIngredient(selectedRecipe.id, i)}
-                        style={[
-                          styles.checklistRow,
-                          { borderBottomColor: colors.border },
-                          isChecked && styles.checklistRowChecked
-                        ]}
-                      >
-                        <Ionicons 
-                          name={isChecked ? "checkbox" : "square-outline"} 
-                          size={20} 
-                          color={isChecked ? colors.secondary : colors.textSecondary} 
-                        />
-                        <Text 
-                          style={[
-                            styles.checklistText,
-                            { color: colors.text },
-                            isChecked && [styles.checklistTextChecked, { color: colors.textSecondary }]
-                          ]}
-                        >
-                          {ing}
-                        </Text>
-                      </Pressable>
-                    );
-                  })}
-                </View>
-
-                {/* Preparation Steps */}
-                <View style={[styles.modalSection, { backgroundColor: colors.surface }]}>
-                  <Text style={[styles.modalSectionTitle, { color: colors.text, borderLeftColor: colors.primary }]}>Paso a Paso</Text>
-                  {selectedRecipe.preparación.map((step, i) => (
-                    <View key={i} style={styles.stepContainer}>
-                      <View style={[styles.stepNumCircle, { backgroundColor: colors.primary }]}>
-                        <Text style={[styles.stepNumText, { color: colors.white }]}>{i + 1}</Text>
-                      </View>
-                      <Text style={[styles.stepText, { color: colors.text }]}>{step}</Text>
-                    </View>
-                  ))}
-                </View>
-
-                {/* Grandma Tip */}
-                <View style={[styles.modalSection, styles.grandmaCard, {
-                  backgroundColor: isDarkMode ? 'rgba(223, 177, 91, 0.15)' : 'rgba(223, 177, 91, 0.08)',
-                  borderColor: isDarkMode ? 'rgba(223, 177, 91, 0.3)' : 'rgba(223, 177, 91, 0.25)'
-                }]}>
-                  <View style={styles.grandmaCardHeader}>
-                    <Ionicons name="flame" size={20} color={colors.accent} />
-                    <Text style={[styles.grandmaCardTitle, { color: isDarkMode ? '#DFB15B' : '#9E7A1C' }]}>El Consejo de la Abuela</Text>
-                  </View>
-                  <Text style={[styles.grandmaCardBody, { color: colors.text }]}>{getGrandmaTip(selectedRecipe.id)}</Text>
-                </View>
-              </ScrollView>
-            </View>
-          </View>
-        </Modal>
-      )}
     </SafeAreaView>
   );
 };
@@ -1146,13 +1134,11 @@ const styles = StyleSheet.create({
     color: Theme.colors.text,
     lineHeight: 20,
   },
-  grandmaCard: {
-    backgroundColor: 'rgba(223, 177, 91, 0.08)',
-    borderColor: 'rgba(223, 177, 91, 0.25)',
+  grandmaTipCard: {
     borderWidth: 1.5,
     borderRadius: Theme.roundness.md,
-    margin: Theme.spacing.md,
     padding: Theme.spacing.md,
+    marginTop: Theme.spacing.md,
   },
   grandmaCardHeader: {
     flexDirection: 'row',
@@ -1170,6 +1156,161 @@ const styles = StyleSheet.create({
     color: Theme.colors.text,
     lineHeight: 20,
     fontStyle: 'italic',
+  },
+  detailHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 56,
+    paddingHorizontal: Theme.spacing.md,
+  },
+  backButton: {
+    padding: 4,
+    marginRight: 8,
+  },
+  detailHeaderTitle: {
+    fontSize: Theme.typography.sizes.md + 1,
+    fontWeight: 'bold',
+    flex: 1,
+  },
+  detailScrollContent: {
+    paddingBottom: 40,
+  },
+  heroSection: {
+    position: 'relative',
+    width: '100%',
+    height: 200,
+    overflow: 'hidden',
+  },
+  heroImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  heroOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.45)',
+    padding: Theme.spacing.md,
+  },
+  heroTitle: {
+    fontSize: Theme.typography.sizes.lg,
+    fontWeight: 'bold',
+    color: '#FFF',
+    marginBottom: 4,
+  },
+  heroLocationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  heroLocationText: {
+    color: '#FFF',
+    fontSize: Theme.typography.sizes.sm - 1,
+    marginLeft: 4,
+  },
+  detailSection: {
+    padding: Theme.spacing.md,
+    marginTop: Theme.spacing.sm,
+  },
+  sectionTitle: {
+    fontSize: Theme.typography.sizes.md,
+    fontWeight: 'bold',
+    marginBottom: Theme.spacing.md,
+    borderLeftWidth: 3.5,
+    paddingLeft: Theme.spacing.sm,
+  },
+  contextLabel: {
+    fontSize: Theme.typography.sizes.sm - 0.5,
+    fontWeight: 'bold',
+    textTransform: 'uppercase',
+    marginBottom: 4,
+  },
+  contextText: {
+    fontSize: Theme.typography.sizes.sm,
+    lineHeight: 20,
+    marginBottom: 12,
+  },
+  featuredProductCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: Theme.spacing.md,
+    borderRadius: Theme.roundness.md,
+    borderWidth: 1,
+  },
+  featuredProductInfo: {
+    marginLeft: 12,
+    flex: 1,
+  },
+  featuredProductLabel: {
+    fontSize: 9.5,
+    fontWeight: 'bold',
+    textTransform: 'uppercase',
+    marginBottom: 2,
+  },
+  featuredProductName: {
+    fontSize: Theme.typography.sizes.md,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  featuredProductDesc: {
+    fontSize: Theme.typography.sizes.xs + 1,
+    lineHeight: 16,
+  },
+  recipeMetaRow: {
+    flexDirection: 'row',
+    paddingVertical: Theme.spacing.md,
+    borderBottomWidth: 1,
+    justifyContent: 'space-around',
+    marginBottom: Theme.spacing.md,
+  },
+  recipeMetaItem: {
+    alignItems: 'center',
+  },
+  recipeMetaValue: {
+    fontSize: Theme.typography.sizes.sm,
+    fontWeight: 'bold',
+    marginTop: 4,
+  },
+  recipeMetaLabel: {
+    fontSize: 9.5,
+    textTransform: 'uppercase',
+    marginTop: 2,
+  },
+  recipeTitleName: {
+    fontSize: Theme.typography.sizes.md,
+    fontWeight: 'bold',
+    marginVertical: Theme.spacing.sm,
+  },
+  recipeSubheading: {
+    fontSize: Theme.typography.sizes.sm,
+    fontWeight: 'bold',
+    marginTop: 12,
+    marginBottom: 6,
+  },
+  recipeHelpText: {
+    fontSize: 10.5,
+    fontStyle: 'italic',
+    marginBottom: 8,
+  },
+  galleryImageItem: {
+    width: 140,
+    height: 95,
+    borderRadius: Theme.roundness.sm,
+    marginRight: 8,
+  },
+  shareBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: Theme.spacing.md - 2,
+    borderRadius: Theme.roundness.md,
+    marginTop: Theme.spacing.lg,
+  },
+  shareBtnText: {
+    color: '#FFF',
+    fontSize: Theme.typography.sizes.sm,
+    fontWeight: 'bold',
   },
 });
 
