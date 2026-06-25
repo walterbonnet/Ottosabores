@@ -26,6 +26,9 @@ export interface Festival {
   galeria: string[];
   video: string; // Video player thumbnail mock
   categoría: string;
+  productoDestacado: string;
+  descripcionCorta: string;
+  rutaGastronomica: 'Carnes Tradicionales' | 'Herencia Guaraní' | 'Sabores Naturales';
 }
 
 export interface MultimediaItem {

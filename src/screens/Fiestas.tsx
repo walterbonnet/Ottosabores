@@ -42,8 +42,7 @@ const getGrandmaTip = (recipeId: string): string => {
 
 export const FiestasScreen: React.FC = () => {
   const { colors, isDarkMode } = useGlobalState();
-  const [selectedMonth, setSelectedMonth] = useState<string>('Todos');
-  const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
+  const [selectedRoute, setSelectedRoute] = useState<string>('Todas las Rutas');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedFestival, setSelectedFestival] = useState<Festival | null>(null);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
@@ -53,8 +52,7 @@ export const FiestasScreen: React.FC = () => {
   const [modalActiveTab, setModalActiveTab] = useState<number>(0);
   const [isPlayingVideo, setIsPlayingVideo] = useState<boolean>(false);
 
-  const months = ['Todos', 'Enero', 'Agosto', 'Septiembre'];
-  const categories = ['Todos', 'Música y Fogón', 'Ollas y Campo', 'Tradición Criolla', 'Pesca y Río'];
+  const routes = ['Todas las Rutas', 'Carnes Tradicionales', 'Herencia Guaraní', 'Sabores Naturales'];
 
   const toggleIngredient = (recipeId: string, index: number) => {
     const key = `${recipeId}-${index}`;
@@ -65,12 +63,13 @@ export const FiestasScreen: React.FC = () => {
   };
 
   const filteredFestivals = FESTIVALS.filter(fest => {
-    const matchesMonth = selectedMonth === 'Todos' || fest.fecha.toLowerCase().includes(selectedMonth.toLowerCase());
-    const matchesCategory = selectedCategory === 'Todos' || fest.categoría === selectedCategory;
+    const matchesRoute = selectedRoute === 'Todas las Rutas' || fest.rutaGastronomica === selectedRoute;
     const matchesSearch = fest.nombre.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           fest.localidad.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          fest.productoDestacado.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          fest.descripcionCorta.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           fest.historia.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesMonth && matchesCategory && matchesSearch;
+    return matchesRoute && matchesSearch;
   });
 
   const relatedRecipe = selectedFestival ? RECIPES.find(r => r.id === selectedFestival.recetaRelacionada) : undefined;
@@ -81,11 +80,15 @@ export const FiestasScreen: React.FC = () => {
     setIsPlayingVideo(false);
   };
 
+  const routesToRender = selectedRoute === 'Todas las Rutas'
+    ? ['Carnes Tradicionales', 'Herencia Guaraní', 'Sabores Naturales']
+    : [selectedRoute];
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <Header 
-        title="Fiestas Populares" 
-        subtitle="Celebraciones y fuegos de la provincia" 
+        title="Rutas Gastronómicas" 
+        subtitle="Exploración culinaria y fiestas populares" 
         showDivider={true}
       />
       
@@ -99,7 +102,7 @@ export const FiestasScreen: React.FC = () => {
             <Ionicons name="search" size={18} color={colors.textSecondary} style={{ marginRight: 6 }} />
             <TextInput
               style={[styles.searchInput, { color: colors.text }]}
-              placeholder="Buscar por nombre o localidad..."
+              placeholder="Buscar por nombre, localidad o sabor..."
               placeholderTextColor={colors.textSecondary}
               value={searchQuery}
               onChangeText={setSearchQuery}
@@ -112,89 +115,94 @@ export const FiestasScreen: React.FC = () => {
           </View>
         </View>
 
-        {/* Month Filters */}
+        {/* Route Filters */}
         <View style={styles.filterSection}>
-          <Text style={[styles.filterTitle, { color: colors.text }]}>Filtrar por Mes</Text>
+          <Text style={[styles.filterTitle, { color: colors.text }]}>Seleccionar Ruta</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.badgeScroll}>
-            {months.map(m => (
+            {routes.map(r => (
               <Pressable
-                key={m}
-                onPress={() => setSelectedMonth(m)}
+                key={r}
+                onPress={() => setSelectedRoute(r)}
                 style={[
                   styles.filterBadge,
                   { backgroundColor: colors.surface, borderColor: colors.border },
-                  selectedMonth === m && [styles.filterBadgeActive, { backgroundColor: colors.primary, borderColor: colors.primary }]
+                  selectedRoute === r && [styles.filterBadgeActive, { backgroundColor: colors.primary, borderColor: colors.primary }]
                 ]}
               >
-                <Text style={[styles.filterBadgeText, { color: colors.textSecondary }, selectedMonth === m && { color: colors.white }]}>
-                  {m}
+                <Text style={[styles.filterBadgeText, { color: colors.textSecondary }, selectedRoute === r && { color: colors.white }]}>
+                  {r}
                 </Text>
               </Pressable>
             ))}
           </ScrollView>
         </View>
 
-        {/* Category Chips */}
-        <View style={styles.filterSection}>
-          <Text style={[styles.filterTitle, { color: colors.text }]}>Filtrar por Temática</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.badgeScroll}>
-            {categories.map(cat => (
-              <Pressable
-                key={cat}
-                onPress={() => setSelectedCategory(cat)}
-                style={[
-                  styles.categoryChip,
-                  { backgroundColor: colors.surface, borderColor: colors.border },
-                  selectedCategory === cat && [styles.categoryChipActive, { backgroundColor: colors.secondary, borderColor: colors.secondary }]
-                ]}
-              >
-                <Text style={[styles.categoryChipText, { color: colors.textSecondary }, selectedCategory === cat && { color: colors.white }]}>
-                  {cat}
-                </Text>
-              </Pressable>
-            ))}
-          </ScrollView>
-        </View>
-
-        {/* Responsive / Adaptable Grid Layout */}
+        {/* Route Containers */}
         <View style={styles.gridSection}>
-          <Text style={[styles.gridSectionTitle, { color: colors.text }]}>Cartelera de Festivales</Text>
-          <View style={styles.gridContainer}>
-            {filteredFestivals.length > 0 ? (
-              filteredFestivals.map((fest) => (
-                <Card
-                  key={fest.id}
-                  style={[styles.gridCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
-                  elevation="sm"
-                  border={true}
-                  onPress={() => openFestivalDetails(fest)}
-                >
-                  <Image source={{ uri: fest.galeria[0] }} style={styles.cardImage} />
-                  <View style={styles.cardInfo}>
-                    <Text style={[styles.cardCategory, { color: colors.primary }]}>{fest.categoría}</Text>
-                    <Text style={[styles.cardTitle, { color: colors.text }]} numberOfLines={2}>{fest.nombre}</Text>
-                    
-                    <View style={styles.cardMetaRow}>
-                      <Ionicons name="location-outline" size={12} color={colors.secondary} />
-                      <Text style={[styles.cardMetaText, { color: colors.textSecondary }]} numberOfLines={1}>
-                        {fest.localidad.split(' (')[0]}
-                      </Text>
-                    </View>
-                    
-                    <View style={[styles.cardMetaRow, { marginTop: 4 }]}>
-                      <Ionicons name="calendar-outline" size={12} color={colors.primary} />
-                      <Text style={[styles.cardMetaText, { color: colors.textSecondary }]}>{fest.fecha}</Text>
-                    </View>
+          {filteredFestivals.length > 0 ? (
+            routesToRender.map(routeName => {
+              const routeFestivals = filteredFestivals.filter(f => f.rutaGastronomica === routeName);
+              if (routeFestivals.length === 0) return null;
+
+              return (
+                <View key={routeName} style={styles.routeContainer}>
+                  <Text style={[styles.routeContainerTitle, { color: colors.text }]}>
+                    Ruta de las {routeName}
+                  </Text>
+                  <View style={styles.gridContainer}>
+                    {routeFestivals.map((fest) => (
+                      <Card
+                        key={fest.id}
+                        style={[styles.gridCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
+                        elevation="sm"
+                        border={true}
+                        onPress={() => openFestivalDetails(fest)}
+                      >
+                        <Image source={{ uri: fest.galeria[0] }} style={styles.cardImage} />
+                        <View style={styles.cardInfo}>
+                          {/* Localidad */}
+                          <View style={styles.cardMetaRow}>
+                            <Ionicons name="location-outline" size={11} color={colors.secondary} />
+                            <Text style={[styles.cardMetaText, { color: colors.textSecondary }]} numberOfLines={1}>
+                              {fest.localidad}
+                            </Text>
+                          </View>
+
+                          {/* Nombre / Fiesta */}
+                          <Text style={[styles.cardTitle, { color: colors.text }]} numberOfLines={2}>
+                            {fest.nombre}
+                          </Text>
+
+                          {/* Producto Destacado */}
+                          <View style={[styles.productBadge, { backgroundColor: colors.primary + '15' }]}>
+                            <Text style={[styles.productBadgeText, { color: colors.primary }]}>
+                              {fest.productoDestacado}
+                            </Text>
+                          </View>
+
+                          {/* Breve descripción */}
+                          <Text style={[styles.cardDesc, { color: colors.textSecondary }]} numberOfLines={3}>
+                            {fest.descripcionCorta}
+                          </Text>
+
+                          {/* CTA Explorar */}
+                          <View style={[styles.exploreBtn, { backgroundColor: colors.primary }]}>
+                            <Text style={styles.exploreBtnText}>Explorar</Text>
+                            <Ionicons name="arrow-forward" size={11} color={colors.white} style={{ marginLeft: 4 }} />
+                          </View>
+                        </View>
+                      </Card>
+                    ))}
                   </View>
-                </Card>
-              ))
-            ) : (
-              <View style={styles.emptyContainer}>
-                <Ionicons name="sparkles-outline" size={48} color={colors.textSecondary} />
-                <Text style={[styles.emptyText, { color: colors.textSecondary }]}>No encontramos festivales con el filtro seleccionado.</Text>
-              </View>
-            )}
-          </View>
+                </View>
+              );
+            })
+          ) : (
+            <View style={styles.emptyContainer}>
+              <Ionicons name="sparkles-outline" size={48} color={colors.textSecondary} />
+              <Text style={[styles.emptyText, { color: colors.textSecondary }]}>No encontramos fiestas populares con el filtro seleccionado.</Text>
+            </View>
+          )}
         </View>
       </ScrollView>
 
@@ -610,6 +618,18 @@ const styles = StyleSheet.create({
     color: Theme.colors.text,
     marginBottom: Theme.spacing.sm,
   },
+  routeContainer: {
+    marginBottom: Theme.spacing.lg,
+  },
+  routeContainerTitle: {
+    fontSize: Theme.typography.sizes.md,
+    fontWeight: Theme.typography.weights.bold,
+    color: Theme.colors.text,
+    marginBottom: Theme.spacing.md,
+    borderLeftWidth: 3.5,
+    borderLeftColor: Theme.colors.primary,
+    paddingLeft: Theme.spacing.sm,
+  },
   gridContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -625,7 +645,7 @@ const styles = StyleSheet.create({
   },
   cardImage: {
     width: '100%',
-    height: 110,
+    height: 105,
     resizeMode: 'cover',
   },
   cardInfo: {
@@ -639,17 +659,49 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   cardTitle: {
-    fontSize: Theme.typography.sizes.sm,
+    fontSize: Theme.typography.sizes.sm - 0.5,
     fontWeight: Theme.typography.weights.bold,
     color: Theme.colors.text,
-    height: 38,
+    marginTop: 4,
+    marginBottom: 4,
+    lineHeight: 16,
+  },
+  productBadge: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: Theme.roundness.xs,
+    marginBottom: 6,
+  },
+  productBadgeText: {
+    fontSize: 8.5,
+    fontWeight: Theme.typography.weights.bold,
+    textTransform: 'uppercase',
+  },
+  cardDesc: {
+    fontSize: 10.5,
+    lineHeight: 14,
+    marginBottom: 10,
+  },
+  exploreBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 5,
+    borderRadius: Theme.roundness.xs,
+    marginTop: 2,
+  },
+  exploreBtnText: {
+    color: '#FFF',
+    fontSize: 10.5,
+    fontWeight: Theme.typography.weights.bold,
   },
   cardMetaRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   cardMetaText: {
-    fontSize: 10,
+    fontSize: 9.5,
     color: Theme.colors.textSecondary,
     marginLeft: 4,
     flex: 1,
