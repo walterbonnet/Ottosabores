@@ -6,15 +6,15 @@ import {
   ScrollView,
   Image,
   Pressable,
-  Modal,
   SafeAreaView,
   TextInput,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import Theme from '../theme';
 import Card from '../components/Card';
 import Header from '../components/Header';
-import { RECIPES } from '../services/mockData';
+import { RECIPES, FESTIVALS } from '../services/mockData';
 import { Recipe } from '../types';
 import { useGlobalState } from '../services/GlobalStateContext';
 import SkeletonLoader from '../components/SkeletonLoader';
@@ -43,6 +43,8 @@ export const RecetasScreen: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<string>('Todos');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoadingDetail, setIsLoadingDetail] = useState<boolean>(false);
+  const [visibleSections, setVisibleSections] = useState<number>(0);
 
   const {
     favorites,
@@ -51,6 +53,7 @@ export const RecetasScreen: React.FC = () => {
     updateIngredientProgress,
     updateStepProgress,
     addRecentlyViewed,
+    recentlyViewed,
     colors,
     isDarkMode,
   } = useGlobalState();
@@ -67,6 +70,31 @@ export const RecetasScreen: React.FC = () => {
       clearTimeout(timer2);
     };
   }, [activeCategory, searchQuery]);
+
+  useEffect(() => {
+    let timers: any[] = [];
+    if (selectedRecipe) {
+      setIsLoadingDetail(true);
+      setVisibleSections(0);
+      const loadTimer = setTimeout(() => {
+        setIsLoadingDetail(false);
+        timers.push(setTimeout(() => setVisibleSections(1), 50));
+        timers.push(setTimeout(() => setVisibleSections(2), 150));
+        timers.push(setTimeout(() => setVisibleSections(3), 250));
+        timers.push(setTimeout(() => setVisibleSections(4), 350));
+        timers.push(setTimeout(() => setVisibleSections(5), 450));
+        timers.push(setTimeout(() => setVisibleSections(6), 550));
+        timers.push(setTimeout(() => setVisibleSections(7), 650));
+      }, 450);
+      timers.push(loadTimer);
+    } else {
+      setIsLoadingDetail(false);
+      setVisibleSections(0);
+    }
+    return () => {
+      timers.forEach(t => clearTimeout(t));
+    };
+  }, [selectedRecipe]);
 
   const categories = [
     'Todos',
@@ -90,6 +118,409 @@ export const RecetasScreen: React.FC = () => {
                           recipe.historia.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
+
+  // Encuentra la receta con progreso para el banner de "Continuar lectura"
+  const inProgressRecipes = Object.entries(recipeProgress)
+    .map(([recipeId, progress]) => {
+      const recipe = RECIPES.find(r => r.id === recipeId);
+      return { recipe, progress };
+    })
+    .filter((item): item is { recipe: Recipe; progress: typeof item.progress } => {
+      if (!item.recipe) return false;
+      const totalSteps = item.recipe.preparación.length;
+      const stepsDone = item.progress.completedSteps?.length || 0;
+      const totalIngredients = item.recipe.ingredientes.length;
+      const ingredientsDone = item.progress.completedIngredients?.length || 0;
+      return (stepsDone > 0 || ingredientsDone > 0) && (stepsDone < totalSteps);
+    })
+    .sort((a, b) => (b.progress.lastUpdated || 0) - (a.progress.lastUpdated || 0));
+
+  const resumingItem = inProgressRecipes[0];
+
+  if (selectedRecipe) {
+    if (isLoadingDetail) {
+      return (
+        <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+          <View style={[styles.detailHeader, { backgroundColor: colors.surface, borderBottomColor: colors.border, borderBottomWidth: 1 }]}>
+            <Pressable onPress={() => setSelectedRecipe(null)} style={styles.backButton} accessibilityRole="button" accessibilityLabel="Volver">
+              <Ionicons name="arrow-back" size={24} color={colors.text} />
+            </Pressable>
+            <Text style={[styles.detailHeaderTitle, { color: colors.primary }]} numberOfLines={1}>
+              {selectedRecipe.nombre}
+            </Text>
+          </View>
+          <ScrollView>
+            <SkeletonLoader type="details" />
+          </ScrollView>
+        </SafeAreaView>
+      );
+    }
+
+    const relatedFestival = FESTIVALS.find(f => f.recetaRelacionada === selectedRecipe.id);
+    const otherRecipes = RECIPES.filter(r => r.id !== selectedRecipe.id && r.categoría === selectedRecipe.categoría).slice(0, 3);
+    const prog = recipeProgress[selectedRecipe.id];
+    const stepsDone = prog ? prog.completedSteps.length : 0;
+    const totalSteps = selectedRecipe.preparación.length;
+    const percent = totalSteps > 0 ? Math.round((stepsDone / totalSteps) * 100) : 0;
+    const isFav = favorites.includes(selectedRecipe.id);
+    const isRecentlyViewed = recentlyViewed.some(item => item.id === selectedRecipe.id && item.type === 'recipe');
+
+    // Identificar el paso activo actual
+    const completedSteps = prog ? prog.completedSteps : [];
+    let activeStepIndex = 0;
+    for (let i = 0; i < selectedRecipe.preparación.length; i++) {
+      if (!completedSteps.includes(i)) {
+        activeStepIndex = i;
+        break;
+      }
+    }
+    if (completedSteps.length === selectedRecipe.preparación.length) {
+      activeStepIndex = selectedRecipe.preparación.length - 1;
+    }
+
+    return (
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+        {/* Navigation Header */}
+        <View style={[styles.detailHeader, { backgroundColor: colors.surface, borderBottomColor: colors.border, borderBottomWidth: 1 }]}>
+          <Pressable onPress={() => setSelectedRecipe(null)} style={styles.backButton} accessibilityRole="button" accessibilityLabel="Volver al catálogo">
+            <Ionicons name="arrow-back" size={24} color={colors.text} />
+          </Pressable>
+          <Text style={[styles.detailHeaderTitle, { color: colors.primary }]} numberOfLines={1}>
+            {selectedRecipe.nombre}
+          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Pressable 
+              onPress={() => toggleFavorite(selectedRecipe.id)} 
+              style={{ marginRight: 8, padding: 4 }}
+              accessibilityRole="button"
+              accessibilityLabel="Favorito"
+            >
+              <Ionicons 
+                name={isFav ? "heart" : "heart-outline"} 
+                size={24} 
+                color={isFav ? colors.primary : colors.text} 
+              />
+            </Pressable>
+          </View>
+        </View>
+
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.detailScrollContent}>
+          {/* SECCIÓN 1: Hero */}
+          {visibleSections >= 1 && (
+            <View style={styles.heroSection}>
+              <Image source={{ uri: selectedRecipe.video || 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600' }} style={styles.heroImage} />
+              <View style={styles.heroOverlay}>
+                <Text style={styles.heroTitle}>{selectedRecipe.nombre}</Text>
+                <View style={styles.heroCategoryRow}>
+                  <Ionicons name="restaurant" size={14} color="#FFF" />
+                  <Text style={styles.heroCategoryText}>{selectedRecipe.categoría}</Text>
+                </View>
+              </View>
+            </View>
+          )}
+
+          {/* SECCIÓN 2: Meta Info y Guardado/Visto */}
+          {visibleSections >= 2 && (
+            <View style={[styles.metaRow, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+              <View style={styles.metaCol}>
+                <Ionicons name="time" size={18} color={colors.primary} />
+                <Text style={[styles.metaVal, { color: colors.text }]}>{selectedRecipe.duración}</Text>
+                <Text style={styles.metaLab}>Tiempo</Text>
+              </View>
+              <View style={styles.metaCol}>
+                <Ionicons name="star" size={18} color={colors.primary} />
+                <Text style={[styles.metaVal, { color: colors.text }]}>{selectedRecipe.dificultad}</Text>
+                <Text style={styles.metaLab}>Dificultad</Text>
+              </View>
+              <View style={styles.metaCol}>
+                <Pressable
+                  onPress={() => addRecentlyViewed(selectedRecipe.id, 'recipe')}
+                  style={styles.eyeBtn}
+                >
+                  <Ionicons 
+                    name={isRecentlyViewed ? "checkmark-circle" : "eye-outline"} 
+                    size={20} 
+                    color={isRecentlyViewed ? colors.secondary : colors.textSecondary} 
+                  />
+                  <Text style={[styles.metaVal, { color: isRecentlyViewed ? colors.secondary : colors.text, fontSize: 13, fontWeight: '700' }]}>
+                    {isRecentlyViewed ? "Leída" : "Marcar vista"}
+                  </Text>
+                  <Text style={styles.metaLab}>Lectura</Text>
+                </Pressable>
+              </View>
+            </View>
+          )}
+
+          {/* SECCIÓN 3: Barra de Progreso */}
+          {visibleSections >= 3 && (
+            <View style={[styles.progressBox, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+              <View style={styles.progressTextRow}>
+                <Text style={[styles.progressLabel, { color: colors.textSecondary }]}>Progreso de Preparación</Text>
+                <Text style={[styles.progressPercent, { color: colors.primary }]}>{percent}%</Text>
+              </View>
+              <View style={[styles.progressTrack, { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(232, 226, 213, 0.5)' }]}>
+                <View style={[styles.progressBar, { width: `${percent}%`, backgroundColor: colors.primary }]} />
+              </View>
+            </View>
+          )}
+
+          {/* SECCIÓN 4: Herencia Cultural */}
+          {visibleSections >= 4 && (
+            <View style={[styles.detailSection, { backgroundColor: colors.surface }]}>
+              <Text style={[styles.detailSectionTitle, { color: colors.text, borderLeftColor: colors.primary }]}>Herencia Cultural</Text>
+              <Text style={[styles.detailBodyText, { color: colors.textSecondary }]}>{selectedRecipe.historia}</Text>
+            </View>
+          )}
+
+          {/* SECCIÓN 5: Ingredientes */}
+          {visibleSections >= 5 && (
+            <View style={[styles.detailSection, { backgroundColor: colors.surface }]}>
+              <Text style={[styles.detailSectionTitle, { color: colors.text, borderLeftColor: colors.primary }]}>Ingredientes</Text>
+              <Text style={[styles.sectionHelpText, { color: colors.textSecondary }]}>
+                Marcá los ingredientes que ya tenés listos en tu mesa:
+              </Text>
+              
+              {selectedRecipe.ingredientes.map((ing, i) => {
+                const isChecked = prog ? prog.completedIngredients.includes(i) : false;
+                return (
+                  <Pressable
+                    key={i}
+                    onPress={() => updateIngredientProgress(selectedRecipe.id, i, !isChecked)}
+                    style={[
+                      styles.checklistRow,
+                      { borderBottomColor: colors.border },
+                      isChecked && styles.checklistRowChecked
+                    ]}
+                  >
+                    <Ionicons 
+                      name={isChecked ? "checkbox" : "square-outline"} 
+                      size={22} 
+                      color={isChecked ? colors.secondary : colors.textSecondary} 
+                    />
+                    <Text 
+                      style={[
+                        styles.checklistText,
+                        { color: isChecked ? colors.textSecondary : colors.text },
+                        isChecked && styles.checklistTextChecked
+                      ]}
+                    >
+                      {ing}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          )}
+
+          {/* SECCIÓN 6: Preparación Paso a Paso */}
+          {visibleSections >= 6 && (
+            <View style={[styles.detailSection, { backgroundColor: colors.surface }]}>
+              <Text style={[styles.detailSectionTitle, { color: colors.text, borderLeftColor: colors.primary }]}>Preparación Paso a Paso</Text>
+              <Text style={[styles.sectionHelpText, { color: colors.textSecondary }]}>Marcá los pasos a medida que los realizás para continuar la lectura:</Text>
+              
+              {selectedRecipe.preparación.map((step, i) => {
+                const isChecked = completedSteps.includes(i);
+                const isActive = activeStepIndex === i;
+                return (
+                  <Pressable
+                    key={i}
+                    onPress={() => updateStepProgress(selectedRecipe.id, i, !isChecked)}
+                    style={[
+                      styles.stepCard,
+                      { 
+                        backgroundColor: colors.background, 
+                        borderColor: isActive ? colors.primary : colors.border,
+                        borderWidth: isActive ? 2 : 1
+                      },
+                      isChecked && styles.stepCardChecked
+                    ]}
+                  >
+                    <View style={styles.stepCardHeader}>
+                      <View style={[
+                        styles.stepNumCircle, 
+                        { backgroundColor: isChecked ? colors.secondary : isActive ? colors.primary : colors.textSecondary }
+                      ]}>
+                        {isChecked ? (
+                          <Ionicons name="checkmark" size={12} color={colors.white} />
+                        ) : (
+                          <Text style={styles.stepNumText}>{i + 1}</Text>
+                        )}
+                      </View>
+                      
+                      <Text style={[
+                        styles.stepCardTitle, 
+                        { color: isActive ? colors.primary : colors.text }
+                      ]}>
+                        {isActive ? "Paso Activo" : `Paso ${i + 1}`}
+                      </Text>
+
+                      {isChecked && (
+                        <Text style={[styles.completedBadge, { color: colors.secondary }]}>✓ Completado</Text>
+                      )}
+                    </View>
+
+                    <Text style={[
+                      styles.stepCardBody, 
+                      { color: isChecked ? colors.textSecondary : colors.text }, 
+                      isChecked && styles.stepTextChecked
+                    ]}>
+                      {step}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+
+              {/* El Consejo de la Abuela */}
+              <View style={[styles.grandmaCard, { 
+                backgroundColor: isDarkMode ? 'rgba(223, 177, 91, 0.15)' : 'rgba(223, 177, 91, 0.08)', 
+                borderColor: isDarkMode ? 'rgba(223, 177, 91, 0.4)' : 'rgba(223, 177, 91, 0.25)' 
+              }]}>
+                <View style={styles.grandmaCardHeader}>
+                  <Ionicons name="flame" size={20} color={colors.accent} />
+                  <Text style={[styles.grandmaCardTitle, { color: isDarkMode ? colors.accent : '#9E7A1C' }]}>El Consejo de la Abuela</Text>
+                </View>
+                <Text style={[styles.grandmaCardBody, { color: colors.text }]}>{getGrandmaTip(selectedRecipe.id)}</Text>
+              </View>
+            </View>
+          )}
+
+          {/* SECCIÓN 7: Relación Automática (Fiesta ➔ Producto ➔ Receta ➔ Ruta gastronómica) */}
+          {visibleSections >= 7 && (
+            <View style={[styles.detailSection, { backgroundColor: colors.surface }]}>
+              <Text style={[styles.detailSectionTitle, { color: colors.text, borderLeftColor: colors.primary }]}>
+                Origen y Relación Territorial
+              </Text>
+              <Text style={[styles.sectionHelpText, { color: colors.textSecondary, marginBottom: 12 }]}>
+                Esta receta forma parte de una cadena cultural que une fiestas, productos y rutas locales:
+              </Text>
+
+              {relatedFestival ? (
+                <View>
+                  {/* Visual Timeline/Chain */}
+                  <View style={[styles.relationChain, { backgroundColor: colors.background, borderColor: colors.border }]}>
+                    {/* Element 1: Fiesta */}
+                    <View style={styles.chainNode}>
+                      <View style={[styles.nodeIconCircle, { backgroundColor: colors.primary }]}>
+                        <Ionicons name="sparkles" size={16} color={colors.white} />
+                      </View>
+                      <Text style={[styles.nodeLabel, { color: colors.text }]} numberOfLines={1}>Fiesta</Text>
+                      <Text style={[styles.nodeVal, { color: colors.textSecondary }]} numberOfLines={1}>
+                        {relatedFestival.nombre.replace('Fiesta Provincial del ', '').replace('Fiesta Nacional del ', '').replace('Festival del ', '')}
+                      </Text>
+                    </View>
+
+                    <Ionicons name="chevron-forward" size={12} color={colors.textSecondary} style={styles.chainArrow} />
+
+                    {/* Element 2: Producto */}
+                    <View style={styles.chainNode}>
+                      <View style={[styles.nodeIconCircle, { backgroundColor: colors.secondary }]}>
+                        <Ionicons name="leaf" size={16} color={colors.white} />
+                      </View>
+                      <Text style={[styles.nodeLabel, { color: colors.text }]} numberOfLines={1}>Producto</Text>
+                      <Text style={[styles.nodeVal, { color: colors.textSecondary }]} numberOfLines={1}>
+                        {relatedFestival.productoDestacado}
+                      </Text>
+                    </View>
+
+                    <Ionicons name="chevron-forward" size={12} color={colors.textSecondary} style={styles.chainArrow} />
+
+                    {/* Element 3: Receta */}
+                    <View style={styles.chainNode}>
+                      <View style={[styles.nodeIconCircle, { backgroundColor: colors.accent }]}>
+                        <Ionicons name="restaurant" size={16} color={colors.white} />
+                      </View>
+                      <Text style={[styles.nodeLabel, { color: colors.text }]} numberOfLines={1}>Receta</Text>
+                      <Text style={[styles.nodeVal, { color: colors.textSecondary }]} numberOfLines={1}>
+                        {selectedRecipe.nombre.split(' ')[0]}
+                      </Text>
+                    </View>
+
+                    <Ionicons name="chevron-forward" size={12} color={colors.textSecondary} style={styles.chainArrow} />
+
+                    {/* Element 4: Ruta */}
+                    <View style={styles.chainNode}>
+                      <View style={[styles.nodeIconCircle, { backgroundColor: '#4A3E3D' }]}>
+                        <Ionicons name="map" size={16} color={colors.white} />
+                      </View>
+                      <Text style={[styles.nodeLabel, { color: colors.text }]} numberOfLines={1}>Ruta</Text>
+                      <Text style={[styles.nodeVal, { color: colors.textSecondary }]} numberOfLines={1}>
+                        {relatedFestival.rutaGastronomica}
+                      </Text>
+                    </View>
+                  </View>
+
+                  {/* Related Festival Card */}
+                  <View style={[styles.relatedFestivalCard, { backgroundColor: colors.background, borderColor: colors.border }]}>
+                    <Image source={{ uri: relatedFestival.galeria?.[0] }} style={styles.relatedFestivalImg} />
+                    <View style={styles.relatedFestivalBody}>
+                      <View style={styles.badgeRow}>
+                        <View style={[styles.miniBadge, { backgroundColor: colors.primary }]}>
+                          <Text style={styles.miniBadgeText}>{relatedFestival.rutaGastronomica}</Text>
+                        </View>
+                        <View style={[styles.miniBadge, { backgroundColor: colors.secondary }]}>
+                          <Text style={styles.miniBadgeText}>{relatedFestival.localidad}</Text>
+                        </View>
+                      </View>
+                      
+                      <Text style={[styles.relatedFestivalTitle, { color: colors.text }]}>{relatedFestival.nombre}</Text>
+                      <Text style={[styles.relatedFestivalDesc, { color: colors.textSecondary }]} numberOfLines={3}>
+                        {relatedFestival.descripcionCorta || relatedFestival.historia}
+                      </Text>
+
+                      <Pressable 
+                        style={[styles.verFiestaBtn, { backgroundColor: colors.primary }]}
+                        onPress={() => {
+                          setSelectedRecipe(null); // Close recipe detail first
+                          router.push({ pathname: '/fiestas', params: { id: relatedFestival.id } });
+                        }}
+                      >
+                        <Text style={styles.verFiestaBtnText}>Ver Fiesta Gastronómica</Text>
+                        <Ionicons name="arrow-forward" size={16} color={colors.white} />
+                      </Pressable>
+                    </View>
+                  </View>
+                </View>
+              ) : (
+                <View style={[styles.noRelationCard, { backgroundColor: colors.background, borderColor: colors.border }]}>
+                  <Ionicons name="information-circle-outline" size={24} color={colors.textSecondary} />
+                  <Text style={[styles.noRelationText, { color: colors.textSecondary }]}>
+                    Esta técnica tradicional es un saber libre de los hogares y no está asociada a un evento oficial único.
+                  </Text>
+                </View>
+              )}
+
+              {/* Recomendados: Otras recetas de la misma ruta */}
+              {otherRecipes.length > 0 && (
+                <View style={{ marginTop: 24 }}>
+                  <Text style={[styles.subSectionTitle, { color: colors.text }]}>Otras Recetas de la misma Categoría</Text>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingVertical: 8 }}>
+                    {otherRecipes.map(item => (
+                      <Pressable
+                        key={item.id}
+                        onPress={() => {
+                          setSelectedRecipe(item);
+                          addRecentlyViewed(item.id, 'recipe');
+                        }}
+                        style={[styles.smallRecipeCard, { backgroundColor: colors.background, borderColor: colors.border }]}
+                      >
+                        <Image source={{ uri: item.video || 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600' }} style={styles.smallRecipeImg} />
+                        <View style={{ padding: 8 }}>
+                          <Text style={[styles.smallRecipeTitle, { color: colors.text }]} numberOfLines={1}>{item.nombre}</Text>
+                          <Text style={[styles.smallRecipeMeta, { color: colors.textSecondary }]}>
+                            {item.duración} • {item.dificultad}
+                          </Text>
+                        </View>
+                      </Pressable>
+                    ))}
+                  </ScrollView>
+                </View>
+              )}
+            </View>
+          )}
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
@@ -121,6 +552,56 @@ export const RecetasScreen: React.FC = () => {
             )}
           </View>
         </View>
+
+        {/* Continuar Lectura Banner Section */}
+        {resumingItem && (
+          <View>
+            <Text style={[styles.sectionTitleLabel, { color: colors.textSecondary }]}>Retomar Preparación</Text>
+            <Card
+              style={[styles.resumeBanner, { backgroundColor: colors.surface, borderColor: colors.primary }]}
+              border={true}
+              elevation="sm"
+              onPress={() => handleOpenRecipe(resumingItem.recipe)}
+            >
+              <Image source={{ uri: resumingItem.recipe.video || 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600' }} style={styles.resumeImg} />
+              <View style={styles.resumeContent}>
+                <Text style={[styles.resumeLabel, { color: colors.primary }]}>Continuar Lectura</Text>
+                <Text style={[styles.resumeTitle, { color: colors.text }]} numberOfLines={1}>{resumingItem.recipe.nombre}</Text>
+                
+                {(() => {
+                  const rProg = resumingItem.progress;
+                  const done = rProg.completedSteps?.length || 0;
+                  const total = resumingItem.recipe.preparación.length;
+                  const rPercent = total > 0 ? Math.round((done / total) * 100) : 0;
+                  // Get next step text
+                  let nextStepText = 'Empezar preparación';
+                  for (let s = 0; s < total; s++) {
+                    if (!rProg.completedSteps.includes(s)) {
+                      nextStepText = `Paso ${s + 1}: ${resumingItem.recipe.preparación[s]}`;
+                      break;
+                    }
+                  }
+                  return (
+                    <View>
+                      <Text style={{ fontSize: 10, color: colors.textSecondary, marginTop: 2 }} numberOfLines={1}>
+                        {nextStepText}
+                      </Text>
+                      <View style={styles.resumeProgressRow}>
+                        <View style={[styles.resumeProgressTrack, { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(232, 226, 213, 0.5)' }]}>
+                          <View style={[styles.resumeProgressFill, { width: `${rPercent}%`, backgroundColor: colors.primary }]} />
+                        </View>
+                        <Text style={[styles.resumeProgressText, { color: colors.primary }]}>{rPercent}%</Text>
+                      </View>
+                    </View>
+                  );
+                })()}
+              </View>
+              <View style={[styles.resumeBtn, { backgroundColor: 'rgba(200, 92, 56, 0.08)' }]}>
+                <Ionicons name="play" size={16} color={colors.primary} />
+              </View>
+            </Card>
+          </View>
+        )}
 
         {/* Category Tabs */}
         <ScrollView 
@@ -161,6 +642,7 @@ export const RecetasScreen: React.FC = () => {
           ) : filteredRecipes.length > 0 ? (
             filteredRecipes.map((recipe) => {
               const isFav = favorites.includes(recipe.id);
+              const isSeen = recentlyViewed.some(item => item.id === recipe.id && item.type === 'recipe');
               return (
                 <Card
                   key={recipe.id}
@@ -171,6 +653,12 @@ export const RecetasScreen: React.FC = () => {
                 >
                   <View style={{ position: 'relative' }}>
                     <Image source={{ uri: recipe.video || 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600' }} style={styles.editorialImage} />
+                    {isSeen && (
+                      <View style={styles.viewedBadge}>
+                        <Ionicons name="checkmark-circle" size={10} color="#FFF" style={{ marginRight: 3 }} />
+                        <Text style={styles.viewedBadgeText}>VISTA</Text>
+                      </View>
+                    )}
                     <Pressable 
                       style={styles.cardHeartIcon} 
                       onPress={(e) => { e.stopPropagation(); toggleFavorite(recipe.id); }}
@@ -239,169 +727,10 @@ export const RecetasScreen: React.FC = () => {
           )}
         </View>
       </ScrollView>
-
-      {/* Recipe Detail Modal with Interactive Checklist */}
-      {selectedRecipe && (
-        <Modal
-          visible={!!selectedRecipe}
-          animationType="slide"
-          transparent={true}
-          onRequestClose={() => setSelectedRecipe(null)}
-        >
-          <View style={styles.modalOverlay}>
-            <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
-              <View style={[styles.modalHeader, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-                <Text style={[styles.modalHeaderTitle, { color: colors.primary }]} numberOfLines={1}>
-                  {selectedRecipe.nombre}
-                </Text>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <Pressable 
-                    onPress={() => toggleFavorite(selectedRecipe.id)} 
-                    style={{ marginRight: Theme.spacing.md, padding: 4 }}
-                  >
-                    <Ionicons 
-                      name={favorites.includes(selectedRecipe.id) ? "heart" : "heart-outline"} 
-                      size={24} 
-                      color={favorites.includes(selectedRecipe.id) ? colors.primary : colors.text} 
-                    />
-                  </Pressable>
-                  <Pressable onPress={() => setSelectedRecipe(null)} style={styles.closeButton}>
-                    <Ionicons name="close" size={24} color={colors.text} />
-                  </Pressable>
-                </View>
-              </View>
-
-              <ScrollView 
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={styles.modalScroll}
-              >
-                <Image source={{ uri: selectedRecipe.video || 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600' }} style={styles.modalImage} />
-                
-                <View style={[styles.modalMetaRow, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-                  <View style={styles.modalMetaItem}>
-                    <Ionicons name="time" size={18} color={colors.primary} />
-                    <Text style={[styles.modalMetaValue, { color: colors.text }]}>{selectedRecipe.duración}</Text>
-                    <Text style={styles.modalMetaLabel}>Tiempo</Text>
-                  </View>
-                  <View style={styles.modalMetaItem}>
-                    <Ionicons name="star" size={18} color={colors.primary} />
-                    <Text style={[styles.modalMetaValue, { color: colors.text }]}>{selectedRecipe.dificultad}</Text>
-                    <Text style={styles.modalMetaLabel}>Dificultad</Text>
-                  </View>
-                  <View style={styles.modalMetaItem}>
-                    <Ionicons name="restaurant" size={18} color={colors.primary} />
-                    <Text style={[styles.modalMetaValue, { color: colors.text }]}>{selectedRecipe.categoría}</Text>
-                    <Text style={styles.modalMetaLabel}>Mesa</Text>
-                  </View>
-                </View>
-
-                {(() => {
-                  const prog = recipeProgress[selectedRecipe.id];
-                  const stepsDone = prog ? prog.completedSteps.length : 0;
-                  const totalSteps = selectedRecipe.preparación.length;
-                  const percent = totalSteps > 0 ? Math.round((stepsDone / totalSteps) * 100) : 0;
-                  return (
-                    <View style={[styles.progressContainer, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-                      <View style={styles.progressTextRow}>
-                        <Text style={styles.progressLabel}>Progreso de la receta</Text>
-                        <Text style={[styles.progressPercent, { color: colors.primary }]}>{percent}%</Text>
-                      </View>
-                      <View style={[styles.progressTrack, { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(232, 226, 213, 0.5)' }]}>
-                        <View style={[styles.progressBar, { width: `${percent}%`, backgroundColor: colors.primary }]} />
-                      </View>
-                    </View>
-                  );
-                })()}
-
-                <View style={[styles.modalSection, { backgroundColor: colors.surface }]}>
-                  <Text style={[styles.modalSectionTitle, { color: colors.text, borderLeftColor: colors.primary }]}>Herencia Cultural</Text>
-                  <Text style={[styles.modalBodyText, { color: colors.textSecondary }]}>{selectedRecipe.historia}</Text>
-                </View>
-
-                <View style={[styles.modalSection, { backgroundColor: colors.surface }]}>
-                  <Text style={[styles.modalSectionTitle, { color: colors.text, borderLeftColor: colors.primary }]}>Ingredientes</Text>
-                  <Text style={[styles.sectionHelpText, { color: colors.textSecondary }]}>
-                    Marcá los ingredientes que ya tenés listos en tu mesa:
-                  </Text>
-                  
-                  {selectedRecipe.ingredientes.map((ing, i) => {
-                    const prog = recipeProgress[selectedRecipe.id];
-                    const isChecked = prog ? prog.completedIngredients.includes(i) : false;
-                    return (
-                      <Pressable
-                        key={i}
-                        onPress={() => updateIngredientProgress(selectedRecipe.id, i, !isChecked)}
-                        style={[
-                          styles.checklistRow,
-                          { borderBottomColor: colors.border },
-                          isChecked && styles.checklistRowChecked
-                        ]}
-                      >
-                        <Ionicons 
-                          name={isChecked ? "checkbox" : "square-outline"} 
-                          size={20} 
-                          color={isChecked ? colors.secondary : colors.textSecondary} 
-                        />
-                        <Text 
-                          style={[
-                            styles.checklistText,
-                            { color: isChecked ? colors.textSecondary : colors.text },
-                            isChecked && styles.checklistTextChecked
-                          ]}
-                        >
-                          {ing}
-                        </Text>
-                      </Pressable>
-                    );
-                  })}
-                </View>
-
-                <View style={[styles.modalSection, { backgroundColor: colors.surface }]}>
-                  <Text style={[styles.modalSectionTitle, { color: colors.text, borderLeftColor: colors.primary }]}>Paso a Paso</Text>
-                  <Text style={[styles.sectionHelpText, { color: colors.textSecondary }]}>Marcá los pasos completados:</Text>
-                  {selectedRecipe.preparación.map((step, i) => {
-                    const prog = recipeProgress[selectedRecipe.id];
-                    const isChecked = prog ? prog.completedSteps.includes(i) : false;
-                    return (
-                      <Pressable
-                        key={i}
-                        onPress={() => updateStepProgress(selectedRecipe.id, i, !isChecked)}
-                        style={[
-                          styles.stepCheckRow,
-                          { borderBottomColor: colors.border },
-                          isChecked && styles.stepCheckRowChecked
-                        ]}
-                      >
-                        <View style={[styles.stepNumCircle, { backgroundColor: isChecked ? colors.secondary : colors.primary }]}>
-                          {isChecked ? (
-                            <Ionicons name="checkmark" size={12} color={colors.white} />
-                          ) : (
-                            <Text style={styles.stepNumText}>{i + 1}</Text>
-                          )}
-                        </View>
-                        <Text style={[styles.stepText, { color: isChecked ? colors.textSecondary : colors.text }, isChecked && styles.stepTextChecked]}>
-                          {step}
-                        </Text>
-                      </Pressable>
-                    );
-                  })}
-                </View>
-
-                <View style={[styles.modalSection, styles.grandmaCard, { backgroundColor: isDarkMode ? 'rgba(223, 177, 91, 0.15)' : 'rgba(223, 177, 91, 0.08)', borderColor: isDarkMode ? 'rgba(223, 177, 91, 0.4)' : 'rgba(223, 177, 91, 0.25)' }]}>
-                  <View style={styles.grandmaCardHeader}>
-                    <Ionicons name="flame" size={20} color={colors.accent} />
-                    <Text style={[styles.grandmaCardTitle, { color: isDarkMode ? colors.accent : '#9E7A1C' }]}>El Consejo de la Abuela</Text>
-                  </View>
-                  <Text style={[styles.grandmaCardBody, { color: colors.text }]}>{getGrandmaTip(selectedRecipe.id)}</Text>
-                </View>
-              </ScrollView>
-            </View>
-          </View>
-        </Modal>
-      )}
     </SafeAreaView>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
@@ -409,7 +738,7 @@ const styles = StyleSheet.create({
     backgroundColor: Theme.colors.background,
   },
   scrollContent: {
-    paddingBottom: 110,
+    paddingBottom: 120,
   },
   searchBarContainer: {
     paddingHorizontal: Theme.spacing.md,
@@ -548,163 +877,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 10,
   },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.65)',
-    justifyContent: 'flex-end',
-  },
-  modalContent: {
-    height: '85%',
-    backgroundColor: Theme.colors.background,
-    borderTopLeftRadius: Theme.roundness.xl,
-    borderTopRightRadius: Theme.roundness.xl,
-    overflow: 'hidden',
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: Theme.spacing.md,
-    backgroundColor: Theme.colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: Theme.colors.border,
-  },
-  modalHeaderTitle: {
-    fontSize: Theme.typography.sizes.lg,
-    fontWeight: Theme.typography.weights.bold,
-    color: Theme.colors.primary,
-    flex: 1,
-    marginRight: Theme.spacing.md,
-  },
-  closeButton: {
-    padding: 4,
-  },
-  modalScroll: {
-    paddingBottom: 40,
-  },
-  modalImage: {
-    width: '100%',
-    height: 200,
-    resizeMode: 'cover',
-  },
-  modalMetaRow: {
-    flexDirection: 'row',
-    backgroundColor: Theme.colors.surface,
-    paddingVertical: Theme.spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: Theme.colors.border,
-    justifyContent: 'space-around',
-  },
-  modalMetaItem: {
-    alignItems: 'center',
-  },
-  modalMetaValue: {
-    fontSize: Theme.typography.sizes.sm,
-    fontWeight: Theme.typography.weights.bold,
-    color: Theme.colors.text,
-    marginTop: 4,
-  },
-  modalMetaLabel: {
-    fontSize: 10,
-    color: Theme.colors.textSecondary,
-    textTransform: 'uppercase',
-    marginTop: 2,
-  },
-  modalSection: {
-    padding: Theme.spacing.md,
-    backgroundColor: Theme.colors.surface,
-    marginTop: Theme.spacing.sm,
-  },
-  modalSectionTitle: {
-    fontSize: Theme.typography.sizes.md,
-    fontWeight: Theme.typography.weights.bold,
-    color: Theme.colors.text,
-    marginBottom: Theme.spacing.sm,
-    borderLeftWidth: 3,
-    borderLeftColor: Theme.colors.primary,
-    paddingLeft: Theme.spacing.sm,
-  },
-  modalBodyText: {
-    fontSize: Theme.typography.sizes.sm,
-    color: Theme.colors.textSecondary,
-    lineHeight: 20,
-  },
-  sectionHelpText: {
-    fontSize: 11,
-    color: Theme.colors.textSecondary,
-    marginBottom: Theme.spacing.sm,
-    fontStyle: 'italic',
-  },
-  checklistRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 10,
-    borderBottomWidth: 0.5,
-    borderBottomColor: Theme.colors.border,
-  },
-  checklistRowChecked: {
-    opacity: 0.7,
-  },
-  checklistText: {
-    fontSize: Theme.typography.sizes.sm,
-    color: Theme.colors.text,
-    marginLeft: Theme.spacing.md,
-    flex: 1,
-  },
-  checklistTextChecked: {
-    textDecorationLine: 'line-through',
-    color: Theme.colors.textSecondary,
-  },
-  stepContainer: {
-    flexDirection: 'row',
-    marginBottom: Theme.spacing.md,
-  },
-  stepNumCircle: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: Theme.colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: Theme.spacing.sm,
-    marginTop: 2,
-  },
-  stepNumText: {
-    fontSize: Theme.typography.sizes.xs,
-    fontWeight: Theme.typography.weights.bold,
-    color: Theme.colors.white,
-  },
-  stepText: {
-    flex: 1,
-    fontSize: Theme.typography.sizes.sm,
-    color: Theme.colors.text,
-    lineHeight: 20,
-  },
-  grandmaCard: {
-    backgroundColor: 'rgba(223, 177, 91, 0.08)',
-    borderColor: 'rgba(223, 177, 91, 0.25)',
-    borderWidth: 1.5,
-    borderRadius: Theme.roundness.md,
-    margin: Theme.spacing.md,
-    padding: Theme.spacing.md,
-  },
-  grandmaCardHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: Theme.spacing.sm,
-  },
-  grandmaCardTitle: {
-    fontSize: Theme.typography.sizes.md,
-    fontWeight: Theme.typography.weights.bold,
-    color: '#9E7A1C',
-    marginLeft: Theme.spacing.sm,
-  },
-  grandmaCardBody: {
-    fontSize: Theme.typography.sizes.sm,
-    color: Theme.colors.text,
-    lineHeight: 20,
-    fontStyle: 'italic',
-  },
   cardHeartIcon: {
     position: 'absolute',
     top: Theme.spacing.sm,
@@ -715,57 +887,6 @@ const styles = StyleSheet.create({
     height: 36,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  progressContainer: {
-    padding: Theme.spacing.md,
-    backgroundColor: Theme.colors.surface,
-    marginTop: Theme.spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: Theme.colors.border,
-  },
-  progressTextRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: Theme.spacing.xs,
-  },
-  progressLabel: {
-    fontSize: Theme.typography.sizes.xs + 1,
-    fontWeight: Theme.typography.weights.semibold,
-    color: Theme.colors.textSecondary,
-  },
-  progressPercent: {
-    fontSize: Theme.typography.sizes.sm,
-    fontWeight: Theme.typography.weights.bold,
-    color: Theme.colors.primary,
-  },
-  progressTrack: {
-    height: 6,
-    backgroundColor: Theme.colors.border,
-    borderRadius: 3,
-    overflow: 'hidden',
-  },
-  progressBar: {
-    height: '100%',
-    backgroundColor: Theme.colors.primary,
-    borderRadius: 3,
-  },
-  stepCheckRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    paddingVertical: Theme.spacing.sm,
-    borderBottomWidth: 0.5,
-    borderBottomColor: Theme.colors.border,
-  },
-  stepCheckRowChecked: {
-    opacity: 0.65,
-  },
-  stepNumCircleChecked: {
-    backgroundColor: Theme.colors.secondary,
-  },
-  stepTextChecked: {
-    textDecorationLine: 'line-through',
-    color: Theme.colors.textSecondary,
   },
   emptyFavoritesCard: {
     width: '100%',
@@ -789,6 +910,423 @@ const styles = StyleSheet.create({
     fontWeight: Theme.typography.weights.bold,
     textAlign: 'center',
     marginBottom: 6,
+  },
+  // --- Detailed Inline View Styles ---
+  detailHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: Theme.spacing.md,
+    height: 56,
+  },
+  detailHeaderTitle: {
+    fontSize: Theme.typography.sizes.md + 1,
+    fontWeight: Theme.typography.weights.bold,
+    flex: 1,
+    marginHorizontal: Theme.spacing.sm,
+  },
+  backButton: {
+    padding: 4,
+  },
+  detailScrollContent: {
+    paddingBottom: 130,
+  },
+  heroSection: {
+    position: 'relative',
+    height: 220,
+  },
+  heroImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  heroOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.55)',
+    padding: Theme.spacing.md,
+  },
+  heroTitle: {
+    fontSize: Theme.typography.sizes.xl,
+    fontWeight: Theme.typography.weights.bold,
+    color: '#FFF',
+    marginBottom: 4,
+  },
+  heroCategoryRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  heroCategoryText: {
+    fontSize: Theme.typography.sizes.xs,
+    color: '#FFF',
+    marginLeft: 4,
+    fontWeight: Theme.typography.weights.medium,
+  },
+  metaRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingVertical: Theme.spacing.md,
+    borderBottomWidth: 1,
+  },
+  metaCol: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  metaVal: {
+    fontSize: Theme.typography.sizes.sm,
+    fontWeight: Theme.typography.weights.bold,
+    marginTop: 4,
+  },
+  metaLab: {
+    fontSize: 10,
+    color: Theme.colors.textSecondary,
+    textTransform: 'uppercase',
+    marginTop: 2,
+  },
+  eyeBtn: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  progressBox: {
+    padding: Theme.spacing.md,
+    borderBottomWidth: 1,
+  },
+  progressTextRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: Theme.spacing.xs,
+  },
+  progressLabel: {
+    fontSize: Theme.typography.sizes.xs + 1,
+    fontWeight: Theme.typography.weights.semibold,
+  },
+  progressPercent: {
+    fontSize: Theme.typography.sizes.sm,
+    fontWeight: Theme.typography.weights.bold,
+  },
+  progressTrack: {
+    height: 6,
+    borderRadius: 3,
+    overflow: 'hidden',
+  },
+  progressBar: {
+    height: '100%',
+    borderRadius: 3,
+  },
+  detailSection: {
+    padding: Theme.spacing.md,
+    marginTop: Theme.spacing.sm,
+  },
+  detailSectionTitle: {
+    fontSize: Theme.typography.sizes.md,
+    fontWeight: Theme.typography.weights.bold,
+    marginBottom: Theme.spacing.sm,
+    borderLeftWidth: 3,
+    paddingLeft: Theme.spacing.sm,
+  },
+  detailBodyText: {
+    fontSize: Theme.typography.sizes.sm,
+    lineHeight: 22,
+  },
+  sectionHelpText: {
+    fontSize: 11,
+    marginBottom: Theme.spacing.sm,
+    fontStyle: 'italic',
+  },
+  checklistRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 0.5,
+  },
+  checklistRowChecked: {
+    opacity: 0.55,
+  },
+  checklistText: {
+    fontSize: Theme.typography.sizes.sm + 1,
+    marginLeft: Theme.spacing.md,
+    flex: 1,
+  },
+  checklistTextChecked: {
+    textDecorationLine: 'line-through',
+  },
+  stepCard: {
+    borderRadius: Theme.roundness.md,
+    padding: Theme.spacing.md,
+    marginBottom: Theme.spacing.sm,
+    borderWidth: 1,
+  },
+  stepCardChecked: {
+    opacity: 0.55,
+  },
+  stepCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: Theme.spacing.xs,
+  },
+  stepNumCircle: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: Theme.spacing.sm,
+  },
+  stepNumText: {
+    fontSize: Theme.typography.sizes.xs,
+    fontWeight: Theme.typography.weights.bold,
+    color: '#FFF',
+  },
+  stepCardTitle: {
+    fontSize: Theme.typography.sizes.sm,
+    fontWeight: Theme.typography.weights.bold,
+    flex: 1,
+  },
+  completedBadge: {
+    fontSize: 10,
+    fontWeight: Theme.typography.weights.semibold,
+  },
+  stepCardBody: {
+    fontSize: Theme.typography.sizes.sm + 1,
+    lineHeight: 22,
+    paddingLeft: 32,
+  },
+  stepTextChecked: {
+    textDecorationLine: 'line-through',
+  },
+  grandmaCard: {
+    borderWidth: 1.5,
+    borderRadius: Theme.roundness.md,
+    marginTop: Theme.spacing.lg,
+    padding: Theme.spacing.md,
+  },
+  grandmaCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: Theme.spacing.sm,
+  },
+  grandmaCardTitle: {
+    fontSize: Theme.typography.sizes.md,
+    fontWeight: Theme.typography.weights.bold,
+    marginLeft: Theme.spacing.sm,
+  },
+  grandmaCardBody: {
+    fontSize: Theme.typography.sizes.sm,
+    lineHeight: 20,
+    fontStyle: 'italic',
+  },
+  // --- Relationship styles ---
+  relationChain: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderRadius: Theme.roundness.md,
+    borderWidth: 1,
+    padding: Theme.spacing.sm,
+    marginBottom: Theme.spacing.md,
+    marginTop: Theme.spacing.xs,
+  },
+  chainNode: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  nodeIconCircle: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 4,
+  },
+  nodeLabel: {
+    fontSize: 8,
+    fontWeight: Theme.typography.weights.bold,
+    textTransform: 'uppercase',
+  },
+  nodeVal: {
+    fontSize: 9,
+    fontWeight: Theme.typography.weights.bold,
+    textAlign: 'center',
+  },
+  chainArrow: {
+    alignSelf: 'center',
+    opacity: 0.5,
+  },
+  relatedFestivalCard: {
+    borderRadius: Theme.roundness.lg,
+    overflow: 'hidden',
+    borderWidth: 1,
+    marginBottom: Theme.spacing.md,
+  },
+  relatedFestivalImg: {
+    width: '100%',
+    height: 140,
+    resizeMode: 'cover',
+  },
+  relatedFestivalBody: {
+    padding: Theme.spacing.md,
+  },
+  badgeRow: {
+    flexDirection: 'row',
+    marginBottom: Theme.spacing.xs,
+  },
+  miniBadge: {
+    paddingHorizontal: Theme.spacing.sm,
+    paddingVertical: 2,
+    borderRadius: Theme.roundness.round,
+    marginRight: 6,
+  },
+  miniBadgeText: {
+    fontSize: 9,
+    fontWeight: Theme.typography.weights.bold,
+    color: '#FFF',
+  },
+  relatedFestivalTitle: {
+    fontSize: Theme.typography.sizes.md,
+    fontWeight: Theme.typography.weights.bold,
+    marginBottom: 4,
+  },
+  relatedFestivalDesc: {
+    fontSize: Theme.typography.sizes.xs + 1,
+    lineHeight: 16,
+    marginBottom: Theme.spacing.md,
+  },
+  verFiestaBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    borderRadius: Theme.roundness.sm,
+  },
+  verFiestaBtnText: {
+    fontSize: Theme.typography.sizes.sm,
+    fontWeight: Theme.typography.weights.bold,
+    color: '#FFF',
+    marginRight: Theme.spacing.sm,
+  },
+  noRelationCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: Theme.spacing.md,
+    borderRadius: Theme.roundness.md,
+    borderWidth: 1,
+  },
+  noRelationText: {
+    fontSize: Theme.typography.sizes.xs + 1,
+    flex: 1,
+    marginLeft: Theme.spacing.sm,
+    lineHeight: 16,
+  },
+  subSectionTitle: {
+    fontSize: Theme.typography.sizes.sm + 1,
+    fontWeight: Theme.typography.weights.bold,
+    marginBottom: Theme.spacing.sm,
+  },
+  smallRecipeCard: {
+    width: 140,
+    borderRadius: Theme.roundness.md,
+    borderWidth: 1,
+    marginRight: Theme.spacing.sm,
+    overflow: 'hidden',
+  },
+  smallRecipeImg: {
+    width: '100%',
+    height: 80,
+    resizeMode: 'cover',
+  },
+  smallRecipeTitle: {
+    fontSize: Theme.typography.sizes.xs,
+    fontWeight: Theme.typography.weights.bold,
+  },
+  smallRecipeMeta: {
+    fontSize: 9,
+  },
+  // --- Resumption and card badges ---
+  sectionTitleLabel: {
+    fontSize: Theme.typography.sizes.xs,
+    fontWeight: Theme.typography.weights.bold,
+    textTransform: 'uppercase',
+    marginHorizontal: Theme.spacing.md,
+    marginTop: Theme.spacing.md,
+    marginBottom: Theme.spacing.xs,
+    letterSpacing: 0.5,
+  },
+  resumeBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: Theme.roundness.lg,
+    borderWidth: 1.5,
+    padding: Theme.spacing.md,
+    marginHorizontal: Theme.spacing.md,
+    marginBottom: Theme.spacing.sm,
+  },
+  resumeImg: {
+    width: 54,
+    height: 54,
+    borderRadius: Theme.roundness.sm,
+    marginRight: Theme.spacing.md,
+  },
+  resumeContent: {
+    flex: 1,
+  },
+  resumeLabel: {
+    fontSize: 8,
+    fontWeight: Theme.typography.weights.bold,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  resumeTitle: {
+    fontSize: Theme.typography.sizes.sm + 1,
+    fontWeight: Theme.typography.weights.bold,
+    marginTop: 1,
+  },
+  resumeProgressRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 5,
+  },
+  resumeProgressTrack: {
+    flex: 1,
+    height: 4,
+    borderRadius: 2,
+    marginRight: Theme.spacing.sm,
+    overflow: 'hidden',
+  },
+  resumeProgressFill: {
+    height: '100%',
+    borderRadius: 2,
+  },
+  resumeProgressText: {
+    fontSize: 9,
+    fontWeight: Theme.typography.weights.bold,
+  },
+  resumeBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: Theme.spacing.sm,
+  },
+  viewedBadge: {
+    position: 'absolute',
+    top: Theme.spacing.sm,
+    left: Theme.spacing.sm,
+    backgroundColor: 'rgba(46, 111, 64, 0.9)',
+    borderRadius: Theme.roundness.xs,
+    paddingHorizontal: Theme.spacing.sm,
+    paddingVertical: 3,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  viewedBadgeText: {
+    fontSize: 8,
+    fontWeight: Theme.typography.weights.bold,
+    color: '#FFF',
+    letterSpacing: 0.5,
   },
 });
 

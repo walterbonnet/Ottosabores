@@ -12,6 +12,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useLocalSearchParams } from 'expo-router';
 import Theme from '../theme';
 import Card from '../components/Card';
 import Header from '../components/Header';
@@ -43,11 +44,21 @@ const getGrandmaTip = (recipeId: string): string => {
 
 export const FiestasScreen: React.FC = () => {
   const { colors, isDarkMode } = useGlobalState();
+  const params = useLocalSearchParams<{ id?: string }>();
   const [selectedRoute, setSelectedRoute] = useState<string>('Todas las Rutas');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedFestival, setSelectedFestival] = useState<Festival | null>(null);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [checkedIngredients, setCheckedIngredients] = useState<{ [key: string]: boolean }>({});
+
+  useEffect(() => {
+    if (params.id) {
+      const found = FESTIVALS.find(f => f.id === params.id);
+      if (found) {
+        setSelectedFestival(found);
+      }
+    }
+  }, [params.id]);
   
   const [isPlayingVideo, setIsPlayingVideo] = useState<boolean>(false);
   const [isLoadingDetail, setIsLoadingDetail] = useState<boolean>(false);
