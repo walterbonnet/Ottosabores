@@ -12,11 +12,12 @@ import {
   Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import Theme from '../theme';
 import Card from '../components/Card';
 import Header from '../components/Header';
 import { useGlobalState } from '../services/GlobalStateContext';
-import { RECIPES } from '../services/mockData';
+import { RECIPES, FESTIVALS } from '../services/mockData';
 
 interface FAQItem {
   question: string;
@@ -42,10 +43,47 @@ const FAQS: FAQItem[] = [
   }
 ];
 
+const DISCOVERIES = [
+  {
+    id: 'd1',
+    category: 'Curiosidades Gastronómicas',
+    title: 'El tatacúa y las cenizas',
+    desc: 'El tatacúa (horno de barro) se calienta con leña dura y luego se limpia barriendo las cenizas con ramas húmedas de laurel silvestre para perfumar las chipas y panes litoraleños.',
+    icon: 'flame-outline' as const,
+    color: '#C85C38',
+  },
+  {
+    id: 'd2',
+    category: 'Tradiciones',
+    title: 'El Mate Dulce y Chipacuerito',
+    desc: 'Una costumbre infaltable para las tardes de lluvia y música chamamecera. Las familias se reúnen a matear con tortas fritas crujientes espolvoreadas con azúcar.',
+    icon: 'heart-outline' as const,
+    color: '#2E6F40',
+  },
+  {
+    id: 'd3',
+    category: 'Técnicas Culinarias',
+    title: 'El trenzado del matambre',
+    desc: 'Técnica artesanal criolla que consiste en tejer tiras finas de matambre antes de hervirlas a fuego muy lento en su propia grasa para lograr el chicharrón perfecto.',
+    icon: 'build-outline' as const,
+    color: '#9E7A1C',
+  },
+  {
+    id: 'd4',
+    category: 'Productos Regionales',
+    title: 'El yatay silvestre',
+    desc: 'Fruto pequeño y dorado de la palmera yatay, de sabor agridulce e intenso. Es recolectado a mano en los palmares nativos para hacer licores y mermeladas.',
+    icon: 'leaf-outline' as const,
+    color: '#3B7EC8',
+  }
+];
+
 export const PerfilScreen: React.FC = () => {
-  const [profileTab, setProfileTab] = useState<'progreso' | 'actividad' | 'proyecto'>('progreso');
+  const router = useRouter();
+  const [profileTab, setProfileTab] = useState<'progreso' | 'actividad' | 'descubrimiento' | 'proyecto'>('progreso');
   const [activeProjTab, setActiveProjTab] = useState<'objetivos' | 'metodologia' | 'impacto'>('objetivos');
   const [expandedFaqIdx, setExpandedFaqIdx] = useState<number | null>(null);
+  const [expandedDiscoveryId, setExpandedDiscoveryId] = useState<string | null>(null);
 
   // Form states (Institutional)
   const [name, setName] = useState('');
@@ -64,6 +102,7 @@ export const PerfilScreen: React.FC = () => {
     viewedHotspots,
     playedAudios,
     readCuriosities,
+    markCuriosityRead,
     colors,
     isDarkMode,
   } = useGlobalState();
@@ -258,7 +297,7 @@ export const PerfilScreen: React.FC = () => {
       >
         {/* Main Tab Controller */}
         <View style={[styles.profileTabs, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-          {(['progreso', 'actividad', 'proyecto'] as const).map((tab) => (
+          {(['progreso', 'actividad', 'descubrimiento', 'proyecto'] as const).map((tab) => (
             <Pressable
               key={tab}
               onPress={() => setProfileTab(tab)}
@@ -268,7 +307,7 @@ export const PerfilScreen: React.FC = () => {
               ]}
             >
               <Text style={[styles.profileTabBtnText, { color: colors.textSecondary }, profileTab === tab && [styles.profileTabBtnTextActive, { color: colors.primary }]]}>
-                {tab === 'progreso' ? 'Mi Progreso' : tab === 'actividad' ? 'Actividad' : 'El Proyecto'}
+                {tab === 'progreso' ? 'Mi Progreso' : tab === 'actividad' ? 'Actividad' : tab === 'descubrimiento' ? 'Descubrir' : 'El Proyecto'}
               </Text>
             </Pressable>
           ))}
@@ -536,7 +575,245 @@ export const PerfilScreen: React.FC = () => {
             </View>
           )}
 
-          {/* TAB 3: EL PROYECTO INSTITUCIONAL */}
+          {/* TAB 3: CAPA DE DESCUBRIMIENTO GASTRONÓMICO */}
+          {profileTab === 'descubrimiento' && (
+            <View style={styles.tabContent}>
+              
+              {/* Explorar Corrientes: Categorías Culturales */}
+              <View style={styles.section}>
+                <Text style={[styles.sectionHeaderTitle, { color: colors.text }]}>Explorar Corrientes</Text>
+                <Text style={[styles.sectionHelpText, { color: colors.textSecondary, marginBottom: 12 }]}>
+                  Sumergite en los secretos del litoral. Toca cada tarjeta para descubrir su historia:
+                </Text>
+
+                <View style={styles.discoveryGrid}>
+                  {DISCOVERIES.map((item) => {
+                    const isRead = readCuriosities.includes(item.id);
+                    const isExpanded = expandedDiscoveryId === item.id;
+                    return (
+                      <Card
+                        key={item.id}
+                        style={[
+                          styles.discoveryCard,
+                          { 
+                            backgroundColor: colors.surface, 
+                            borderColor: isExpanded ? colors.primary : colors.border,
+                            borderWidth: isExpanded ? 1.5 : 1
+                          }
+                        ]}
+                        elevation="sm"
+                        border={true}
+                        onPress={() => {
+                          setExpandedDiscoveryId(isExpanded ? null : item.id);
+                          if (!isRead) {
+                            markCuriosityRead(item.id);
+                          }
+                        }}
+                      >
+                        <View style={styles.discoveryHeader}>
+                          <View style={[styles.discoveryIconBg, { backgroundColor: item.color + '18' }]}>
+                            <Ionicons name={item.icon} size={22} color={item.color} />
+                          </View>
+                          <View style={styles.discoveryMeta}>
+                            <Text style={[styles.discoveryCategory, { color: item.color }]}>{item.category}</Text>
+                            <Text style={[styles.discoveryTitle, { color: colors.text }]}>{item.title}</Text>
+                          </View>
+                          <Ionicons 
+                            name={isRead ? "checkmark-circle" : "eye-outline"} 
+                            size={20} 
+                            color={isRead ? colors.secondary : colors.textSecondary} 
+                          />
+                        </View>
+
+                        {isExpanded && (
+                          <View style={[styles.discoveryDetailBlock, { borderTopColor: colors.border }]}>
+                            <Text style={[styles.discoveryDescText, { color: colors.textSecondary }]}>{item.desc}</Text>
+                            <View style={[styles.discoveryReadBadge, { backgroundColor: colors.secondary + '12' }]}>
+                              <Ionicons name="checkmark-circle" size={14} color={colors.secondary} style={{ marginRight: 4 }} />
+                              <Text style={{ fontSize: 11, fontWeight: 'bold', color: colors.secondary }}>
+                                ¡Sabiduría Adquirida! (+5 XP)
+                              </Text>
+                            </View>
+                          </View>
+                        )}
+                      </Card>
+                    );
+                  })}
+                </View>
+              </View>
+
+              {/* Sistema de Exploración: Descubrir ➔ Guardar ➔ Continuar */}
+              <View style={styles.section}>
+                <Text style={[styles.sectionHeaderTitle, { color: colors.text }]}>Sistema de Exploración</Text>
+                
+                <View style={[styles.explorationFlow, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                  {/* Step 1: Descubrir */}
+                  <View style={styles.flowStep}>
+                    <View style={[styles.flowIconCircle, { backgroundColor: colors.primary }]}>
+                      <Ionicons name="compass" size={18} color={colors.white} />
+                    </View>
+                    <Text style={[styles.flowStepName, { color: colors.text }]}>1. Descubrir</Text>
+                    <Text style={[styles.flowStepSub, { color: colors.textSecondary }]}>
+                      {readCuriosities.length}/4 Saberes
+                    </Text>
+                    <Text style={[styles.flowStepSub, { color: colors.textSecondary }]}>
+                      {viewedHotspots.length}/4 Regiones
+                    </Text>
+                  </View>
+
+                  <Ionicons name="arrow-forward" size={18} color={colors.border} style={styles.flowArrow} />
+
+                  {/* Step 2: Guardar */}
+                  <View style={styles.flowStep}>
+                    <View style={[styles.flowIconCircle, { backgroundColor: colors.accent }]}>
+                      <Ionicons name="heart" size={18} color={colors.white} />
+                    </View>
+                    <Text style={[styles.flowStepName, { color: colors.text }]}>2. Guardar</Text>
+                    <Text style={[styles.flowStepSub, { color: colors.textSecondary }]}>
+                      {favorites.length} Favoritas
+                    </Text>
+                    <Text style={[styles.flowStepSub, { color: colors.textSecondary }]}>
+                      En tu recetario
+                    </Text>
+                  </View>
+
+                  <Ionicons name="arrow-forward" size={18} color={colors.border} style={styles.flowArrow} />
+
+                  {/* Step 3: Continuar */}
+                  <View style={styles.flowStep}>
+                    <View style={[styles.flowIconCircle, { backgroundColor: colors.secondary }]}>
+                      <Ionicons name="restaurant" size={18} color={colors.white} />
+                    </View>
+                    <Text style={[styles.flowStepName, { color: colors.text }]}>3. Continuar</Text>
+                    <Text style={[styles.flowStepSub, { color: colors.textSecondary }]}>
+                      {Object.keys(recipeProgress).length} Recetas
+                    </Text>
+                    <Text style={[styles.flowStepSub, { color: colors.textSecondary }]}>
+                      En preparación
+                    </Text>
+                  </View>
+                </View>
+              </View>
+
+              {/* Bitácora de Viaje: Rutas Recorridas, Fiestas Visitadas, Recetas Abiertas */}
+              <View style={styles.section}>
+                <Text style={[styles.sectionHeaderTitle, { color: colors.text }]}>Bitácora de Viaje</Text>
+
+                {/* Rutas Recorridas */}
+                <Text style={[styles.subSectionTitleLabel, { color: colors.textSecondary, marginTop: 8 }]}>Rutas Recorridas</Text>
+                <Card style={[styles.bitacoraStatsCard, { backgroundColor: colors.surface, borderColor: colors.border }]} border={true}>
+                  <View style={styles.bitacoraStatItem}>
+                    <Text style={[styles.bitacoraStatName, { color: colors.text }]}>Ruta de Carnes Tradicionales</Text>
+                    <Text style={[styles.bitacoraStatPercent, { color: colors.primary }]}>{carnesProgress}%</Text>
+                  </View>
+                  <View style={styles.bitacoraStatItem}>
+                    <Text style={[styles.bitacoraStatName, { color: colors.text }]}>Ruta de la Herencia Guaraní</Text>
+                    <Text style={[styles.bitacoraStatPercent, { color: colors.secondary }]}>{guaraniProgress}%</Text>
+                  </View>
+                  <View style={styles.bitacoraStatItem}>
+                    <Text style={[styles.bitacoraStatName, { color: colors.text }]}>Ruta de Sabores Naturales</Text>
+                    <Text style={[styles.bitacoraStatPercent, { color: colors.accent }]}>{naturalesProgress}%</Text>
+                  </View>
+                </Card>
+
+                {/* Fiestas Visitadas */}
+                <Text style={[styles.subSectionTitleLabel, { color: colors.textSecondary, marginTop: 16 }]}>Fiestas Visitadas</Text>
+                {recentlyViewed.filter(item => item.type === 'festival').length > 0 ? (
+                  <View style={styles.horizontalScrollWrapper}>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                      {recentlyViewed
+                        .filter(item => item.type === 'festival')
+                        .map(item => {
+                          const fest = FESTIVALS.find(f => f.id === item.id);
+                          if (!fest) return null;
+                          return (
+                            <Pressable
+                              key={item.id}
+                              style={[styles.bitacoraMiniCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
+                              onPress={() => router.push({ pathname: '/fiestas', params: { id: fest.id } })}
+                            >
+                              <View style={[styles.bitacoraIconCircle, { backgroundColor: colors.primary + '12' }]}>
+                                <Ionicons name="sparkles" size={16} color={colors.primary} />
+                              </View>
+                              <View style={styles.bitacoraMiniMeta}>
+                                <Text style={[styles.bitacoraMiniTitle, { color: colors.text }]} numberOfLines={1}>{fest.nombre}</Text>
+                                <Text style={[styles.bitacoraMiniSub, { color: colors.textSecondary }]} numberOfLines={1}>{fest.localidad}</Text>
+                              </View>
+                            </Pressable>
+                          );
+                        })}
+                    </ScrollView>
+                  </View>
+                ) : (
+                  <View style={[styles.noBitacoraData, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                    <Text style={[styles.noBitacoraText, { color: colors.textSecondary }]}>Ninguna fiesta visitada todavía.</Text>
+                  </View>
+                )}
+
+                {/* Recetas Abiertas */}
+                <Text style={[styles.subSectionTitleLabel, { color: colors.textSecondary, marginTop: 16 }]}>Recetas Abiertas</Text>
+                {recentlyViewed.filter(item => item.type === 'recipe').length > 0 ? (
+                  <View style={styles.horizontalScrollWrapper}>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                      {recentlyViewed
+                        .filter(item => item.type === 'recipe')
+                        .map(item => {
+                          const rec = RECIPES.find(r => r.id === item.id);
+                          if (!rec) return null;
+                          return (
+                            <Pressable
+                              key={item.id}
+                              style={[styles.bitacoraMiniCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
+                              onPress={() => router.push('/recetas')}
+                            >
+                              <View style={[styles.bitacoraIconCircle, { backgroundColor: colors.secondary + '12' }]}>
+                                <Ionicons name="restaurant" size={16} color={colors.secondary} />
+                              </View>
+                              <View style={styles.bitacoraMiniMeta}>
+                                <Text style={[styles.bitacoraMiniTitle, { color: colors.text }]} numberOfLines={1}>{rec.nombre}</Text>
+                                <Text style={[styles.bitacoraMiniSub, { color: colors.textSecondary }]} numberOfLines={1}>{rec.categoría}</Text>
+                              </View>
+                            </Pressable>
+                          );
+                        })}
+                    </ScrollView>
+                  </View>
+                ) : (
+                  <View style={[styles.noBitacoraData, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                    <Text style={[styles.noBitacoraText, { color: colors.textSecondary }]}>Ninguna receta abierta todavía.</Text>
+                  </View>
+                )}
+              </View>
+
+              {/* Pantalla Final Emocional */}
+              <Card style={[styles.emotionalFinalCard, { backgroundColor: isDarkMode ? '#1E1B18' : '#F4ECE1', borderColor: colors.primary }]} border={true}>
+                <Ionicons name="trail-sign-outline" size={32} color={colors.primary} style={{ marginBottom: 12 }} />
+                <Text style={[styles.emotionalFinalTitle, { color: colors.text }]}>
+                  Descubrí más sabores de Corrientes
+                </Text>
+                <Text style={[styles.emotionalFinalDesc, { color: colors.textSecondary }]}>
+                  Cada rincón del Taragüí resguarda un fogón encendido. Desde las costas del Paraná hasta los Esteros del Iberá, las abuelas siguen custodiando los secretos de nuestra tierra. Continúa explorando y cocinando para mantener vivo el fuego.
+                </Text>
+                <View style={styles.emotionalBtnsRow}>
+                  <Pressable 
+                    style={[styles.emotionalBtn, { backgroundColor: colors.primary }]}
+                    onPress={() => router.push('/mapa')}
+                  >
+                    <Text style={styles.emotionalBtnText}>Ver Mapa Gastronómico</Text>
+                  </Pressable>
+                  <Pressable 
+                    style={[styles.emotionalBtn, { backgroundColor: colors.secondary }]}
+                    onPress={() => router.push('/recetas')}
+                  >
+                    <Text style={styles.emotionalBtnText}>Ir a Recetario</Text>
+                  </Pressable>
+                </View>
+              </Card>
+
+            </View>
+          )}
+
+          {/* TAB 4: EL PROYECTO INSTITUCIONAL */}
           {profileTab === 'proyecto' && (
             <View style={styles.tabContent}>
               {/* Segmented Institutional Selector */}
@@ -1352,5 +1629,210 @@ const styles = StyleSheet.create({
     fontWeight: Theme.typography.weights.bold,
     textAlign: 'center',
     marginBottom: 6,
+  },
+  // --- Discovery Tab Styles ---
+  discoveryGrid: {
+    marginTop: Theme.spacing.xs,
+  },
+  discoveryCard: {
+    borderRadius: Theme.roundness.md,
+    padding: Theme.spacing.md,
+    marginBottom: Theme.spacing.sm,
+    borderWidth: 1,
+  },
+  discoveryHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  discoveryIconBg: {
+    width: 40,
+    height: 40,
+    borderRadius: Theme.roundness.sm,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: Theme.spacing.md,
+  },
+  discoveryMeta: {
+    flex: 1,
+  },
+  discoveryCategory: {
+    fontSize: 9,
+    fontWeight: Theme.typography.weights.bold,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  discoveryTitle: {
+    fontSize: Theme.typography.sizes.sm + 1,
+    fontWeight: Theme.typography.weights.bold,
+    marginTop: 2,
+  },
+  discoveryDetailBlock: {
+    marginTop: Theme.spacing.md,
+    paddingTop: Theme.spacing.md,
+    borderTopWidth: 0.5,
+  },
+  discoveryDescText: {
+    fontSize: Theme.typography.sizes.sm,
+    lineHeight: 20,
+  },
+  discoveryReadBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    marginTop: Theme.spacing.sm,
+    paddingHorizontal: Theme.spacing.sm,
+    paddingVertical: 4,
+    borderRadius: Theme.roundness.xs,
+  },
+  explorationFlow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: Theme.spacing.md,
+    borderRadius: Theme.roundness.lg,
+    borderWidth: 1,
+    marginTop: Theme.spacing.xs,
+  },
+  flowStep: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  flowIconCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: Theme.spacing.xs,
+  },
+  flowStepName: {
+    fontSize: Theme.typography.sizes.xs,
+    fontWeight: Theme.typography.weights.bold,
+    textAlign: 'center',
+    marginBottom: 2,
+  },
+  flowStepSub: {
+    fontSize: 9,
+    textAlign: 'center',
+  },
+  flowArrow: {
+    alignSelf: 'center',
+    marginHorizontal: Theme.spacing.xs,
+  },
+  bitacoraStatsCard: {
+    padding: Theme.spacing.md,
+    borderRadius: Theme.roundness.md,
+    marginTop: Theme.spacing.xs,
+  },
+  bitacoraStatItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: Theme.spacing.sm - 2,
+  },
+  bitacoraStatName: {
+    fontSize: Theme.typography.sizes.sm,
+    fontWeight: Theme.typography.weights.medium,
+  },
+  bitacoraStatPercent: {
+    fontSize: Theme.typography.sizes.sm,
+    fontWeight: Theme.typography.weights.bold,
+  },
+  subSectionTitleLabel: {
+    fontSize: Theme.typography.sizes.xs,
+    fontWeight: Theme.typography.weights.bold,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: Theme.spacing.xs,
+  },
+  horizontalScrollWrapper: {
+    marginTop: Theme.spacing.xs,
+    marginBottom: Theme.spacing.sm,
+  },
+  bitacoraMiniCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: 200,
+    borderRadius: Theme.roundness.md,
+    borderWidth: 1,
+    padding: Theme.spacing.sm,
+    marginRight: Theme.spacing.sm,
+  },
+  bitacoraIconCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: Theme.spacing.sm,
+  },
+  bitacoraMiniMeta: {
+    flex: 1,
+  },
+  bitacoraMiniTitle: {
+    fontSize: Theme.typography.sizes.xs + 1,
+    fontWeight: Theme.typography.weights.bold,
+  },
+  bitacoraMiniSub: {
+    fontSize: 9,
+    marginTop: 1,
+  },
+  noBitacoraData: {
+    padding: Theme.spacing.md,
+    borderRadius: Theme.roundness.md,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: Theme.spacing.xs,
+    marginBottom: Theme.spacing.sm,
+  },
+  noBitacoraText: {
+    fontSize: Theme.typography.sizes.xs,
+    fontStyle: 'italic',
+  },
+  emotionalFinalCard: {
+    padding: Theme.spacing.lg,
+    borderRadius: Theme.roundness.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: Theme.spacing.xl,
+    marginBottom: Theme.spacing.lg,
+    borderWidth: 1.5,
+  },
+  emotionalFinalTitle: {
+    fontSize: Theme.typography.sizes.md + 2,
+    fontWeight: Theme.typography.weights.bold,
+    textAlign: 'center',
+    marginBottom: Theme.spacing.sm,
+  },
+  emotionalFinalDesc: {
+    fontSize: Theme.typography.sizes.xs + 1,
+    lineHeight: 18,
+    textAlign: 'center',
+    marginBottom: Theme.spacing.md,
+  },
+  emotionalBtnsRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    width: '100%',
+    marginTop: Theme.spacing.xs,
+  },
+  emotionalBtn: {
+    paddingVertical: 10,
+    paddingHorizontal: Theme.spacing.md,
+    borderRadius: Theme.roundness.round,
+    marginHorizontal: Theme.spacing.xs,
+    minWidth: 120,
+    alignItems: 'center',
+  },
+  emotionalBtnText: {
+    color: '#FFF',
+    fontSize: 11,
+    fontWeight: Theme.typography.weights.bold,
+  },
+  sectionHelpText: {
+    fontSize: Theme.typography.sizes.xs + 1,
+    fontStyle: 'italic',
   },
 });
