@@ -1,6 +1,7 @@
 import React from 'react';
 import { Tabs, usePathname } from 'expo-router';
-import { View, Text, Pressable, Image, StyleSheet, Platform } from 'react-native';
+import { View, Text, Pressable, StyleSheet, Platform } from 'react-native';
+import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import CustomTabBar from '../components/CustomTabBar';
 import { GlobalStateProvider, useGlobalState } from '../services/GlobalStateContext';
@@ -20,7 +21,11 @@ function FloatingGlobalPlayer() {
       </View>
 
       <View style={styles.playerBody}>
-        <Image source={{ uri: currentAudio.image }} style={styles.playerThumbnail} />
+        <Image 
+          source={{ uri: currentAudio.image }} 
+          style={styles.playerThumbnail} 
+          contentFit="cover"
+        />
         <View style={styles.playerDetails}>
           <Text style={styles.playerTitle} numberOfLines={1}>
             {currentAudio.title}
@@ -55,7 +60,7 @@ function FloatingGlobalPlayer() {
 }
 
 function AppLayoutContent() {
-  return (
+  const content = (
     <View style={{ flex: 1 }}>
       <Tabs
         tabBar={(props) => <CustomTabBar {...props} />}
@@ -78,6 +83,18 @@ function AppLayoutContent() {
       <FloatingGlobalPlayer />
     </View>
   );
+
+  if (Platform.OS === 'web') {
+    return (
+      <View style={styles.webContainer}>
+        <View style={styles.webAppShell}>
+          {content}
+        </View>
+      </View>
+    );
+  }
+
+  return content;
 }
 
 export default function AppLayout() {
@@ -89,6 +106,27 @@ export default function AppLayout() {
 }
 
 const styles = StyleSheet.create({
+  webContainer: {
+    flex: 1,
+    backgroundColor: '#1E1B18', // Warm dark background for surrounding browser window
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    height: '100%',
+  },
+  webAppShell: {
+    width: '100%',
+    maxWidth: 768,
+    height: '100%',
+    backgroundColor: '#F8F6F0',
+    position: 'relative',
+    ...Platform.select({
+      web: {
+        boxShadow: '0 0 24px rgba(0, 0, 0, 0.45)',
+      },
+      default: {},
+    }),
+  },
   playerContainer: {
     position: 'absolute',
     bottom: Platform.OS === 'ios' ? 104 : 96,

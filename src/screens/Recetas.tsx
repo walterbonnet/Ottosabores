@@ -4,20 +4,20 @@ import {
   Text,
   View,
   ScrollView,
-  Image,
+  TextInput,
   Pressable,
   SafeAreaView,
-  TextInput,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
 import Theme from '../theme';
 import Card from '../components/Card';
 import Header from '../components/Header';
+import SkeletonLoader from '../components/SkeletonLoader';
 import { RECIPES, FESTIVALS } from '../services/mockData';
 import { Recipe } from '../types';
 import { useGlobalState } from '../services/GlobalStateContext';
-import SkeletonLoader from '../components/SkeletonLoader';
+import RecipeDetailModal from '../components/RecipeDetailModal';
 
 const getGrandmaTip = (recipeId: string): string => {
   switch (recipeId) {
@@ -43,8 +43,6 @@ export const RecetasScreen: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<string>('Todos');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isLoadingDetail, setIsLoadingDetail] = useState<boolean>(false);
-  const [visibleSections, setVisibleSections] = useState<number>(0);
 
   const {
     favorites,
@@ -71,30 +69,7 @@ export const RecetasScreen: React.FC = () => {
     };
   }, [activeCategory, searchQuery]);
 
-  useEffect(() => {
-    let timers: any[] = [];
-    if (selectedRecipe) {
-      setIsLoadingDetail(true);
-      setVisibleSections(0);
-      const loadTimer = setTimeout(() => {
-        setIsLoadingDetail(false);
-        timers.push(setTimeout(() => setVisibleSections(1), 50));
-        timers.push(setTimeout(() => setVisibleSections(2), 150));
-        timers.push(setTimeout(() => setVisibleSections(3), 250));
-        timers.push(setTimeout(() => setVisibleSections(4), 350));
-        timers.push(setTimeout(() => setVisibleSections(5), 450));
-        timers.push(setTimeout(() => setVisibleSections(6), 550));
-        timers.push(setTimeout(() => setVisibleSections(7), 650));
-      }, 450);
-      timers.push(loadTimer);
-    } else {
-      setIsLoadingDetail(false);
-      setVisibleSections(0);
-    }
-    return () => {
-      timers.forEach(t => clearTimeout(t));
-    };
-  }, [selectedRecipe]);
+
 
   const categories = [
     'Todos',
@@ -727,6 +702,13 @@ export const RecetasScreen: React.FC = () => {
           )}
         </View>
       </ScrollView>
+
+      {/* Recipe Detail Modal */}
+      <RecipeDetailModal
+        recipe={selectedRecipe}
+        visible={!!selectedRecipe}
+        onClose={() => setSelectedRecipe(null)}
+      />
     </SafeAreaView>
   );
 };
@@ -738,7 +720,7 @@ const styles = StyleSheet.create({
     backgroundColor: Theme.colors.background,
   },
   scrollContent: {
-    paddingBottom: 120,
+    paddingBottom: 170, // Increased bottom padding to prevent overlap with audio player
   },
   searchBarContainer: {
     paddingHorizontal: Theme.spacing.md,

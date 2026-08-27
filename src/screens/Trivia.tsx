@@ -7,8 +7,8 @@ import {
   Pressable,
   SafeAreaView,
   Modal,
-  Image,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import Theme from '../theme';
 import Card from '../components/Card';
@@ -1087,6 +1087,7 @@ const styles = StyleSheet.create({
     width: 110,
     height: '100%',
     minHeight: 120,
+    resizeMode: 'cover',
   },
   curiosityCardContent: {
     flex: 1,

@@ -4,13 +4,13 @@ import {
   Text,
   View,
   ScrollView,
-  Image,
   Pressable,
-  Modal,
   SafeAreaView,
   Platform,
   Dimensions,
+  Modal,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import Theme from '../theme';
 import Card from '../components/Card';
@@ -19,6 +19,8 @@ import { MULTIMEDIA_ITEMS, FESTIVALS, RECIPES } from '../services/mockData';
 import { Festival, Recipe } from '../types';
 import { useGlobalState } from '../services/GlobalStateContext';
 import SkeletonLoader from '../components/SkeletonLoader';
+import RecipeDetailModal from '../components/RecipeDetailModal';
+import FestivalDetailModal from '../components/FestivalDetailModal';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -61,35 +63,11 @@ const MOCK_PHOTOS = [
   { id: 'f6', title: 'Frutos dorados del mamón', url: 'https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?w=600&auto=format&fit=crop&q=70' }
 ];
 
-const getGrandmaTip = (recipeId: string): string => {
-  switch (recipeId) {
-    case 'r1':
-      return 'El gran secreto de las abuelas correntinas es agregar una cucharada de jugo de naranja natural al amasar. Esto ayuda a que el chipá quede esponjoso.';
-    case 'r2':
-      return 'Revolver siempre en sentido de las agujas del reloj y usando una cuchara de madera de espinillo para que no se corte la textura.';
-    case 'r3':
-      return 'Para el guiso, agrega un chorrito de jugo de limón al apagar el fuego. Realza los sabores de la carne and el arroz de manera espectacular.';
-    case 'r4':
-      return 'Servilo siempre bien frío del refrigerador con una rodaja gruesa de queso de campo correntino (queso criollo).';
-    case 'r5':
-      return 'Humedecer la carne constantemente con salmuera de romero y ajo para que conserve su jugosidad en la estaca.';
-    case 'r6':
-      return 'Pinchá varias veces con un tenedor el chipá cuerito antes de tirarlo al aceite hirviendo para que no se infle desparejo.';
-    default:
-      return 'Cocinar siempre con leña o fuego de carbón vegetal para conservar el aroma tradicional del litoral.';
-  }
-};
-
 export const MultimediaScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'audios' | 'videos' | 'fotos'>('audios');
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const {
-    favorites,
-    toggleFavorite,
-    recipeProgress,
-    updateIngredientProgress,
-    updateStepProgress,
     addRecentlyViewed,
     currentAudio,
     isPlaying,
@@ -136,11 +114,7 @@ export const MultimediaScreen: React.FC = () => {
 
   // Linked Fiestas and Recipes details states
   const [selectedFestival, setSelectedFestival] = useState<Festival | null>(null);
-  const [modalActiveTab, setModalActiveTab] = useState<number>(0);
-  const [isPlayingFestivalVideo, setIsPlayingFestivalVideo] = useState<boolean>(false);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
-
-  const relatedRecipe = selectedFestival ? RECIPES.find(r => r.id === selectedFestival.recetaRelacionada) : undefined;
 
   // Helper for duration strings
   const getDurationInSeconds = (durationStr: string) => {
@@ -183,10 +157,7 @@ export const MultimediaScreen: React.FC = () => {
     setVideoTimeStr('0:00');
   };
 
-  const handleOpenRecipe = (recipe: Recipe) => {
-    addRecentlyViewed(recipe.id, 'recipe');
-    setSelectedRecipe(recipe);
-  };
+
 
   const handleOpenFestival = (festival: Festival) => {
     addRecentlyViewed(festival.id, 'festival');
@@ -242,7 +213,7 @@ export const MultimediaScreen: React.FC = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
           styles.scrollContent,
-          activeTab === 'audios' ? { paddingBottom: 220 } : { paddingBottom: 110 }
+          activeTab === 'audios' ? { paddingBottom: 280 } : { paddingBottom: 170 }
         ]}
       >
         {isLoading ? (
@@ -567,368 +538,20 @@ export const MultimediaScreen: React.FC = () => {
         </Modal>
       )}
 
-      {/* Expanded Festival Details Modal (Detalle de Fiesta) */}
-      {selectedFestival && (
-        <Modal
-          visible={!!selectedFestival}
-          animationType="slide"
-          transparent={true}
-          onRequestClose={() => setSelectedFestival(null)}
-        >
-          <View style={styles.modalOverlay}>
-            <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
-              <View style={[styles.modalHeader, { backgroundColor: colors.surface, borderBottomWidth: 1, borderBottomColor: colors.border }]}>
-                <Text style={[styles.modalHeaderTitle, { color: colors.primary }]} numberOfLines={1}>
-                  {selectedFestival.nombre}
-                </Text>
-                <Pressable onPress={() => setSelectedFestival(null)} style={styles.closeButton}>
-                  <Ionicons name="close" size={24} color={colors.text} />
-                </Pressable>
-              </View>
+      {/* Recipe Detail Modal */}
+      <RecipeDetailModal
+        recipe={selectedRecipe}
+        visible={!!selectedRecipe}
+        onClose={() => setSelectedRecipe(null)}
+      />
 
-              {/* Segmented Modal Tabs */}
-              <View style={[styles.modalTabsRow, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-                {['General', 'Recetas', 'Media', 'Ir'].map((tabLabel, idx) => (
-                  <Pressable
-                    key={idx}
-                    onPress={() => setModalActiveTab(idx)}
-                    style={[
-                      styles.modalTabButton,
-                      modalActiveTab === idx && [styles.modalTabButtonActive, { borderBottomColor: colors.primary }]
-                    ]}
-                  >
-                    <Text style={[styles.modalTabLabel, { color: colors.textSecondary }, modalActiveTab === idx && [styles.modalTabLabelActive, { color: colors.primary }]]}>
-                      {tabLabel}
-                    </Text>
-                  </Pressable>
-                ))}
-              </View>
+      {/* Festival Detail Modal */}
+      <FestivalDetailModal
+        festival={selectedFestival}
+        visible={!!selectedFestival}
+        onClose={() => setSelectedFestival(null)}
+      />
 
-              <ScrollView 
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={styles.modalScroll}
-              >
-                {/* 1. GENERAL TAB */}
-                {modalActiveTab === 0 && (
-                  <View style={styles.tabContentBlock}>
-                    <Image source={{ uri: selectedFestival.galeria[0] }} style={styles.detailImage} />
-                    <View style={[styles.detailCardBody, { backgroundColor: colors.surface }]}>
-                      <Text style={[styles.detailSectionTitle, { color: colors.text, borderLeftColor: colors.primary }]}>Historia y Tradición</Text>
-                      <Text style={[styles.detailText, { color: colors.textSecondary }]}>{selectedFestival.historia}</Text>
-                      
-                      <View style={[styles.highlightProductBox, {
-                        backgroundColor: isDarkMode ? 'rgba(200, 92, 56, 0.15)' : 'rgba(200, 92, 56, 0.07)',
-                        borderColor: isDarkMode ? 'rgba(200, 92, 56, 0.3)' : 'rgba(200, 92, 56, 0.2)'
-                      }]}>
-                        <Ionicons name="flame" size={24} color={colors.primary} />
-                        <View style={styles.highlightProductInfo}>
-                          <Text style={[styles.highlightProductLabel, { color: colors.primary }]}>Plato Principal Relacionado</Text>
-                          <Text style={[styles.highlightProductValue, { color: colors.text }]}>
-                            {relatedRecipe ? relatedRecipe.nombre : 'Platos tradicionales'}
-                          </Text>
-                        </View>
-                      </View>
-                    </View>
-                  </View>
-                )}
-
-                {/* 2. RECIPES TAB */}
-                {modalActiveTab === 1 && (
-                  <View style={styles.tabContentBlock}>
-                    <View style={[styles.detailCardBody, { backgroundColor: colors.surface }]}>
-                      {relatedRecipe ? (
-                        <>
-                          <Text style={[styles.detailSectionTitle, { color: colors.text, borderLeftColor: colors.primary }]}>Ingredientes Típicos</Text>
-                          <Text style={[styles.tabSubtitle, { color: colors.textSecondary }]}>
-                            Los ingredientes esenciales de la receta tradicional de la fiesta ({relatedRecipe.nombre}):
-                          </Text>
-                          <View style={styles.badgeWrap}>
-                            {relatedRecipe.ingredientes.map((ing, i) => (
-                              <View key={i} style={[styles.detailIngredientBadge, {
-                                backgroundColor: isDarkMode ? 'rgba(46, 111, 64, 0.15)' : 'rgba(46, 111, 64, 0.05)',
-                                borderColor: isDarkMode ? 'rgba(46, 111, 64, 0.3)' : 'rgba(46, 111, 64, 0.2)'
-                              }]}>
-                                <Ionicons name="leaf" size={12} color={colors.secondary} style={{ marginRight: 4 }} />
-                                <Text style={[styles.ingredientBadgeText, { color: colors.secondary }]}>{ing}</Text>
-                              </View>
-                            ))}
-                          </View>
-
-                          <Text style={[styles.detailSectionTitle, { marginTop: Theme.spacing.lg, color: colors.text, borderLeftColor: colors.primary }]}>
-                            Receta Tradicional
-                          </Text>
-                          <Text style={[styles.tabSubtitle, { color: colors.textSecondary }]}>
-                            Accedé a la guía interactiva paso a paso para preparar este plato típico:
-                          </Text>
-
-                          <Card style={[styles.recipeLinkCard, { backgroundColor: colors.surface, borderColor: colors.border }]} elevation="sm" onPress={() => handleOpenRecipe(relatedRecipe)}>
-                            <Image source={{ uri: relatedRecipe.video || 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600' }} style={styles.recipeLinkImage} />
-                            <View style={styles.recipeLinkBody}>
-                              <Text style={[styles.recipeLinkLabel, { color: colors.primary }]}>Ver Receta Completa</Text>
-                              <Text style={[styles.recipeLinkTitle, { color: colors.text }]}>{relatedRecipe.nombre}</Text>
-                              <Text style={[styles.recipeLinkDesc, { color: colors.textSecondary }]} numberOfLines={2}>{relatedRecipe.historia}</Text>
-                              <View style={styles.recipeLinkButton}>
-                                <Text style={[styles.recipeLinkButtonText, { color: colors.primary }]}>Ver Paso a Paso</Text>
-                                <Ionicons name="arrow-forward" size={14} color={colors.primary} />
-                              </View>
-                            </View>
-                          </Card>
-                        </>
-                      ) : (
-                        <View style={styles.emptyContainer}>
-                          <Ionicons name="restaurant-outline" size={48} color={colors.textSecondary} />
-                          <Text style={[styles.emptyText, { color: colors.textSecondary }]}>No hay receta registrada para esta fiesta.</Text>
-                        </View>
-                      )}
-                    </View>
-                  </View>
-                )}
-
-                {/* 3. MULTIMEDIA TAB */}
-                {modalActiveTab === 2 && (
-                  <View style={styles.tabContentBlock}>
-                    <View style={[styles.detailCardBody, { backgroundColor: colors.surface }]}>
-                      <Text style={[styles.detailSectionTitle, { color: colors.text, borderLeftColor: colors.primary }]}>Fotografías de la Edición Anterior</Text>
-                      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.galleryScroll}>
-                        {selectedFestival.galeria.map((img, i) => (
-                          <Image key={i} source={{ uri: img }} style={styles.galleryThumbnail} />
-                        ))}
-                      </ScrollView>
-
-                      <Text style={[styles.detailSectionTitle, { marginTop: Theme.spacing.lg, color: colors.text, borderLeftColor: colors.primary }]}>
-                        Transmisión de Cocina en Vivo (Simulado)
-                      </Text>
-                      <Text style={[styles.tabSubtitle, { color: colors.textSecondary }]}>Reviví el resumen de la última edición:</Text>
-                      
-                      {!isPlayingFestivalVideo ? (
-                        <Pressable style={styles.videoPlayerMock} onPress={() => setIsPlayingFestivalVideo(true)}>
-                          <Image source={{ uri: selectedFestival.video }} style={styles.videoMockThumbnail} />
-                          <View style={styles.videoPlayOverlay}>
-                            <View style={[styles.playButtonCircle, { backgroundColor: colors.primary }]}>
-                              <Ionicons name="play" size={32} color={colors.white} style={{ marginLeft: 4 }} />
-                            </View>
-                            <Text style={[styles.videoPlayText, { color: colors.white }]}>Reproducir Video Resumen</Text>
-                          </View>
-                        </Pressable>
-                      ) : (
-                        <Pressable style={styles.videoPlayingMock} onPress={() => setIsPlayingFestivalVideo(false)}>
-                          <Image source={{ uri: selectedFestival.galeria[0] }} style={styles.videoMockThumbnail} />
-                          <View style={styles.videoPlayingOverlay}>
-                            <Ionicons name="pause" size={36} color={colors.white} />
-                            <Text style={[styles.videoPlayingText, { color: colors.white }]}>Reproduciendo... (Toca para pausar)</Text>
-                            
-                            {/* Simulated Video Progress Bar */}
-                            <View style={styles.videoProgressOuter}>
-                              <View style={[styles.videoProgressInner, { backgroundColor: colors.primary }]} />
-                            </View>
-                          </View>
-                        </Pressable>
-                      )}
-                    </View>
-                  </View>
-                )}
-
-                {/* 4. HOW TO GET THERE TAB */}
-                {modalActiveTab === 3 && (
-                  <View style={styles.tabContentBlock}>
-                    <View style={[styles.detailCardBody, { backgroundColor: colors.surface }]}>
-                      <Text style={[styles.detailSectionTitle, { color: colors.text, borderLeftColor: colors.primary }]}>Cómo Llegar al Evento</Text>
-                      <Text style={[styles.detailText, { color: colors.textSecondary }]}>{selectedFestival.ubicación}</Text>
-                      
-                      {/* Stylized Simulated Route Card */}
-                      <Card style={[styles.routeMockCard, { backgroundColor: colors.background, borderColor: colors.border, borderWidth: isDarkMode ? 1 : 0 }]} elevation="none">
-                        <View style={styles.routeHeader}>
-                          <Ionicons name="navigate-circle" size={32} color={colors.secondary} />
-                          <View style={styles.routeHeaderInfo}>
-                            <Text style={[styles.routeTitle, { color: colors.text }]}>Ruta Recomendada</Text>
-                            <Text style={[styles.routeSubtitle, { color: colors.textSecondary }]}>Desde Corrientes Capital</Text>
-                          </View>
-                        </View>
-                        <View style={[styles.routeDivider, { backgroundColor: colors.border }]} />
-                        <View style={styles.routeStepRow}>
-                          <Ionicons name="car-outline" size={20} color={colors.primary} />
-                          <Text style={[styles.routeStepText, { color: colors.textSecondary }]}>Vehículo particular / Autobús provincial</Text>
-                        </View>
-                        <View style={styles.routeStepRow}>
-                          <Ionicons name="time-outline" size={20} color={colors.primary} />
-                          <Text style={[styles.routeStepText, { color: colors.textSecondary }]}>Frecuencia horaria regular de viajes</Text>
-                        </View>
-                      </Card>
-                    </View>
-                  </View>
-                )}
-              </ScrollView>
-            </View>
-          </View>
-        </Modal>
-      )}
-
-      {/* Recipe Detail Modal with Interactive Checklist nested link */}
-      {selectedRecipe && (
-        <Modal
-          visible={!!selectedRecipe}
-          animationType="slide"
-          transparent={true}
-          onRequestClose={() => setSelectedRecipe(null)}
-        >
-          <View style={styles.modalOverlay}>
-            <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
-              <View style={[styles.modalHeader, { backgroundColor: colors.surface, borderBottomWidth: 1, borderBottomColor: colors.border }]}>
-                <Text style={[styles.modalHeaderTitle, { color: colors.primary }]} numberOfLines={1}>
-                  {selectedRecipe.nombre}
-                </Text>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <Pressable 
-                    onPress={() => toggleFavorite(selectedRecipe.id)} 
-                    style={{ marginRight: Theme.spacing.md, padding: 4 }}
-                  >
-                    <Ionicons 
-                      name={favorites.includes(selectedRecipe.id) ? "heart" : "heart-outline"} 
-                      size={24} 
-                      color={favorites.includes(selectedRecipe.id) ? colors.primary : colors.text} 
-                    />
-                  </Pressable>
-                  <Pressable onPress={() => setSelectedRecipe(null)} style={styles.closeButton}>
-                    <Ionicons name="close" size={24} color={colors.text} />
-                  </Pressable>
-                </View>
-              </View>
-
-              <ScrollView 
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={styles.modalScroll}
-              >
-                <Image source={{ uri: selectedRecipe.video || 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600' }} style={styles.modalImage} />
-                
-                <View style={[styles.modalMetaRow, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-                  <View style={styles.modalMetaItem}>
-                    <Ionicons name="time" size={18} color={colors.primary} />
-                    <Text style={[styles.modalMetaValue, { color: colors.text }]}>{selectedRecipe.duración}</Text>
-                    <Text style={[styles.modalMetaLabel, { color: colors.textSecondary }]}>Tiempo</Text>
-                  </View>
-                  <View style={styles.modalMetaItem}>
-                    <Ionicons name="star" size={18} color={colors.primary} />
-                    <Text style={[styles.modalMetaValue, { color: colors.text }]}>{selectedRecipe.dificultad}</Text>
-                    <Text style={[styles.modalMetaLabel, { color: colors.textSecondary }]}>Dificultad</Text>
-                  </View>
-                  <View style={styles.modalMetaItem}>
-                    <Ionicons name="restaurant" size={18} color={colors.primary} />
-                    <Text style={[styles.modalMetaValue, { color: colors.text }]}>{selectedRecipe.categoría}</Text>
-                    <Text style={[styles.modalMetaLabel, { color: colors.textSecondary }]}>Mesa</Text>
-                  </View>
-                </View>
-
-                {/* Progress Bar */}
-                {(() => {
-                  const prog = recipeProgress[selectedRecipe.id];
-                  const stepsDone = prog ? prog.completedSteps.length : 0;
-                  const totalSteps = selectedRecipe.preparación.length;
-                  const percent = totalSteps > 0 ? Math.round((stepsDone / totalSteps) * 100) : 0;
-                  return (
-                    <View style={[styles.progressContainer, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-                      <View style={styles.progressTextRow}>
-                        <Text style={[styles.progressLabel, { color: colors.textSecondary }]}>Progreso de la receta</Text>
-                        <Text style={[styles.progressPercent, { color: colors.primary }]}>{percent}%</Text>
-                      </View>
-                      <View style={[styles.progressTrack, { backgroundColor: colors.border }]}>
-                        <View style={[styles.progressBar, { backgroundColor: colors.primary, width: `${percent}%` }]} />
-                      </View>
-                    </View>
-                  );
-                })()}
-
-                {/* History Section */}
-                <View style={[styles.modalSection, { backgroundColor: colors.surface }]}>
-                  <Text style={[styles.modalSectionTitle, { color: colors.text, borderLeftColor: colors.primary }]}>Herencia Cultural</Text>
-                  <Text style={[styles.modalBodyText, { color: colors.textSecondary }]}>{selectedRecipe.historia}</Text>
-                </View>
-
-                {/* Interactive Checklist Section */}
-                <View style={[styles.modalSection, { backgroundColor: colors.surface }]}>
-                  <Text style={[styles.modalSectionTitle, { color: colors.text, borderLeftColor: colors.primary }]}>Ingredientes</Text>
-                  <Text style={[styles.sectionHelpText, { color: colors.textSecondary }]}>
-                    Marcá los ingredientes que ya tenés listos en tu mesa:
-                  </Text>
-                  
-                  {selectedRecipe.ingredientes.map((ing, i) => {
-                    const prog = recipeProgress[selectedRecipe.id];
-                    const isChecked = prog ? prog.completedIngredients.includes(i) : false;
-                    return (
-                      <Pressable
-                        key={i}
-                        onPress={() => updateIngredientProgress(selectedRecipe.id, i, !isChecked)}
-                        style={[
-                          styles.checklistRow,
-                          { borderBottomColor: colors.border },
-                          isChecked && styles.checklistRowChecked
-                        ]}
-                      >
-                        <Ionicons 
-                          name={isChecked ? "checkbox" : "square-outline"} 
-                          size={20} 
-                          color={isChecked ? colors.secondary : colors.textSecondary} 
-                        />
-                        <Text 
-                          style={[
-                            styles.checklistText,
-                            { color: colors.text },
-                            isChecked && [styles.checklistTextChecked, { color: colors.textSecondary }]
-                          ]}
-                        >
-                          {ing}
-                        </Text>
-                      </Pressable>
-                    );
-                  })}
-                </View>
-
-                {/* Preparation Steps */}
-                <View style={[styles.modalSection, { backgroundColor: colors.surface }]}>
-                  <Text style={[styles.modalSectionTitle, { color: colors.text, borderLeftColor: colors.primary }]}>Paso a Paso</Text>
-                  <Text style={[styles.sectionHelpText, { color: colors.textSecondary }]}>Marcá los pasos completados:</Text>
-                  {selectedRecipe.preparación.map((step, i) => {
-                    const prog = recipeProgress[selectedRecipe.id];
-                    const isChecked = prog ? prog.completedSteps.includes(i) : false;
-                    return (
-                      <Pressable
-                        key={i}
-                        onPress={() => updateStepProgress(selectedRecipe.id, i, !isChecked)}
-                        style={[
-                          styles.stepCheckRow,
-                          isChecked && styles.stepCheckRowChecked
-                        ]}
-                      >
-                        <View style={[styles.stepNumCircle, { backgroundColor: colors.primary }, isChecked && styles.stepNumCircleChecked]}>
-                          {isChecked ? (
-                            <Ionicons name="checkmark" size={12} color={colors.white} />
-                          ) : (
-                            <Text style={[styles.stepNumText, { color: colors.white }]}>{i + 1}</Text>
-                          )}
-                        </View>
-                        <Text style={[styles.stepText, { color: colors.text }, isChecked && [styles.stepTextChecked, { color: colors.textSecondary }]]}>
-                          {step}
-                        </Text>
-                      </Pressable>
-                    );
-                  })}
-                </View>
-
-                {/* Grandma Tip */}
-                <View style={[styles.modalSection, styles.grandmaCard, {
-                  backgroundColor: isDarkMode ? 'rgba(223, 177, 91, 0.15)' : 'rgba(223, 177, 91, 0.08)',
-                  borderColor: isDarkMode ? 'rgba(223, 177, 91, 0.3)' : 'rgba(223, 177, 91, 0.25)'
-                }]}>
-                  <View style={styles.grandmaCardHeader}>
-                    <Ionicons name="flame" size={20} color={colors.accent} />
-                    <Text style={[styles.grandmaCardTitle, { color: isDarkMode ? '#DFB15B' : '#9E7A1C' }]}>El Consejo de la Abuela</Text>
-                  </View>
-                  <Text style={[styles.grandmaCardBody, { color: colors.text }]}>{getGrandmaTip(selectedRecipe.id)}</Text>
-                </View>
-              </ScrollView>
-            </View>
-          </View>
-        </Modal>
-      )}
     </SafeAreaView>
   );
 };

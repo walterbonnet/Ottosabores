@@ -4,13 +4,12 @@ import {
   Text,
   View,
   ScrollView,
-  Image,
   TextInput,
   Pressable,
-  Modal,
   SafeAreaView,
   Dimensions,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams } from 'expo-router';
 import Theme from '../theme';
@@ -20,6 +19,7 @@ import SkeletonLoader from '../components/SkeletonLoader';
 import { FESTIVALS, RECIPES } from '../services/mockData';
 import { Festival, Recipe } from '../types';
 import { useGlobalState } from '../services/GlobalStateContext';
+import FestivalDetailModal from '../components/FestivalDetailModal';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -48,96 +48,20 @@ export const FiestasScreen: React.FC = () => {
   const [selectedRoute, setSelectedRoute] = useState<string>('Todas las Rutas');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedFestival, setSelectedFestival] = useState<Festival | null>(null);
-  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
-  const [checkedIngredients, setCheckedIngredients] = useState<{ [key: string]: boolean }>({});
 
   useEffect(() => {
     if (params.id) {
       const found = FESTIVALS.find(f => f.id === params.id);
       if (found) {
-        setSelectedFestival(found);
+        const timer = setTimeout(() => {
+          setSelectedFestival(found);
+        }, 0);
+        return () => clearTimeout(timer);
       }
     }
   }, [params.id]);
-  
-  const [isPlayingVideo, setIsPlayingVideo] = useState<boolean>(false);
-  const [isLoadingDetail, setIsLoadingDetail] = useState<boolean>(false);
-  const [visibleSections, setVisibleSections] = useState<number>(0);
 
   const routes = ['Todas las Rutas', 'Carnes Tradicionales', 'Herencia Guaraní', 'Sabores Naturales'];
-
-  const getFestivalContext = (id: string) => {
-    const data: { [key: string]: { caracteristicas: string; importancia: string } } = {
-      '1': {
-        caracteristicas: 'Exhibición ganadera de búfalos, jineteadas, asados multitudinarios y peñas folclóricas.',
-        importancia: 'Es la fiesta emblema del desarrollo bufalero en Caá Catí, destacando una alternativa productiva sostenible para los campos del norte.'
-      },
-      '2': {
-        caracteristicas: 'Concurso de asadores a la estaca con leña de espinillo, jineteadas y espectáculos de chamamé de primer nivel.',
-        importancia: 'Homenaje al peón rural y a la producción de cordero de excelente calidad en los campos lindantes a los Esteros del Iberá.'
-      },
-      '3': {
-        caracteristicas: 'Cocción comunitaria en hornos de barro tradicionales alimentados a leña, degustación de costillares y cueros crocantes.',
-        importancia: 'Promueve el trabajo de los pequeños productores porcinos del centro de la provincia, conservando métodos de cocción centenarios.'
-      },
-      '4': {
-        caracteristicas: 'Competencia abierta de parrilleros a la orilla del río Paraná, guitarreadas tradicionales y ferias de artesanía criolla.',
-        importancia: 'Reúne la tradición del asado de fin de semana con la imponente belleza de las barrancas del río Paraná.'
-      },
-      '5': {
-        caracteristicas: 'Feria gastronómica de chipá calentito hecho al horno de barro y tatacua, música folclórica y elección de la reina del chipá.',
-        importancia: 'Homenaje al pan sagrado de la cultura guaraní que une a toda la comunidad en torno a la mesa familiar del nordeste.'
-      },
-      '6': {
-        caracteristicas: 'Preparación de tortas fritas en ollas gigantescas al aire libre, guitarreadas espontáneas y rondas de mate cebado.',
-        importancia: 'Celebración de la merienda campesina por excelencia, rescatando el valor del encuentro y la hospitalidad litoraleña.'
-      },
-      '7': {
-        caracteristicas: 'Cocina en vivo de Mbaipy en grandes ollas de hierro a la leña, preparación de Mbejú caliente en sartenes de chapa.',
-        importancia: 'Celebración de la polenta y el pan plano de origen guaraní, fundamentales para combatir el frío invierno del campo correntino.'
-      },
-      '8': {
-        caracteristicas: 'Exposición de raíces gigantes, talleres de cocina con mandioca, ferias agroecológicas y degustación de platos regionales.',
-        importancia: 'Pone en valor el cultivo alimenticio más importante de la región guaranítica, pilar de la soberanía alimentaria correntina.'
-      },
-      '9': {
-        caracteristicas: 'Demostración de extracción manual del almidón de mandioca, elaboración de chipas y panificados tradicionales sin gluten.',
-        importancia: 'Rescata la técnica tradicional de molienda y colado artesanal del almidón, un saber que se transmite de abuelas a nietos.'
-      },
-      '10': {
-        caracteristicas: 'Feria apícola con cata de mieles multiflorales, conferencias sobre apicultura y concursos de cocina dulce con miel de monte.',
-        importancia: 'Impulsa la protección del monte nativo y la biodiversidad a través de la producción sostenible de mieles silvestres.'
-      },
-      '11': {
-        caracteristicas: 'Cosecha de mango fresco de los árboles históricos, ferias de helados, mermeladas, jugos y conservas en almíbar.',
-        importancia: 'Homenaje al paisaje urbano y cultural de Santa Ana, donde el mango representa abundancia y frescura veraniega.'
-      },
-      '12': {
-        caracteristicas: 'Premiación a las sandías más grandes y dulces de la cosecha, desfiles costeros y shows musicales frente al río.',
-        importancia: 'Celebra la sandía primicia de Esquina, símbolo del esfuerzo de los agricultores y del inicio del verano correntino.'
-      },
-      '13': {
-        caracteristicas: 'Cosecha comunitaria del fruto de palmera yatay, talleres de licores artesanales, mermeladas y cestería con hojas de palma.',
-        importancia: 'Promueve la conservación y el uso sustentable de los palmares nativos de yatay, recuperando un sabor silvestre histórico.'
-      },
-      '14': {
-        caracteristicas: 'Cena campestre con platos dulces y salados elaborados con batatas locales, música chamamecera y bailes tradicionales.',
-        importancia: 'Homenaje a la producción familiar batatera de Tres de Abril, un noble cultivo que sustenta la economía rural de la zona.'
-      }
-    };
-    return data[id] || {
-      caracteristicas: 'Feria gastronómica criolla, peñas de música chamamecera y degustación de platos locales.',
-      importancia: 'Rescate de los saberes tradicionales y de las recetas transmitidas de generación en generación en la provincia.'
-    };
-  };
-
-  const toggleIngredient = (recipeId: string, index: number) => {
-    const key = `${recipeId}-${index}`;
-    setCheckedIngredients(prev => ({
-      ...prev,
-      [key]: !prev[key]
-    }));
-  };
 
   const filteredFestivals = FESTIVALS.filter(fest => {
     const matchesRoute = selectedRoute === 'Todas las Rutas' || fest.rutaGastronomica === selectedRoute;
@@ -149,252 +73,13 @@ export const FiestasScreen: React.FC = () => {
     return matchesRoute && matchesSearch;
   });
 
-  const relatedRecipe = selectedFestival ? RECIPES.find(r => r.id === selectedFestival.recetaRelacionada) : undefined;
-
-  useEffect(() => {
-    let timers: any[] = [];
-    if (selectedFestival) {
-      setIsLoadingDetail(true);
-      setVisibleSections(0);
-      
-      const loadTimer = setTimeout(() => {
-        setIsLoadingDetail(false);
-        timers.push(setTimeout(() => setVisibleSections(1), 50));
-        timers.push(setTimeout(() => setVisibleSections(2), 150));
-        timers.push(setTimeout(() => setVisibleSections(3), 250));
-        timers.push(setTimeout(() => setVisibleSections(4), 350));
-        timers.push(setTimeout(() => setVisibleSections(5), 450));
-      }, 500);
-      
-      timers.push(loadTimer);
-    } else {
-      setIsLoadingDetail(false);
-      setVisibleSections(0);
-    }
-    
-    return () => {
-      timers.forEach(t => clearTimeout(t));
-    };
-  }, [selectedFestival]);
-
   const openFestivalDetails = (fest: Festival) => {
     setSelectedFestival(fest);
-    setIsPlayingVideo(false);
   };
 
   const routesToRender = selectedRoute === 'Todas las Rutas'
     ? ['Carnes Tradicionales', 'Herencia Guaraní', 'Sabores Naturales']
     : [selectedRoute];
-
-  if (selectedFestival) {
-    if (isLoadingDetail) {
-      return (
-        <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-          <View style={[styles.detailHeader, { backgroundColor: colors.surface, borderBottomColor: colors.border, borderBottomWidth: 1 }]}>
-            <Pressable onPress={() => setSelectedFestival(null)} style={styles.backButton}>
-              <Ionicons name="arrow-back" size={24} color={colors.text} />
-            </Pressable>
-            <Text style={[styles.detailHeaderTitle, { color: colors.primary }]} numberOfLines={1}>
-              {selectedFestival?.nombre}
-            </Text>
-          </View>
-          <ScrollView>
-            <SkeletonLoader type="details" />
-          </ScrollView>
-        </SafeAreaView>
-      );
-    }
-
-    const context = getFestivalContext(selectedFestival?.id || '');
-
-    return (
-      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-        {/* Navigation Header */}
-        <View style={[styles.detailHeader, { backgroundColor: colors.surface, borderBottomColor: colors.border, borderBottomWidth: 1 }]}>
-          <Pressable onPress={() => setSelectedFestival(null)} style={styles.backButton} accessibilityRole="button" accessibilityLabel="Volver a las rutas">
-            <Ionicons name="arrow-back" size={24} color={colors.text} />
-          </Pressable>
-          <Text style={[styles.detailHeaderTitle, { color: colors.primary }]} numberOfLines={1}>
-            {selectedFestival?.nombre}
-          </Text>
-        </View>
-
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.detailScrollContent}>
-          {/* SECCIÓN 1: Hero */}
-          {visibleSections >= 1 && (
-            <View style={styles.heroSection}>
-              <Image source={{ uri: selectedFestival?.galeria?.[0] }} style={styles.heroImage} />
-              <View style={styles.heroOverlay}>
-                <Text style={styles.heroTitle}>{selectedFestival?.nombre}</Text>
-                <View style={styles.heroLocationRow}>
-                  <Ionicons name="location" size={14} color="#FFF" />
-                  <Text style={styles.heroLocationText}>{selectedFestival?.localidad}</Text>
-                </View>
-              </View>
-            </View>
-          )}
-
-          {/* SECCIÓN 2: Contexto */}
-          {visibleSections >= 2 && (
-            <View style={[styles.detailSection, { backgroundColor: colors.surface }]}>
-              <Text style={[styles.sectionTitle, { color: colors.text, borderLeftColor: colors.primary }]}>Contexto & Tradición</Text>
-              
-              <Text style={[styles.contextLabel, { color: colors.primary }]}>Características del Evento</Text>
-              <Text style={[styles.contextText, { color: colors.textSecondary }]}>{context.caracteristicas}</Text>
-
-              <Text style={[styles.contextLabel, { color: colors.primary, marginTop: 12 }]}>Importancia Cultural</Text>
-              <Text style={[styles.contextText, { color: colors.textSecondary }]}>{context.importancia}</Text>
-              
-              <Text style={[styles.contextLabel, { color: colors.primary, marginTop: 12 }]}>Historia General</Text>
-              <Text style={[styles.contextText, { color: colors.textSecondary }]}>{selectedFestival?.historia}</Text>
-            </View>
-          )}
-
-          {/* SECCIÓN 3: Producto Destacado */}
-          {visibleSections >= 3 && (
-            <View style={[styles.detailSection, { backgroundColor: colors.surface }]}>
-              <Text style={[styles.sectionTitle, { color: colors.text, borderLeftColor: colors.primary }]}>Producto Destacado</Text>
-              <View style={[styles.featuredProductCard, { backgroundColor: colors.primary + '0c', borderColor: colors.primary + '25' }]}>
-                <Ionicons name="sparkles" size={24} color={colors.primary} />
-                <View style={styles.featuredProductInfo}>
-                  <Text style={[styles.featuredProductLabel, { color: colors.primary }]}>Sabor e Identidad</Text>
-                  <Text style={[styles.featuredProductName, { color: colors.text }]}>{selectedFestival?.productoDestacado}</Text>
-                  <Text style={[styles.featuredProductDesc, { color: colors.textSecondary }]}>
-                    Este ingrediente es el corazón de la festividad en {selectedFestival?.localidad}, representando una tradición gastronómica única de las rutas del Taragüí.
-                  </Text>
-                </View>
-              </View>
-            </View>
-          )}
-
-          {/* SECCIÓN 4: Receta Tradicional */}
-          {visibleSections >= 4 && (
-            <View style={[styles.detailSection, { backgroundColor: colors.surface }]}>
-              <Text style={[styles.sectionTitle, { color: colors.text, borderLeftColor: colors.primary }]}>Receta Tradicional</Text>
-              {relatedRecipe ? (
-                <View>
-                  {/* Receta Meta Row */}
-                  <View style={[styles.recipeMetaRow, { borderBottomColor: colors.border }]}>
-                    <View style={styles.recipeMetaItem}>
-                      <Ionicons name="time-outline" size={18} color={colors.primary} />
-                      <Text style={[styles.recipeMetaValue, { color: colors.text }]}>{relatedRecipe?.duración}</Text>
-                      <Text style={[styles.recipeMetaLabel, { color: colors.textSecondary }]}>Tiempo</Text>
-                    </View>
-                    <View style={styles.recipeMetaItem}>
-                      <Ionicons name="star-outline" size={18} color={colors.primary} />
-                      <Text style={[styles.recipeMetaValue, { color: colors.text }]}>{relatedRecipe?.dificultad}</Text>
-                      <Text style={[styles.recipeMetaLabel, { color: colors.textSecondary }]}>Dificultad</Text>
-                    </View>
-                  </View>
-
-                  {/* Nombre de la Receta */}
-                  <Text style={[styles.recipeTitleName, { color: colors.text }]}>{relatedRecipe?.nombre}</Text>
-
-                  {/* Ingredientes Checklist */}
-                  <Text style={[styles.recipeSubheading, { color: colors.text }]}>Ingredientes necesarios:</Text>
-                  <Text style={[styles.recipeHelpText, { color: colors.textSecondary }]}>Marcá los ingredientes que ya tenés listos:</Text>
-                  {relatedRecipe?.ingredientes?.map((ing, i) => {
-                    const recipeId = relatedRecipe?.id || '';
-                    const isChecked = !!checkedIngredients[`${recipeId}-${i}`];
-                    return (
-                      <Pressable
-                        key={i}
-                        onPress={() => toggleIngredient(recipeId, i)}
-                        style={[styles.checklistRow, { borderBottomColor: colors.border }, isChecked && styles.checklistRowChecked]}
-                      >
-                        <Ionicons 
-                          name={isChecked ? "checkbox" : "square-outline"} 
-                          size={18} 
-                          color={isChecked ? colors.secondary : colors.textSecondary} 
-                        />
-                        <Text style={[styles.checklistText, { color: colors.text }, isChecked && styles.checklistTextChecked]}>
-                          {ing}
-                        </Text>
-                      </Pressable>
-                    );
-                  })}
-
-                  {/* Pasos de Preparación */}
-                  <Text style={[styles.recipeSubheading, { color: colors.text, marginTop: 18 }]}>Preparación paso a paso:</Text>
-                  {relatedRecipe?.preparación?.map((step, i) => (
-                    <View key={i} style={styles.stepContainer}>
-                      <View style={[styles.stepNumCircle, { backgroundColor: colors.primary }]}>
-                        <Text style={[styles.stepNumText, { color: colors.white }]}>{i + 1}</Text>
-                      </View>
-                      <Text style={[styles.stepText, { color: colors.text }]}>{step}</Text>
-                    </View>
-                  ))}
-
-                  {/* Grandma Tip */}
-                  <View style={[styles.grandmaTipCard, {
-                    backgroundColor: isDarkMode ? 'rgba(223, 177, 91, 0.15)' : 'rgba(223, 177, 91, 0.08)',
-                    borderColor: isDarkMode ? 'rgba(223, 177, 91, 0.3)' : 'rgba(223, 177, 91, 0.25)'
-                  }]}>
-                    <View style={styles.grandmaCardHeader}>
-                      <Ionicons name="flame" size={20} color={colors.accent} />
-                      <Text style={[styles.grandmaCardTitle, { color: isDarkMode ? '#DFB15B' : '#9E7A1C' }]}>El Consejo de la Abuela</Text>
-                    </View>
-                    <Text style={[styles.grandmaCardBody, { color: colors.text }]}>{getGrandmaTip(relatedRecipe?.id || '')}</Text>
-                  </View>
-                </View>
-              ) : (
-                <Text style={{ color: colors.textSecondary, fontStyle: 'italic' }}>No hay receta registrada para este evento.</Text>
-              )}
-            </View>
-          )}
-
-          {/* SECCIÓN 5: Contenido Multimedia */}
-          {visibleSections >= 5 && (
-            <View style={[styles.detailSection, { backgroundColor: colors.surface, marginBottom: 110 }]}>
-              <Text style={[styles.sectionTitle, { color: colors.text, borderLeftColor: colors.primary }]}>Contenido Multimedia</Text>
-              
-              <Text style={[styles.contextLabel, { color: colors.primary }]}>Galería de Fotos</Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.galleryScroll}>
-                {selectedFestival?.galeria?.map((img, i) => (
-                  <Image key={i} source={{ uri: img }} style={styles.galleryImageItem} />
-                ))}
-              </ScrollView>
-
-              <Text style={[styles.contextLabel, { color: colors.primary, marginTop: 12 }]}>Video Resumen</Text>
-              {!isPlayingVideo ? (
-                <Pressable style={styles.videoPlayerMock} onPress={() => setIsPlayingVideo(true)}>
-                  <Image source={{ uri: selectedFestival?.video }} style={styles.videoMockThumbnail} />
-                  <View style={styles.videoPlayOverlay}>
-                    <View style={[styles.playButtonCircle, { backgroundColor: colors.primary }]}>
-                      <Ionicons name="play" size={32} color={colors.white} style={{ marginLeft: 4 }} />
-                    </View>
-                    <Text style={[styles.videoPlayText, { color: colors.white }]}>Reproducir Video Resumen</Text>
-                  </View>
-                </Pressable>
-              ) : (
-                <Pressable style={styles.videoPlayingMock} onPress={() => setIsPlayingVideo(false)}>
-                  <Image source={{ uri: selectedFestival?.galeria?.[0] }} style={styles.videoMockThumbnail} />
-                  <View style={styles.videoPlayingOverlay}>
-                    <Ionicons name="pause" size={36} color={colors.white} />
-                    <Text style={[styles.videoPlayingText, { color: colors.white }]}>Reproduciendo... (Toca para pausar)</Text>
-                    <View style={styles.videoProgressOuter}>
-                      <View style={[styles.videoProgressInner, { backgroundColor: colors.primary }]} />
-                    </View>
-                  </View>
-                </Pressable>
-              )}
-
-              {/* Share CTA Button */}
-              <Pressable 
-                onPress={() => {
-                  alert(`¡Enlace de la ${selectedFestival?.nombre} copiado al portapapeles!`);
-                }}
-                style={[styles.shareBtn, { backgroundColor: colors.secondary }]}
-              >
-                <Ionicons name="share-social-outline" size={18} color="#FFF" style={{ marginRight: 8 }} />
-                <Text style={styles.shareBtnText}>Compartir Ruta Gastronómica</Text>
-              </Pressable>
-            </View>
-          )}
-        </ScrollView>
-      </SafeAreaView>
-    );
-  }
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
@@ -428,75 +113,74 @@ export const FiestasScreen: React.FC = () => {
         </View>
 
         {/* Route Filters */}
-        <View style={styles.filterSection}>
-          <Text style={[styles.filterTitle, { color: colors.text }]}>Seleccionar Ruta</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.badgeScroll}>
-            {routes.map(r => (
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.filterTabsContainer}
+        >
+          {routes.map((route) => {
+            const isActive = selectedRoute === route;
+            return (
               <Pressable
-                key={r}
-                onPress={() => setSelectedRoute(r)}
+                key={route}
+                onPress={() => setSelectedRoute(route)}
                 style={[
-                  styles.filterBadge,
+                  styles.filterTab,
                   { backgroundColor: colors.surface, borderColor: colors.border },
-                  selectedRoute === r && [styles.filterBadgeActive, { backgroundColor: colors.primary, borderColor: colors.primary }]
+                  isActive && [styles.filterTabActive, { backgroundColor: colors.primary, borderColor: colors.primary }]
                 ]}
               >
-                <Text style={[styles.filterBadgeText, { color: colors.textSecondary }, selectedRoute === r && { color: colors.white }]}>
-                  {r}
+                <Text 
+                  style={[
+                    styles.filterTabText, 
+                    { color: colors.textSecondary },
+                    isActive && { color: colors.white, fontWeight: 'bold' }
+                  ]}
+                >
+                  {route}
                 </Text>
               </Pressable>
-            ))}
-          </ScrollView>
-        </View>
+            );
+          })}
+        </ScrollView>
 
-        {/* Route Containers */}
-        <View style={styles.gridSection}>
-          {filteredFestivals.length > 0 ? (
-            routesToRender.map(routeName => {
-              const routeFestivals = filteredFestivals.filter(f => f.rutaGastronomica === routeName);
+        {/* Routes & Festivals list */}
+        <View style={styles.listSection}>
+          {routesToRender.length > 0 && filteredFestivals.length > 0 ? (
+            routesToRender.map((route) => {
+              const routeFestivals = filteredFestivals.filter(f => f.rutaGastronomica === route);
               if (routeFestivals.length === 0) return null;
 
               return (
-                <View key={routeName} style={styles.routeContainer}>
-                  <Text style={[styles.routeContainerTitle, { color: colors.text }]}>
-                    Ruta de las {routeName}
-                  </Text>
-                  <View style={styles.gridContainer}>
+                <View key={route} style={styles.routeGroup}>
+                  <View style={styles.routeHeaderRow}>
+                    <View style={[styles.routeIndicatorCircle, { backgroundColor: route === 'Carnes Tradicionales' ? colors.primary : route === 'Herencia Guaraní' ? colors.secondary : colors.accent }]} />
+                    <Text style={[styles.routeGroupTitle, { color: colors.text }]}>{route}</Text>
+                  </View>
+                  
+                  <View style={styles.festivalsGrid}>
                     {routeFestivals.map((fest) => (
                       <Card
                         key={fest.id}
-                        style={[styles.gridCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
-                        elevation="sm"
-                        border={true}
+                        style={[styles.festivalCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
                         onPress={() => openFestivalDetails(fest)}
                       >
-                        <Image source={{ uri: fest.galeria[0] }} style={styles.cardImage} />
-                        <View style={styles.cardInfo}>
-                          {/* Localidad */}
-                          <View style={styles.cardMetaRow}>
-                            <Ionicons name="location-outline" size={11} color={colors.secondary} />
-                            <Text style={[styles.cardMetaText, { color: colors.textSecondary }]} numberOfLines={1}>
-                              {fest.localidad}
-                            </Text>
+                        <Image source={{ uri: fest.galeria?.[0] }} style={styles.festivalImage} />
+                        
+                        <View style={styles.festivalCardBody}>
+                          <View style={styles.festivalCardHeader}>
+                            <Ionicons name="location-outline" size={12} color={colors.textSecondary} />
+                            <Text style={styles.festivalLocation} numberOfLines={1}>{fest.localidad}</Text>
                           </View>
-
-                          {/* Nombre / Fiesta */}
-                          <Text style={[styles.cardTitle, { color: colors.text }]} numberOfLines={2}>
-                            {fest.nombre}
-                          </Text>
-
-                          {/* Producto Destacado */}
-                          <View style={[styles.productBadge, { backgroundColor: colors.primary + '15' }]}>
-                            <Text style={[styles.productBadgeText, { color: colors.primary }]}>
-                              {fest.productoDestacado}
-                            </Text>
+                          
+                          <Text style={[styles.festivalTitle, { color: colors.text }]} numberOfLines={1}>{fest.nombre}</Text>
+                          <Text style={[styles.festivalDesc, { color: colors.textSecondary }]} numberOfLines={2}>{fest.descripcionCorta}</Text>
+                          
+                          <View style={styles.productBadgeContainer}>
+                            <Ionicons name="leaf-outline" size={10} color={colors.secondary} style={{ marginRight: 4 }} />
+                            <Text style={[styles.productBadgeText, { color: colors.secondary }]} numberOfLines={1}>{fest.productoDestacado}</Text>
                           </View>
-
-                          {/* Breve descripción */}
-                          <Text style={[styles.cardDesc, { color: colors.textSecondary }]} numberOfLines={3}>
-                            {fest.descripcionCorta}
-                          </Text>
-
+                          
                           {/* CTA Explorar */}
                           <View style={[styles.exploreBtn, { backgroundColor: colors.primary }]}>
                             <Text style={styles.exploreBtnText}>Explorar</Text>
@@ -517,6 +201,13 @@ export const FiestasScreen: React.FC = () => {
           )}
         </View>
       </ScrollView>
+
+      {/* Festival Detail Modal */}
+      <FestivalDetailModal
+        festival={selectedFestival}
+        visible={!!selectedFestival}
+        onClose={() => setSelectedFestival(null)}
+      />
     </SafeAreaView>
   );
 };
@@ -527,7 +218,7 @@ const styles = StyleSheet.create({
     backgroundColor: Theme.colors.background,
   },
   scrollContent: {
-    paddingBottom: 110,
+    paddingBottom: 170, // Increased bottom padding to prevent overlap with audio player
   },
   searchSection: {
     paddingHorizontal: Theme.spacing.md,

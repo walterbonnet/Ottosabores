@@ -7,10 +7,9 @@ import {
   Pressable,
   SafeAreaView,
   Dimensions,
-  Modal,
-  Image,
   ActivityIndicator,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import Theme from '../theme';
 import Card from '../components/Card';
@@ -19,6 +18,8 @@ import { FESTIVALS, RECIPES } from '../services/mockData';
 import { Festival, Recipe } from '../types';
 import { useGlobalState } from '../services/GlobalStateContext';
 import SkeletonLoader from '../components/SkeletonLoader';
+import RecipeDetailModal from '../components/RecipeDetailModal';
+import FestivalDetailModal from '../components/FestivalDetailModal';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -229,10 +230,6 @@ export const MapaScreen: React.FC = () => {
 
   // Estados para el detalle de la ficha gastronómica inline
   const [activeDetailedFestival, setActiveDetailedFestival] = useState<Festival | null>(null);
-  const [isLoadingDetail, setIsLoadingDetail] = useState<boolean>(false);
-  const [visibleSections, setVisibleSections] = useState<number>(0);
-  const [checkedIngredients, setCheckedIngredients] = useState<{ [key: string]: boolean }>({});
-  const [isPlayingVideo, setIsPlayingVideo] = useState<boolean>(false);
   
   // Estados auxiliares existentes de navegación para recetas en modal
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
@@ -248,32 +245,7 @@ export const MapaScreen: React.FC = () => {
     isDarkMode,
   } = useGlobalState();
 
-  // Carga progresiva de secciones detalladas al abrir un festival
-  useEffect(() => {
-    let timers: any[] = [];
-    if (activeDetailedFestival) {
-      setIsLoadingDetail(true);
-      setVisibleSections(0);
-      
-      const loadTimer = setTimeout(() => {
-        setIsLoadingDetail(false);
-        timers.push(setTimeout(() => setVisibleSections(1), 50));
-        timers.push(setTimeout(() => setVisibleSections(2), 150));
-        timers.push(setTimeout(() => setVisibleSections(3), 250));
-        timers.push(setTimeout(() => setVisibleSections(4), 350));
-        timers.push(setTimeout(() => setVisibleSections(5), 450));
-      }, 500);
-      
-      timers.push(loadTimer);
-    } else {
-      setIsLoadingDetail(false);
-      setVisibleSections(0);
-    }
-    
-    return () => {
-      timers.forEach(t => clearTimeout(t));
-    };
-  }, [activeDetailedFestival]);
+
 
   const handleDetectLocation = () => {
     setIsLoadingLocation(true);
@@ -836,171 +808,18 @@ export const MapaScreen: React.FC = () => {
       </View>
 
       {/* Recipe Detail Modal */}
-      {selectedRecipe && (
-        <Modal
-          visible={!!selectedRecipe}
-          animationType="slide"
-          transparent={true}
-          onRequestClose={() => setSelectedRecipe(null)}
-        >
-          <View style={styles.modalOverlay}>
-            <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
-              <View style={[styles.modalHeader, { backgroundColor: colors.surface, borderBottomWidth: 1, borderBottomColor: colors.border }]}>
-                <Text style={[styles.modalHeaderTitle, { color: colors.primary }]} numberOfLines={1}>
-                  {selectedRecipe.nombre}
-                </Text>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <Pressable 
-                    onPress={() => toggleFavorite(selectedRecipe.id)} 
-                    style={{ marginRight: Theme.spacing.md, padding: 4 }}
-                  >
-                    <Ionicons 
-                      name={favorites.includes(selectedRecipe.id) ? "heart" : "heart-outline"} 
-                      size={24} 
-                      color={favorites.includes(selectedRecipe.id) ? colors.primary : colors.text} 
-                    />
-                  </Pressable>
-                  <Pressable onPress={() => setSelectedRecipe(null)} style={styles.closeButton}>
-                    <Ionicons name="close" size={24} color={colors.text} />
-                  </Pressable>
-                </View>
-              </View>
+      <RecipeDetailModal
+        recipe={selectedRecipe}
+        visible={!!selectedRecipe}
+        onClose={() => setSelectedRecipe(null)}
+      />
 
-              <ScrollView 
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={styles.modalScroll}
-              >
-                <Image source={{ uri: selectedRecipe.video || 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600' }} style={styles.modalImage} />
-                
-                <View style={[styles.modalMetaRow, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-                  <View style={styles.modalMetaItem}>
-                    <Ionicons name="time" size={18} color={colors.primary} />
-                    <Text style={[styles.modalMetaValue, { color: colors.text }]}>{selectedRecipe.duración}</Text>
-                    <Text style={[styles.modalMetaLabel, { color: colors.textSecondary }]}>Tiempo</Text>
-                  </View>
-                  <View style={styles.modalMetaItem}>
-                    <Ionicons name="star" size={18} color={colors.primary} />
-                    <Text style={[styles.modalMetaValue, { color: colors.text }]}>{selectedRecipe.dificultad}</Text>
-                    <Text style={[styles.modalMetaLabel, { color: colors.textSecondary }]}>Dificultad</Text>
-                  </View>
-                  <View style={styles.modalMetaItem}>
-                    <Ionicons name="restaurant" size={18} color={colors.primary} />
-                    <Text style={[styles.modalMetaValue, { color: colors.text }]}>{selectedRecipe.categoría}</Text>
-                    <Text style={[styles.modalMetaLabel, { color: colors.textSecondary }]}>Mesa</Text>
-                  </View>
-                </View>
-
-                {/* Progress Bar */}
-                {(() => {
-                  const prog = recipeProgress[selectedRecipe.id];
-                  const stepsDone = prog ? prog.completedSteps.length : 0;
-                  const totalSteps = selectedRecipe.preparación.length;
-                  const percent = totalSteps > 0 ? Math.round((stepsDone / totalSteps) * 100) : 0;
-                  return (
-                    <View style={[styles.progressContainer, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-                      <View style={styles.progressTextRow}>
-                        <Text style={[styles.progressLabel, { color: colors.textSecondary }]}>Progreso de la receta</Text>
-                        <Text style={[styles.progressPercent, { color: colors.primary }]}>{percent}%</Text>
-                      </View>
-                      <View style={[styles.progressTrack, { backgroundColor: colors.border }]}>
-                        <View style={[styles.progressBar, { backgroundColor: colors.primary, width: `${percent}%` }]} />
-                      </View>
-                    </View>
-                  );
-                })()}
-
-                {/* History Section */}
-                <View style={[styles.modalSection, { backgroundColor: colors.surface }]}>
-                  <Text style={[styles.modalSectionTitle, { color: colors.text, borderLeftColor: colors.primary }]}>Herencia Cultural</Text>
-                  <Text style={[styles.modalBodyText, { color: colors.textSecondary }]}>{selectedRecipe.historia}</Text>
-                </View>
-
-                {/* Interactive Checklist Section */}
-                <View style={[styles.modalSection, { backgroundColor: colors.surface }]}>
-                  <Text style={[styles.modalSectionTitle, { color: colors.text, borderLeftColor: colors.primary }]}>Ingredientes</Text>
-                  <Text style={[styles.sectionHelpText, { color: colors.textSecondary }]}>
-                    Marcá los ingredientes que ya tenés listos en tu mesa:
-                  </Text>
-                  
-                  {selectedRecipe.ingredientes.map((ing, i) => {
-                    const prog = recipeProgress[selectedRecipe.id];
-                    const isChecked = prog ? prog.completedIngredients.includes(i) : false;
-                    return (
-                      <Pressable
-                        key={i}
-                        onPress={() => updateIngredientProgress(selectedRecipe.id, i, !isChecked)}
-                        style={[
-                          styles.checklistRow,
-                          { borderBottomColor: colors.border },
-                          isChecked && styles.checklistRowChecked
-                        ]}
-                      >
-                        <Ionicons 
-                          name={isChecked ? "checkbox" : "square-outline"} 
-                          size={20} 
-                          color={isChecked ? colors.secondary : colors.textSecondary} 
-                        />
-                        <Text 
-                          style={[
-                            styles.checklistText,
-                            { color: colors.text },
-                            isChecked && [styles.checklistTextChecked, { color: colors.textSecondary }]
-                          ]}
-                        >
-                          {ing}
-                        </Text>
-                      </Pressable>
-                    );
-                  })}
-                </View>
-
-                {/* Preparation Steps */}
-                <View style={[styles.modalSection, { backgroundColor: colors.surface }]}>
-                  <Text style={[styles.modalSectionTitle, { color: colors.text, borderLeftColor: colors.primary }]}>Paso a Paso</Text>
-                  <Text style={[styles.sectionHelpText, { color: colors.textSecondary }]}>Marcá los pasos completados:</Text>
-                  {selectedRecipe.preparación.map((step, i) => {
-                    const prog = recipeProgress[selectedRecipe.id];
-                    const isChecked = prog ? prog.completedSteps.includes(i) : false;
-                    return (
-                      <Pressable
-                        key={i}
-                        onPress={() => updateStepProgress(selectedRecipe.id, i, !isChecked)}
-                        style={[
-                          styles.stepCheckRow,
-                          isChecked && styles.stepCheckRowChecked
-                        ]}
-                      >
-                        <View style={[styles.stepNumCircle, { backgroundColor: colors.primary }, isChecked && styles.stepNumCircleChecked]}>
-                          {isChecked ? (
-                            <Ionicons name="checkmark" size={12} color={colors.white} />
-                          ) : (
-                            <Text style={[styles.stepNumText, { color: colors.white }]}>{i + 1}</Text>
-                          )}
-                        </View>
-                        <Text style={[styles.stepText, { color: colors.text }, isChecked && [styles.stepTextChecked, { color: colors.textSecondary }]]}>
-                          {step}
-                        </Text>
-                      </Pressable>
-                    );
-                  })}
-                </View>
-
-                {/* Grandma Tip */}
-                <View style={[styles.modalSection, styles.grandmaTipCard, {
-                  backgroundColor: isDarkMode ? 'rgba(223, 177, 91, 0.15)' : 'rgba(223, 177, 91, 0.08)',
-                  borderColor: isDarkMode ? 'rgba(223, 177, 91, 0.3)' : 'rgba(223, 177, 91, 0.25)'
-                }]}>
-                  <View style={styles.grandmaCardHeader}>
-                    <Ionicons name="flame" size={20} color={colors.accent} />
-                    <Text style={[styles.grandmaCardTitle, { color: isDarkMode ? '#DFB15B' : '#9E7A1C' }]}>El Consejo de la Abuela</Text>
-                  </View>
-                  <Text style={[styles.grandmaCardBody, { color: colors.text }]}>{getGrandmaTip(selectedRecipe.id)}</Text>
-                </View>
-              </ScrollView>
-            </View>
-          </View>
-        </Modal>
-      )}
+      {/* Festival Detail Modal */}
+      <FestivalDetailModal
+        festival={activeDetailedFestival}
+        visible={!!activeDetailedFestival}
+        onClose={() => setActiveDetailedFestival(null)}
+      />
     </SafeAreaView>
   );
 };

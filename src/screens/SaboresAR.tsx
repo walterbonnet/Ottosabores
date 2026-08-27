@@ -197,10 +197,6 @@ export const SaboresARScreen: React.FC = () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
         setCameraStream(stream);
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          videoRef.current.play().catch((err: any) => console.log('Video auto-play blocked/error:', err));
-        }
         setHasCameraPermission(true);
       } catch (err) {
         console.warn('Camera access error:', err);
@@ -210,6 +206,13 @@ export const SaboresARScreen: React.FC = () => {
       setHasCameraPermission(false);
     }
   };
+
+  useEffect(() => {
+    if (Platform.OS === 'web' && cameraStream && videoRef.current) {
+      videoRef.current.srcObject = cameraStream;
+      videoRef.current.play().catch((err: any) => console.log('Video auto-play blocked/error:', err));
+    }
+  }, [cameraStream]);
 
   const stopCamera = () => {
     if (cameraStream) {
@@ -863,7 +866,12 @@ const styles = StyleSheet.create({
   realCameraStream: {
     width: '100%',
     height: '100%',
-    objectFit: 'cover',
+    ...Platform.select({
+      web: {
+        objectFit: 'cover' as any,
+      },
+      default: {},
+    }),
   },
   fallbackCamBg: {
     width: '100%',

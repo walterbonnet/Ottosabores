@@ -4,15 +4,14 @@ import {
   Text,
   View,
   ScrollView,
-  Image,
   ImageBackground,
   TextInput,
   Pressable,
-  Modal,
   SafeAreaView,
   Dimensions,
   Animated,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import Theme from '../theme';
@@ -21,6 +20,8 @@ import { RECIPES, FESTIVALS } from '../services/mockData';
 import { Recipe, Festival } from '../types';
 import { useGlobalState } from '../services/GlobalStateContext';
 import SkeletonLoader from '../components/SkeletonLoader';
+import RecipeDetailModal from '../components/RecipeDetailModal';
+import FestivalDetailModal from '../components/FestivalDetailModal';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -694,319 +695,18 @@ export const InicioScreen: React.FC = () => {
       </ScrollView>
 
       {/* Recipe Detail Modal */}
-      {selectedRecipe && (
-        <Modal
-          visible={!!selectedRecipe}
-          animationType="slide"
-          transparent={true}
-          onRequestClose={() => setSelectedRecipe(null)}
-        >
-          <View style={styles.modalOverlay}>
-            <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
-              <View style={[styles.modalHeader, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-                <Text style={[styles.modalHeaderTitle, { color: colors.primary }]} numberOfLines={1}>{selectedRecipe.nombre}</Text>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <Pressable 
-                    onPress={() => toggleFavorite(selectedRecipe.id)} 
-                    style={{ marginRight: Theme.spacing.md, padding: 4 }}
-                  >
-                    <Ionicons 
-                      name={favorites.includes(selectedRecipe.id) ? "heart" : "heart-outline"} 
-                      size={24} 
-                      color={favorites.includes(selectedRecipe.id) ? colors.primary : colors.text} 
-                    />
-                  </Pressable>
-                  <Pressable onPress={() => setSelectedRecipe(null)} style={styles.closeButton}>
-                    <Ionicons name="close" size={24} color={colors.text} />
-                  </Pressable>
-                </View>
-              </View>
-              
-              <ScrollView 
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={styles.modalScroll}
-              >
-                <Image source={{ uri: selectedRecipe.video || 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600' }} style={styles.modalImage} />
-                
-                <View style={[styles.modalMetaRow, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-                  <View style={styles.modalMetaItem}>
-                    <Ionicons name="time-outline" size={18} color={colors.primary} />
-                    <Text style={[styles.modalMetaValue, { color: colors.text }]}>{selectedRecipe.duración}</Text>
-                    <Text style={styles.modalMetaLabel}>Tiempo</Text>
-                  </View>
-                  <View style={styles.modalMetaItem}>
-                    <Ionicons name="restaurant-outline" size={18} color={colors.primary} />
-                    <Text style={[styles.modalMetaValue, { color: colors.text }]}>{selectedRecipe.dificultad}</Text>
-                    <Text style={styles.modalMetaLabel}>Dificultad</Text>
-                  </View>
-                  <View style={styles.modalMetaItem}>
-                    <Ionicons name="bookmark-outline" size={18} color={colors.primary} />
-                    <Text style={[styles.modalMetaValue, { color: colors.text }]}>{selectedRecipe.categoría}</Text>
-                    <Text style={styles.modalMetaLabel}>Categoría</Text>
-                  </View>
-                </View>
-
-                {/* Progress bar */}
-                {(() => {
-                  const prog = recipeProgress[selectedRecipe.id];
-                  const stepsDone = prog ? prog.completedSteps.length : 0;
-                  const totalSteps = selectedRecipe.preparación.length;
-                  const percent = totalSteps > 0 ? Math.round((stepsDone / totalSteps) * 100) : 0;
-                  return (
-                    <View style={[styles.progressContainer, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-                      <View style={styles.progressTextRow}>
-                        <Text style={styles.progressLabel}>Progreso de la receta</Text>
-                        <Text style={[styles.progressPercent, { color: colors.primary }]}>{percent}%</Text>
-                      </View>
-                      <View style={[styles.progressTrack, { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(232, 226, 213, 0.5)' }]}>
-                        <View style={[styles.progressBar, { width: `${percent}%`, backgroundColor: colors.primary }]} />
-                      </View>
-                    </View>
-                  );
-                })()}
-
-                <View style={[styles.modalSection, { backgroundColor: colors.surface }]}>
-                  <Text style={[styles.modalSectionTitle, { color: colors.text, borderLeftColor: colors.primary }]}>Historia y Origen</Text>
-                  <Text style={[styles.modalBodyText, { color: colors.textSecondary }]}>{selectedRecipe.historia}</Text>
-                </View>
-
-                <View style={[styles.modalSection, { backgroundColor: colors.surface }]}>
-                  <Text style={[styles.modalSectionTitle, { color: colors.text, borderLeftColor: colors.primary }]}>Ingredientes</Text>
-                  <Text style={[styles.sectionHelpText, { color: colors.textSecondary }]}>Marcá los ingredientes que tenés listos:</Text>
-                  {selectedRecipe.ingredientes.map((ing, i) => {
-                    const prog = recipeProgress[selectedRecipe.id];
-                    const isChecked = prog ? prog.completedIngredients.includes(i) : false;
-                    return (
-                      <Pressable 
-                        key={i} 
-                        style={[styles.checklistRow, { borderBottomColor: colors.border }, isChecked && styles.checklistRowChecked]}
-                        onPress={() => updateIngredientProgress(selectedRecipe.id, i, !isChecked)}
-                      >
-                        <Ionicons 
-                          name={isChecked ? "checkbox" : "square-outline"} 
-                          size={20} 
-                          color={isChecked ? colors.secondary : colors.textSecondary} 
-                        />
-                        <Text style={[styles.checklistText, { color: isChecked ? colors.textSecondary : colors.text }, isChecked && styles.checklistTextChecked]}>
-                          {ing}
-                        </Text>
-                      </Pressable>
-                    );
-                  })}
-                </View>
-
-                <View style={[styles.modalSection, { backgroundColor: colors.surface }]}>
-                  <Text style={[styles.modalSectionTitle, { color: colors.text, borderLeftColor: colors.primary }]}>Preparación</Text>
-                  <Text style={[styles.sectionHelpText, { color: colors.textSecondary }]}>Marcá los pasos completados:</Text>
-                  {selectedRecipe.preparación.map((step, i) => {
-                    const prog = recipeProgress[selectedRecipe.id];
-                    const isChecked = prog ? prog.completedSteps.includes(i) : false;
-                    return (
-                      <Pressable 
-                        key={i} 
-                        style={[styles.stepCheckRow, isChecked && styles.stepCheckRowChecked]}
-                        onPress={() => updateStepProgress(selectedRecipe.id, i, !isChecked)}
-                      >
-                        <View style={[styles.stepNumberCircle, { backgroundColor: isChecked ? colors.secondary : colors.primary }]}>
-                          {isChecked ? (
-                            <Ionicons name="checkmark" size={12} color={colors.white} />
-                          ) : (
-                            <Text style={styles.stepNumberText}>{i + 1}</Text>
-                          )}
-                        </View>
-                        <Text style={[styles.stepText, { color: isChecked ? colors.textSecondary : colors.text }, isChecked && styles.stepTextChecked]}>
-                          {step}
-                        </Text>
-                      </Pressable>
-                    );
-                  })}
-                </View>
-
-                <View style={[styles.modalSection, styles.grandmaTipSection, { backgroundColor: isDarkMode ? 'rgba(223, 177, 91, 0.15)' : 'rgba(223, 177, 91, 0.08)', borderColor: isDarkMode ? 'rgba(223, 177, 91, 0.4)' : 'rgba(223, 177, 91, 0.3)' }]}>
-                  <View style={styles.grandmaTipHeader}>
-                    <Ionicons name="bulb-outline" size={20} color={colors.accent} />
-                    <Text style={[styles.grandmaTipTitle, { color: isDarkMode ? colors.accent : '#B78D1E' }]}>Consejo de la Abuela</Text>
-                  </View>
-                  <Text style={[styles.grandmaTipText, { color: colors.text }]}>{getGrandmaTip(selectedRecipe.id)}</Text>
-                </View>
-              </ScrollView>
-            </View>
-          </View>
-        </Modal>
-      )}
+      <RecipeDetailModal
+        recipe={selectedRecipe}
+        visible={!!selectedRecipe}
+        onClose={() => setSelectedRecipe(null)}
+      />
 
       {/* Festival Detail Modal */}
-      {selectedFestival && (
-        <Modal
-          visible={!!selectedFestival}
-          animationType="slide"
-          transparent={true}
-          onRequestClose={() => setSelectedFestival(null)}
-        >
-          <View style={styles.modalOverlay}>
-            <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
-              <View style={[styles.modalHeader, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-                <Text style={[styles.modalHeaderTitle, { color: colors.primary }]} numberOfLines={1}>
-                  {selectedFestival.nombre}
-                </Text>
-                <Pressable onPress={() => setSelectedFestival(null)} style={styles.closeButton}>
-                  <Ionicons name="close" size={24} color={colors.text} />
-                </Pressable>
-              </View>
-
-              {/* Segmented Modal Tabs */}
-              <View style={[styles.modalTabsRow, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-                {['General', 'Recetas', 'Media', 'Ir'].map((tabLabel, idx) => (
-                  <Pressable
-                    key={idx}
-                    onPress={() => setFestivalActiveTab(idx)}
-                    style={[
-                      styles.modalTabButton,
-                      festivalActiveTab === idx && [styles.modalTabButtonActive, { borderBottomColor: colors.primary }]
-                    ]}
-                  >
-                    <Text style={[styles.modalTabLabel, { color: colors.textSecondary }, festivalActiveTab === idx && [styles.modalTabLabelActive, { color: colors.primary }]]}>
-                      {tabLabel}
-                    </Text>
-                  </Pressable>
-                ))}
-              </View>
-
-              <ScrollView 
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={styles.modalScroll}
-              >
-                {/* 1. GENERAL TAB */}
-                {festivalActiveTab === 0 && (
-                  <View style={styles.tabContentBlock}>
-                    <Image source={{ uri: selectedFestival.galeria[0] }} style={styles.detailImage} />
-                    <View style={[styles.detailCardBody, { backgroundColor: colors.surface }]}>
-                      <Text style={[styles.detailSectionTitle, { color: colors.text, borderLeftColor: colors.primary }]}>Historia y Tradición</Text>
-                      <Text style={[styles.detailText, { color: colors.textSecondary }]}>{selectedFestival.historia}</Text>
-                      
-                      {selectedFestival.recetaRelacionada && (() => {
-                        const relRecipe = RECIPES.find(r => r.id === selectedFestival.recetaRelacionada);
-                        return relRecipe ? (
-                          <View style={[styles.highlightProductBox, { backgroundColor: isDarkMode ? 'rgba(200, 92, 56, 0.15)' : 'rgba(200, 92, 56, 0.07)', borderColor: isDarkMode ? 'rgba(200, 92, 56, 0.3)' : 'rgba(200, 92, 56, 0.2)' }]}>
-                            <Ionicons name="flame" size={24} color={colors.primary} />
-                            <View style={styles.highlightProductInfo}>
-                              <Text style={[styles.highlightProductLabel, { color: colors.primary }]}>Plato Principal Relacionado</Text>
-                              <Text style={[styles.highlightProductValue, { color: colors.text }]}>{relRecipe.nombre}</Text>
-                            </View>
-                          </View>
-                        ) : null;
-                      })()}
-                    </View>
-                  </View>
-                )}
-
-                {/* 2. RECIPES TAB */}
-                {festivalActiveTab === 1 && (() => {
-                  const relRecipe = RECIPES.find(r => r.id === selectedFestival.recetaRelacionada);
-                  return relRecipe ? (
-                    <View style={styles.tabContentBlock}>
-                      <View style={[styles.detailCardBody, { backgroundColor: colors.surface }]}>
-                        <Text style={[styles.detailSectionTitle, { color: colors.text, borderLeftColor: colors.primary }]}>Ingredientes Típicos</Text>
-                        <View style={styles.badgeWrap}>
-                          {relRecipe.ingredientes.map((ing, i) => (
-                            <View key={i} style={[styles.detailIngredientBadge, { backgroundColor: isDarkMode ? 'rgba(46, 111, 64, 0.15)' : 'rgba(46, 111, 64, 0.05)', borderColor: isDarkMode ? 'rgba(46, 111, 64, 0.3)' : 'rgba(46, 111, 64, 0.2)' }]}>
-                              <Ionicons name="leaf" size={12} color={colors.secondary} style={{ marginRight: 4 }} />
-                              <Text style={[styles.ingredientBadgeText, { color: colors.secondary }]}>{ing}</Text>
-                            </View>
-                          ))}
-                        </View>
-
-                        <Text style={[styles.detailSectionTitle, { marginTop: Theme.spacing.lg, color: colors.text, borderLeftColor: colors.primary }]}>
-                          Receta Tradicional
-                        </Text>
-                        <Card style={[styles.recipeLinkCard, { backgroundColor: colors.surface, borderColor: colors.border }]} elevation="sm" border={true} onPress={() => { setSelectedFestival(null); handleOpenRecipe(relRecipe); }}>
-                          <Image source={{ uri: relRecipe.video || 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600' }} style={styles.recipeLinkImage} />
-                          <View style={styles.recipeLinkBody}>
-                            <Text style={[styles.recipeLinkLabel, { color: colors.primary }]}>Ver Receta Completa</Text>
-                            <Text style={[styles.recipeLinkTitle, { color: colors.text }]}>{relRecipe.nombre}</Text>
-                            <Text style={[styles.recipeLinkDesc, { color: colors.textSecondary }]} numberOfLines={2}>{relRecipe.historia}</Text>
-                          </View>
-                        </Card>
-                      </View>
-                    </View>
-                  ) : (
-                    <View style={styles.emptyContainer}>
-                      <Ionicons name="restaurant-outline" size={48} color={colors.textSecondary} />
-                      <Text style={[styles.emptyText, { color: colors.textSecondary }]}>No hay receta registrada para esta fiesta.</Text>
-                    </View>
-                  );
-                })()}
-
-                {/* 3. MULTIMEDIA TAB */}
-                {festivalActiveTab === 2 && (
-                  <View style={styles.tabContentBlock}>
-                    <View style={[styles.detailCardBody, { backgroundColor: colors.surface }]}>
-                      <Text style={[styles.detailSectionTitle, { color: colors.text, borderLeftColor: colors.primary }]}>Fotografías de la Edición Anterior</Text>
-                      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.galleryScroll}>
-                        {selectedFestival.galeria.map((img, i) => (
-                          <Image key={i} source={{ uri: img }} style={styles.galleryThumbnail} />
-                        ))}
-                      </ScrollView>
-
-                      <Text style={[styles.detailSectionTitle, { marginTop: Theme.spacing.lg, color: colors.text, borderLeftColor: colors.primary }]}>
-                        Transmisión de Cocina en Vivo (Simulado)
-                      </Text>
-                      
-                      {!isPlayingFestivalVideo ? (
-                        <Pressable style={styles.videoPlayerMock} onPress={() => setIsPlayingFestivalVideo(true)}>
-                          <Image source={{ uri: selectedFestival.video }} style={styles.videoMockThumbnail} />
-                          <View style={styles.videoPlayOverlay}>
-                            <View style={[styles.playButtonCircle, { backgroundColor: colors.primary }]}>
-                              <Ionicons name="play" size={32} color={colors.white} style={{ marginLeft: 4 }} />
-                            </View>
-                            <Text style={styles.videoPlayText}>Reproducir Video Resumen</Text>
-                          </View>
-                        </Pressable>
-                      ) : (
-                        <Pressable style={styles.videoPlayingMock} onPress={() => setIsPlayingFestivalVideo(false)}>
-                          <Image source={{ uri: selectedFestival.galeria[0] }} style={styles.videoMockThumbnail} />
-                          <View style={styles.videoPlayingOverlay}>
-                            <Ionicons name="pause" size={36} color={colors.white} />
-                            <Text style={styles.videoPlayingText}>Reproduciendo... (Toca para pausar)</Text>
-                            <View style={styles.videoProgressOuter}>
-                              <View style={[styles.videoProgressInner, { backgroundColor: colors.primary }]} />
-                            </View>
-                          </View>
-                        </Pressable>
-                      )}
-                    </View>
-                  </View>
-                )}
-
-                {/* 4. HOW TO GET THERE TAB */}
-                {festivalActiveTab === 3 && (
-                  <View style={styles.tabContentBlock}>
-                    <View style={[styles.detailCardBody, { backgroundColor: colors.surface }]}>
-                      <Text style={[styles.detailSectionTitle, { color: colors.text, borderLeftColor: colors.primary }]}>Cómo Llegar al Evento</Text>
-                      <Text style={[styles.detailText, { color: colors.textSecondary }]}>{selectedFestival.ubicación}</Text>
-                      
-                      <Card style={[styles.routeMockCard, { backgroundColor: colors.surfaceDark }]} elevation="none">
-                        <View style={styles.routeHeader}>
-                          <Ionicons name="navigate-circle" size={32} color={colors.secondary} />
-                          <View style={styles.routeHeaderInfo}>
-                            <Text style={[styles.routeTitle, { color: colors.text }]}>Ruta Recomendada</Text>
-                            <Text style={[styles.routeSubtitle, { color: colors.textSecondary }]}>Desde Corrientes Capital</Text>
-                          </View>
-                        </View>
-                        <View style={[styles.routeDivider, { backgroundColor: colors.border }]} />
-                        <View style={styles.routeStepRow}>
-                          <Ionicons name="car-outline" size={20} color={colors.primary} />
-                          <Text style={[styles.routeStepText, { color: colors.textSecondary }]}>Vehículo particular / Autobús provincial</Text>
-                        </View>
-                      </Card>
-                    </View>
-                  </View>
-                )}
-              </ScrollView>
-            </View>
-          </View>
-        </Modal>
-      )}
+      <FestivalDetailModal
+        festival={selectedFestival}
+        visible={!!selectedFestival}
+        onClose={() => setSelectedFestival(null)}
+      />
     </SafeAreaView>
   );
 };
@@ -1144,6 +844,7 @@ const styles = StyleSheet.create({
   },
   quickAccessItem: {
     width: '48%',
+    minHeight: 110, // Added minHeight to prevent row misalignment
     borderRadius: Theme.roundness.md,
     padding: Theme.spacing.md,
     marginBottom: Theme.spacing.sm,
@@ -1293,18 +994,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: Theme.spacing.lg,
   },
   curiositiesContainer: {
-    flexDirection: 'row',
+    flexDirection: SCREEN_WIDTH < 600 ? 'column' : 'row',
     justifyContent: 'space-between',
     marginTop: Theme.spacing.xs,
   },
   curiosityCard: {
-    width: (SCREEN_WIDTH - 32 - 16) / 3,
+    width: SCREEN_WIDTH < 600 ? '100%' : (SCREEN_WIDTH - 32 - 16) / 3,
     height: 145,
     backgroundColor: Theme.colors.white,
     padding: Theme.spacing.sm,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: Theme.roundness.md,
+    marginBottom: SCREEN_WIDTH < 600 ? Theme.spacing.sm : 0,
   },
   curiosityCardFlipped: {
     backgroundColor: 'rgba(46, 111, 64, 0.08)',

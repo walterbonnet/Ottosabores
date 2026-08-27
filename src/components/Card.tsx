@@ -8,6 +8,10 @@ interface CardProps {
   onPress?: () => void;
   elevation?: 'none' | 'sm' | 'md' | 'lg';
   border?: boolean;
+  accessibilityRole?: any;
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
+  accessibilityState?: any;
 }
 
 export const Card: React.FC<CardProps> = ({
@@ -16,6 +20,10 @@ export const Card: React.FC<CardProps> = ({
   onPress,
   elevation = 'sm',
   border = true,
+  accessibilityRole,
+  accessibilityLabel,
+  accessibilityHint,
+  accessibilityState,
 }) => {
   const cardStyle = [
     styles.card,
@@ -32,13 +40,27 @@ export const Card: React.FC<CardProps> = ({
           cardStyle,
           pressed && styles.pressed,
         ]}
+        accessibilityRole={accessibilityRole}
+        accessibilityLabel={accessibilityLabel}
+        accessibilityHint={accessibilityHint}
+        accessibilityState={accessibilityState}
       >
         {children}
       </Pressable>
     );
   }
 
-  return <View style={cardStyle}>{children}</View>;
+  return (
+    <View 
+      style={cardStyle}
+      accessibilityRole={accessibilityRole}
+      accessibilityLabel={accessibilityLabel}
+      accessibilityHint={accessibilityHint}
+      accessibilityState={accessibilityState}
+    >
+      {children}
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
