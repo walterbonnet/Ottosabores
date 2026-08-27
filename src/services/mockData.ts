@@ -27,7 +27,7 @@ export const RECIPES: Recipe[] = [
     ],
     duración: '45 min',
     dificultad: 'Fácil',
-    video: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=60'
+    video: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&auto=format&fit=crop&q=60'
   },
   {
     id: 'r2',
@@ -57,7 +57,7 @@ export const RECIPES: Recipe[] = [
     ],
     duración: '60 min',
     dificultad: 'Media',
-    video: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=600&auto=format&fit=crop&q=60'
+    video: 'https://images.unsplash.com/photo-1541832676-9b763b0239ab?w=600&auto=format&fit=crop&q=60'
   },
   {
     id: 'r3',
@@ -84,7 +84,7 @@ export const RECIPES: Recipe[] = [
     ],
     duración: '50 min',
     dificultad: 'Fácil',
-    video: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=600&auto=format&fit=crop&q=60'
+    video: 'https://images.unsplash.com/photo-1534080564583-6be75777b70a?w=600&auto=format&fit=crop&q=60'
   },
   {
     id: 'r4',
@@ -111,7 +111,7 @@ export const RECIPES: Recipe[] = [
     ],
     duración: '120 min',
     dificultad: 'Media',
-    video: 'https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?w=600&auto=format&fit=crop&q=60'
+    video: 'https://images.unsplash.com/photo-1601004890684-d8cbf643f5f2?w=600&auto=format&fit=crop&q=60'
   },
   {
     id: 'r5',
@@ -135,7 +135,7 @@ export const RECIPES: Recipe[] = [
     ],
     duración: '270 min',
     dificultad: 'Difícil',
-    video: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=60'
+    video: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&auto=format&fit=crop&q=60'
   },
   {
     id: 'r6',
@@ -184,7 +184,7 @@ export const RECIPES: Recipe[] = [
     ],
     duración: '50 min',
     dificultad: 'Fácil',
-    video: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=600&auto=format&fit=crop&q=60'
+    video: 'https://images.unsplash.com/photo-1515003844-18985b37a864?w=600&auto=format&fit=crop&q=60'
   },
   {
     id: 'r8',
@@ -206,7 +206,7 @@ export const RECIPES: Recipe[] = [
     ],
     duración: '90 min',
     dificultad: 'Media',
-    video: 'https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=600&auto=format&fit=crop&q=60'
+    video: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=60'
   },
   {
     id: 'r9',
@@ -229,7 +229,7 @@ export const RECIPES: Recipe[] = [
     ],
     duración: '60 min',
     dificultad: 'Media',
-    video: 'https://images.unsplash.com/photo-1534482421-64566f976cfa?w=600&auto=format&fit=crop&q=60'
+    video: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=600&auto=format&fit=crop&q=60'
   },
   {
     id: 'r10',
@@ -252,7 +252,7 @@ export const RECIPES: Recipe[] = [
     ],
     duración: '300 min',
     dificultad: 'Difícil',
-    video: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=60'
+    video: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&auto=format&fit=crop&q=60'
   },
   {
     id: 'r11',
@@ -298,7 +298,7 @@ export const RECIPES: Recipe[] = [
     ],
     duración: '120 min',
     dificultad: 'Fácil',
-    video: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=60'
+    video: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&auto=format&fit=crop&q=60'
   },
   {
     id: 'r13',
@@ -322,7 +322,7 @@ export const RECIPES: Recipe[] = [
     ],
     duración: '20 min',
     dificultad: 'Fácil',
-    video: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=60'
+    video: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&auto=format&fit=crop&q=60'
   },
   {
     id: 'r14',
@@ -343,7 +343,7 @@ export const RECIPES: Recipe[] = [
     ],
     duración: '45 min',
     dificultad: 'Fácil',
-    video: 'https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?w=600&auto=format&fit=crop&q=60'
+    video: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&auto=format&fit=crop&q=60'
   },
   {
     id: 'r15',
@@ -408,7 +408,7 @@ export const RECIPES: Recipe[] = [
     ],
     duración: '20 min',
     dificultad: 'Fácil',
-    video: 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=600&auto=format&fit=crop&q=60'
+    video: 'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8?w=600&auto=format&fit=crop&q=60'
   },
   {
     id: 'r18',
@@ -429,7 +429,7 @@ export const RECIPES: Recipe[] = [
     ],
     duración: '60 min',
     dificultad: 'Media',
-    video: 'https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?w=600&auto=format&fit=crop&q=60'
+    video: 'https://images.unsplash.com/photo-1595981267035-7b04ca84a82d?w=600&auto=format&fit=crop&q=60'
   },
   {
     id: 'r19',
@@ -452,7 +452,7 @@ export const RECIPES: Recipe[] = [
     ],
     duración: '90 min',
     dificultad: 'Media',
-    video: 'https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?w=600&auto=format&fit=crop&q=60'
+    video: 'https://images.unsplash.com/photo-1506084868230-bb9d95c24759?w=600&auto=format&fit=crop&q=60'
   }
 ];
 

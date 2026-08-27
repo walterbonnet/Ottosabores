@@ -297,21 +297,21 @@ export const InicioScreen: React.FC = () => {
         desc: 'Navegá por las localidades correntinas, descubriendo sus platos típicos y secretos gastronómicos únicos.',
         icon: 'map-outline',
         color: colors.primary,
-        image: 'https://images.unsplash.com/photo-1524661135-423995f22d0b?w=600&auto=format&fit=crop&q=80',
+        image: 'https://images.unsplash.com/photo-1542362567-b07eac79094f?w=600&auto=format&fit=crop&q=80',
       },
       {
         title: 'Saberes Tradicionales',
         desc: 'Accedé a recetas ancestrales con listas de control inteligentes y sumá puntos de experiencia cocinando.',
         icon: 'restaurant-outline',
         color: colors.secondary,
-        image: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=600&auto=format&fit=crop&q=80',
+        image: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=600&auto=format&fit=crop&q=80',
       },
       {
         title: 'Realidad Aumentada',
         desc: 'Escaneá códigos QR para proyectar platos tradicionales en 3D y escuchar relatos de la historia correntina.',
         icon: 'qr-code-outline',
         color: colors.accent,
-        image: 'https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=600&auto=format&fit=crop&q=80',
+        image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=80',
       },
     ];
 
@@ -335,6 +335,7 @@ export const InicioScreen: React.FC = () => {
             <Image 
               source={{ uri: currentSlide.image }} 
               style={styles.onboardingImage} 
+              contentFit="cover"
             />
 
             <View style={styles.onboardingCardBody}>
@@ -407,7 +408,7 @@ export const InicioScreen: React.FC = () => {
       >
         {/* Hero Principal con Imagen de Fondo y Eslogan */}
         <ImageBackground 
-          source={{ uri: 'https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=1000&auto=format&fit=crop&q=80' }} 
+          source={{ uri: 'https://images.unsplash.com/photo-1516259762381-22954d7d3ad2?w=1000&auto=format&fit=crop&q=80' }} 
           style={styles.heroBackground}
         >
           <View style={styles.heroOverlay}>
@@ -479,7 +480,11 @@ export const InicioScreen: React.FC = () => {
                         border={true}
                       >
                         <View style={styles.recipeRow}>
-                          <Image source={{ uri: recipe.video || 'https://images.unsplash.com/photo-1547592180-85f173990554?w=400' }} style={[styles.recipeThumbnail, { backgroundColor: colors.surfaceDark }]} />
+                          <Image 
+                            source={{ uri: recipe.video || 'https://images.unsplash.com/photo-1547592180-85f173990554?w=400' }} 
+                            style={[styles.recipeThumbnail, { backgroundColor: colors.surfaceDark }]} 
+                            contentFit="cover"
+                          />
                           <View style={styles.recipeInfo}>
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                               <Text style={[styles.recipeCategoryText, { color: colors.primary }]}>{recipe.categoría}</Text>
@@ -520,7 +525,11 @@ export const InicioScreen: React.FC = () => {
                       onPress={() => handleOpenRecipe(continueRecipe!)}
                     >
                       <View style={styles.continueRow}>
-                        <Image source={{ uri: continueRecipe.video }} style={[styles.continueThumbnail, { backgroundColor: colors.surfaceDark }]} />
+                        <Image 
+                          source={{ uri: continueRecipe.video }} 
+                          style={[styles.continueThumbnail, { backgroundColor: colors.surfaceDark }]} 
+                          contentFit="cover"
+                        />
                         <View style={styles.continueInfo}>
                           <Text style={[styles.continueCategory, { color: colors.primary }]}>{continueRecipe.categoría}</Text>
                           <Text style={[styles.continueTitle, { color: colors.text }]}>{continueRecipe.nombre}</Text>
@@ -598,7 +607,11 @@ export const InicioScreen: React.FC = () => {
                           border={true}
                           onPress={() => item.type === 'recipe' ? handleOpenRecipe(item as Recipe) : handleOpenFestival(item as Festival)}
                         >
-                          <Image source={{ uri: item.type === 'recipe' ? (item as Recipe).video : (item as Festival).galeria[0] }} style={styles.recentImage} />
+                          <Image 
+                            source={{ uri: item.type === 'recipe' ? (item as Recipe).video : (item as Festival).galeria[0] }} 
+                            style={styles.recentImage} 
+                            contentFit="cover"
+                          />
                           <View style={styles.recentOverlay}>
                             <View style={[styles.recentBadgeRow, { backgroundColor: colors.primary }]}>
                               <Ionicons 
@@ -631,7 +644,11 @@ export const InicioScreen: React.FC = () => {
                     border={true}
                     onPress={() => handleOpenRecipe(recommendedRecipe)}
                   >
-                    <Image source={{ uri: recommendedRecipe.video || 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600' }} style={styles.featuredImage} />
+                    <Image 
+                      source={{ uri: recommendedRecipe.video || 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600' }} 
+                      style={styles.featuredImage} 
+                      contentFit="cover"
+                    />
                     <View style={styles.featuredOverlay}>
                       <View style={styles.featuredTagContainer}>
                         <Text style={[styles.featuredTag, { color: colors.accent }]}>{recommendedRecipe.categoría}</Text>
