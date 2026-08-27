@@ -157,37 +157,40 @@ export const FiestasScreen: React.FC = () => {
                     <View style={[styles.routeIndicatorCircle, { backgroundColor: route === 'Carnes Tradicionales' ? colors.primary : route === 'Herencia Guaraní' ? colors.secondary : colors.accent }]} />
                     <Text style={[styles.routeGroupTitle, { color: colors.text }]}>{route}</Text>
                   </View>
-                  
-                  <View style={styles.festivalsGrid}>
+                         <View style={styles.gridContainer}>
                     {routeFestivals.map((fest) => (
-                      <Card
-                        key={fest.id}
-                        style={[styles.festivalCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
-                        onPress={() => openFestivalDetails(fest)}
-                      >
-                        <Image source={{ uri: fest.galeria?.[0] }} style={styles.festivalImage} />
-                        
-                        <View style={styles.festivalCardBody}>
-                          <View style={styles.festivalCardHeader}>
-                            <Ionicons name="location-outline" size={12} color={colors.textSecondary} />
-                            <Text style={styles.festivalLocation} numberOfLines={1}>{fest.localidad}</Text>
-                          </View>
-                          
-                          <Text style={[styles.festivalTitle, { color: colors.text }]} numberOfLines={1}>{fest.nombre}</Text>
-                          <Text style={[styles.festivalDesc, { color: colors.textSecondary }]} numberOfLines={2}>{fest.descripcionCorta}</Text>
-                          
-                          <View style={styles.productBadgeContainer}>
-                            <Ionicons name="leaf-outline" size={10} color={colors.secondary} style={{ marginRight: 4 }} />
-                            <Text style={[styles.productBadgeText, { color: colors.secondary }]} numberOfLines={1}>{fest.productoDestacado}</Text>
-                          </View>
-                          
-                          {/* CTA Explorar */}
-                          <View style={[styles.exploreBtn, { backgroundColor: colors.primary }]}>
-                            <Text style={styles.exploreBtnText}>Explorar</Text>
-                            <Ionicons name="arrow-forward" size={11} color={colors.white} style={{ marginLeft: 4 }} />
-                          </View>
-                        </View>
-                      </Card>
+                       <Card
+                         key={fest.id}
+                         style={[styles.gridCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
+                         onPress={() => openFestivalDetails(fest)}
+                       >
+                         <Image 
+                           source={{ uri: fest.galeria?.[0] }} 
+                           style={styles.cardImage} 
+                           contentFit="cover"
+                         />
+                         
+                         <View style={styles.cardInfo}>
+                           <View style={styles.cardMetaRow}>
+                             <Ionicons name="location-outline" size={12} color={colors.textSecondary} />
+                             <Text style={styles.cardMetaText} numberOfLines={1}>{fest.localidad}</Text>
+                           </View>
+                           
+                           <Text style={[styles.cardTitle, { color: colors.text }]} numberOfLines={1}>{fest.nombre}</Text>
+                           <Text style={[styles.cardDesc, { color: colors.textSecondary }]} numberOfLines={2}>{fest.descripcionCorta}</Text>
+                           
+                           <View style={styles.productBadge}>
+                             <Ionicons name="leaf-outline" size={10} color={colors.secondary} style={{ marginRight: 4 }} />
+                             <Text style={[styles.productBadgeText, { color: colors.secondary }]} numberOfLines={1}>{fest.productoDestacado}</Text>
+                           </View>
+                           
+                           {/* CTA Explorar */}
+                           <View style={[styles.exploreBtn, { backgroundColor: colors.primary }]}>
+                             <Text style={styles.exploreBtnText}>Explorar</Text>
+                             <Ionicons name="arrow-forward" size={11} color={colors.white} style={{ marginLeft: 4 }} />
+                           </View>
+                         </View>
+                       </Card>
                     ))}
                   </View>
                 </View>

@@ -183,7 +183,11 @@ export const RecetasScreen: React.FC = () => {
           {/* SECCIÓN 1: Hero */}
           {visibleSections >= 1 && (
             <View style={styles.heroSection}>
-              <Image source={{ uri: selectedRecipe.video || 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600' }} style={styles.heroImage} />
+              <Image 
+                source={{ uri: selectedRecipe.video || 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600' }} 
+                style={styles.heroImage} 
+                contentFit="cover"
+              />
               <View style={styles.heroOverlay}>
                 <Text style={styles.heroTitle}>{selectedRecipe.nombre}</Text>
                 <View style={styles.heroCategoryRow}>
@@ -627,7 +631,11 @@ export const RecetasScreen: React.FC = () => {
                   onPress={() => handleOpenRecipe(recipe)}
                 >
                   <View style={{ position: 'relative' }}>
-                    <Image source={{ uri: recipe.video || 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600' }} style={styles.editorialImage} />
+                    <Image 
+                      source={{ uri: recipe.video || 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600' }} 
+                      style={styles.editorialImage} 
+                      contentFit="cover"
+                    />
                     {isSeen && (
                       <View style={styles.viewedBadge}>
                         <Ionicons name="checkmark-circle" size={10} color="#FFF" style={{ marginRight: 3 }} />

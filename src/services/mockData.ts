@@ -466,10 +466,10 @@ export const FESTIVALS: Festival[] = [
     historia: 'Esta festividad celebra el creciente desarrollo y la cría del búfalo en el norte de Corrientes. Caá Catí se viste de fiesta para recibir a productores y familias que disfrutan de demostraciones de destreza gaucha, peñas de chamamé y una inmensa feria culinaria donde la carne de búfalo es la estrella indiscutida en empanadas, asados y guisados.',
     recetaRelacionada: 'r10',
     galeria: [
-      'https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400&auto=format&fit=crop&q=60',
+      'https://images.unsplash.com/photo-1560611580-b98b2d6f4387?w=400&auto=format&fit=crop&q=60',
       'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&auto=format&fit=crop&q=60'
     ],
-    video: 'https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=600&auto=format&fit=crop&q=60',
+    video: 'https://images.unsplash.com/photo-1560611580-b98b2d6f4387?w=600&auto=format&fit=crop&q=60',
     categoría: 'Carnes Tradicionales',
     productoDestacado: 'Búfalo',
     descripcionCorta: 'Disfrutá de los mejores cortes de carne de búfalo cocinados a la estaca por expertos asadores camperos.',
@@ -484,10 +484,10 @@ export const FESTIVALS: Festival[] = [
     historia: 'El cordero de Mercedes es famoso en toda la Patagonia y el Litoral argentino por el particular sabor de la carne, alimentada en pastizales naturales únicos del Iberá. Anualmente, la Fiesta del Cordero rinde homenaje a los trabajadores rurales con una multitudinaria competencia de asadores a la estaca, ferias artesanales y espectáculos artísticos chamameceros.',
     recetaRelacionada: 'r5',
     galeria: [
-      'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&auto=format&fit=crop&q=60',
+      'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&auto=format&fit=crop&q=60',
       'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400&auto=format&fit=crop&q=60'
     ],
-    video: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=60',
+    video: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&auto=format&fit=crop&q=60',
     categoría: 'Carnes Tradicionales',
     productoDestacado: 'Cordero Mercedeño',
     descripcionCorta: 'Tradicional asado de cordero a la estaca rociado con salmuera de romero y ajo, un manjar criollo del Iberá.',
@@ -503,7 +503,7 @@ export const FESTIVALS: Festival[] = [
     recetaRelacionada: 'r11',
     galeria: [
       'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&auto=format&fit=crop&q=60',
-      'https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?w=400&auto=format&fit=crop&q=60'
+      'https://images.unsplash.com/photo-1516259762381-22954d7d3ad2?w=400&auto=format&fit=crop&q=60'
     ],
     video: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=60',
     categoría: 'Carnes Tradicionales',
@@ -520,10 +520,10 @@ export const FESTIVALS: Festival[] = [
     historia: 'A orillas del imponente río Paraná y rodeado de las barrancas de Empedrado, este festival reúne a los mejores parrilleros y asadores de la región para competir por el gran título. Con fogones a leña viva esparcidos en la costa, se cocinan costillares vacunos, vacíos y chinchulines, acompañados de música litoraleña en vivo.',
     recetaRelacionada: 'r12',
     galeria: [
-      'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&auto=format&fit=crop&q=60',
+      'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&auto=format&fit=crop&q=60',
       'https://images.unsplash.com/photo-1516259762381-22954d7d3ad2?w=400&auto=format&fit=crop&q=60'
     ],
-    video: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=60',
+    video: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&auto=format&fit=crop&q=60',
     categoría: 'Carnes Tradicionales',
     productoDestacado: 'Asado Criollo',
     descripcionCorta: 'Grandes costillares vacunos dorados lentamente a las brasas con leña seleccionada y adobo tradicional.',
@@ -538,10 +538,10 @@ export const FESTIVALS: Festival[] = [
     historia: 'Santa Rosa es una de las cunas de la elaboración artesanal e industrial del chipá en Corrientes. Su festival nacional rinde homenaje a las familias panificadoras tradicionales que conservan la receta heredada de los guaraníes, elaborando el chipá con el mejor almidón de mandioca de sus plantaciones y quesos locales.',
     recetaRelacionada: 'r1',
     galeria: [
-      'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=400&auto=format&fit=crop&q=60',
-      'https://images.unsplash.com/photo-1547592180-85f173990554?w=400&auto=format&fit=crop&q=60'
+      'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&auto=format&fit=crop&q=60',
+      'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=400&auto=format&fit=crop&q=60'
     ],
-    video: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=60',
+    video: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&auto=format&fit=crop&q=60',
     categoría: 'Herencia Guaraní',
     productoDestacado: 'Chipá',
     descripcionCorta: 'Celebración y degustación del pan emblemático correntino elaborado con almidón de mandioca y queso.',
@@ -557,7 +557,7 @@ export const FESTIVALS: Festival[] = [
     recetaRelacionada: 'r6',
     galeria: [
       'https://images.unsplash.com/photo-1542362567-b07eac79094f?w=400&auto=format&fit=crop&q=60',
-      'https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?w=400&auto=format&fit=crop&q=60'
+      'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=400&auto=format&fit=crop&q=60'
     ],
     video: 'https://images.unsplash.com/photo-1542362567-b07eac79094f?w=600&auto=format&fit=crop&q=60',
     categoría: 'Herencia Guaraní',
@@ -574,10 +574,10 @@ export const FESTIVALS: Festival[] = [
     historia: 'El Sombrero reúne anualmente a miles de comensales en torno a dos comidas guaraníes de fuerte arraigo invernal: el Mbaipy (crema espesa de maíz con quesos y carnes) y el Mbejú (pan plano de almidón y queso tostado). Cocineros de toda la provincia compiten cocinando en gigantescas ollas de hierro y sartenes a fuego de leña.',
     recetaRelacionada: 'r2',
     galeria: [
-      'https://images.unsplash.com/photo-1547592180-85f173990554?w=400&auto=format&fit=crop&q=60',
-      'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=400&auto=format&fit=crop&q=60'
+      'https://images.unsplash.com/photo-1541832676-9b763b0239ab?w=400&auto=format&fit=crop&q=60',
+      'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&auto=format&fit=crop&q=60'
     ],
-    video: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=600&auto=format&fit=crop&q=60',
+    video: 'https://images.unsplash.com/photo-1541832676-9b763b0239ab?w=600&auto=format&fit=crop&q=60',
     categoría: 'Herencia Guaraní',
     productoDestacado: 'Mbejú y Mbaipy',
     descripcionCorta: 'Ancestrales preparaciones calientes a base de harina de maíz y almidón de mandioca con queso criollo.',
@@ -592,10 +592,10 @@ export const FESTIVALS: Festival[] = [
     historia: 'La mandioca es el tubérculo sagrado y la base del sustento alimenticio guaraní en todo el litoral. Virasoro le rinde homenaje con esta fiesta popular que expone los mejores cultivos del año de las chacras de la región, complementada con muestras culinarias que van desde la simple mandioca hervida y frita hasta sofisticados postres.',
     recetaRelacionada: 'r14',
     galeria: [
-      'https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?w=400&auto=format&fit=crop&q=60',
-      'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=400&auto=format&fit=crop&q=60'
+      'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&auto=format&fit=crop&q=60',
+      'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=400&auto=format&fit=crop&q=60'
     ],
-    video: 'https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?w=600&auto=format&fit=crop&q=60',
+    video: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&auto=format&fit=crop&q=60',
     categoría: 'Herencia Guaraní',
     productoDestacado: 'Mandioca',
     descripcionCorta: 'Homenaje al cultivo estrella de las chacras correntinas, base de toda la comida tradicional de la región.',
@@ -610,10 +610,10 @@ export const FESTIVALS: Festival[] = [
     historia: 'En San Cosme, las familias artesanas demuestran de generación en generación cómo extraer el almidón puro de mandioca rallando las raíces en ralladores tradicionales de chapa y lavándolas en tamices de lienzo. El festival celebra este insumo imprescindible con muestras de cocina en vivo de chipas, mbejú y dulces regionales.',
     recetaRelacionada: 'r13',
     galeria: [
-      'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=400&auto=format&fit=crop&q=60',
-      'https://images.unsplash.com/photo-1547592180-85f173990554?w=400&auto=format&fit=crop&q=60'
+      'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=400&auto=format&fit=crop&q=60',
+      'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&auto=format&fit=crop&q=60'
     ],
-    video: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=60',
+    video: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=600&auto=format&fit=crop&q=60',
     categoría: 'Herencia Guaraní',
     productoDestacado: 'Almidón Artesanal',
     descripcionCorta: 'Demostración del proceso artesanal de extracción del almidón de mandioca y su uso culinario tradicional.',
@@ -629,7 +629,7 @@ export const FESTIVALS: Festival[] = [
     recetaRelacionada: 'r15',
     galeria: [
       'https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=400&auto=format&fit=crop&q=60',
-      'https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?w=400&auto=format&fit=crop&q=60'
+      'https://images.unsplash.com/photo-1516259762381-22954d7d3ad2?w=400&auto=format&fit=crop&q=60'
     ],
     video: 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=600&auto=format&fit=crop&q=60',
     categoría: 'Sabores Naturales',
@@ -664,10 +664,10 @@ export const FESTIVALS: Festival[] = [
     historia: 'Esquina es una gran zona de producción de sandías de primicia en la Argentina, cosechando frutos sumamente dulces y jugosos. El festival premia anualmente a los productores que presentan los ejemplares más pesados y dulces de la cosecha de verano. Hay desfiles de carrozas, ferias artesanales de postres frescos y peñas folclóricas.',
     recetaRelacionada: 'r17',
     galeria: [
-      'https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=400&auto=format&fit=crop&q=60',
+      'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8?w=400&auto=format&fit=crop&q=60',
       'https://images.unsplash.com/photo-1534482421-64566f976cfa?w=400&auto=format&fit=crop&q=60'
     ],
-    video: 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=600&auto=format&fit=crop&q=60',
+    video: 'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8?w=600&auto=format&fit=crop&q=60',
     categoría: 'Sabores Naturales',
     productoDestacado: 'Sandía',
     descripcionCorta: 'Disfrutá de refrescantes postres, jugos y el tradicional clericó elaborados con sandías esquinenses gigantes.',
@@ -682,10 +682,10 @@ export const FESTIVALS: Festival[] = [
     historia: 'Mantilla rinde tributo a las palmeras yatay, un elemento identitario del paisaje y la cultura correntina. Los frutos del yatay, de un sabor agridulce muy particular, se cosechan en el verano para elaborar artesanalmente licores espirituosos, jaleas, dulces espesos en almíbar y vinagres saborizados muy apreciados en la cocina regional.',
     recetaRelacionada: 'r18',
     galeria: [
-      'https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?w=400&auto=format&fit=crop&q=60',
+      'https://images.unsplash.com/photo-1595981267035-7b04ca84a82d?w=400&auto=format&fit=crop&q=60',
       'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400&auto=format&fit=crop&q=60'
     ],
-    video: 'https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?w=600&auto=format&fit=crop&q=60',
+    video: 'https://images.unsplash.com/photo-1595981267035-7b04ca84a82d?w=600&auto=format&fit=crop&q=60',
     categoría: 'Sabores Naturales',
     productoDestacado: 'Yatay',
     descripcionCorta: 'Artesanales licores, conservas en almíbar y dulces tradicionales de yatay elaborados en base a recetas históricas.',
@@ -700,10 +700,10 @@ export const FESTIVALS: Festival[] = [
     historia: 'Tres de Abril es el epicentro de la producción hortícola de batatas dulces de Corrientes. En esta fiesta regional, las familias productoras exponen sus batatas blancas y coloradas de sabor dulce incomparable. Se realiza una gran cena comunitaria con platos salados que incorporan la batata, asados criollos y excelentes dulces caseros en almíbar.',
     recetaRelacionada: 'r19',
     galeria: [
-      'https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?w=400&auto=format&fit=crop&q=60',
+      'https://images.unsplash.com/photo-1506084868230-bb9d95c24759?w=400&auto=format&fit=crop&q=60',
       'https://images.unsplash.com/photo-1547592180-85f173990554?w=400&auto=format&fit=crop&q=60'
     ],
-    video: 'https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?w=600&auto=format&fit=crop&q=60',
+    video: 'https://images.unsplash.com/photo-1506084868230-bb9d95c24759?w=600&auto=format&fit=crop&q=60',
     categoría: 'Sabores Naturales',
     productoDestacado: 'Batata',
     descripcionCorta: 'Tradicionales postres dulces en almíbar, pasteles y purés elaborados con la batata dulce correntina.',
