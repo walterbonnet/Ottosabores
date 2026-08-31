@@ -162,8 +162,6 @@ export const MultimediaScreen: React.FC = () => {
   const handleOpenFestival = (festival: Festival) => {
     addRecentlyViewed(festival.id, 'festival');
     setSelectedFestival(festival);
-    setModalActiveTab(0);
-    setIsPlayingFestivalVideo(false);
   };
 
   const handleProgressPress = (event: any) => {

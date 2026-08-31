@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import Theme from '../theme';
 import Card from '../components/Card';
 import Header from '../components/Header';
@@ -39,10 +40,47 @@ const getGrandmaTip = (recipeId: string): string => {
 };
 
 export const RecetasScreen: React.FC = () => {
+  const router = useRouter();
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [activeCategory, setActiveCategory] = useState<string>('Todos');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoadingDetail, setIsLoadingDetail] = useState<boolean>(false);
+  const [visibleSections, setVisibleSections] = useState<number>(0);
+
+  useEffect(() => {
+    let timers: any[] = [];
+    if (selectedRecipe) {
+      const initTimer = setTimeout(() => {
+        setIsLoadingDetail(true);
+        setVisibleSections(0);
+      }, 0);
+      timers.push(initTimer);
+      
+      const loadTimer = setTimeout(() => {
+        setIsLoadingDetail(false);
+        timers.push(setTimeout(() => setVisibleSections(1), 50));
+        timers.push(setTimeout(() => setVisibleSections(2), 150));
+        timers.push(setTimeout(() => setVisibleSections(3), 250));
+        timers.push(setTimeout(() => setVisibleSections(4), 350));
+        timers.push(setTimeout(() => setVisibleSections(5), 450));
+        timers.push(setTimeout(() => setVisibleSections(6), 550));
+        timers.push(setTimeout(() => setVisibleSections(7), 650));
+      }, 500);
+
+      timers.push(loadTimer);
+    } else {
+      const initTimer = setTimeout(() => {
+        setIsLoadingDetail(false);
+        setVisibleSections(0);
+      }, 0);
+      timers.push(initTimer);
+    }
+
+    return () => {
+      timers.forEach(t => clearTimeout(t));
+    };
+  }, [selectedRecipe]);
 
   const {
     favorites,

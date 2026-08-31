@@ -234,6 +234,45 @@ export const MapaScreen: React.FC = () => {
   // Estados auxiliares existentes de navegación para recetas en modal
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
 
+  // Estados para reproductor multimedia de video y carga progresiva en detalle de mapa
+  const [isPlayingVideo, setIsPlayingVideo] = useState<boolean>(false);
+  const [isLoadingDetail, setIsLoadingDetail] = useState<boolean>(false);
+  const [visibleSections, setVisibleSections] = useState<number>(0);
+  const [checkedIngredients, setCheckedIngredients] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    let timers: any[] = [];
+    if (activeDetailedFestival) {
+      const initTimer = setTimeout(() => {
+        setIsLoadingDetail(true);
+        setVisibleSections(0);
+      }, 0);
+      timers.push(initTimer);
+      
+      const loadTimer = setTimeout(() => {
+        setIsLoadingDetail(false);
+        timers.push(setTimeout(() => setVisibleSections(1), 50));
+        timers.push(setTimeout(() => setVisibleSections(2), 150));
+        timers.push(setTimeout(() => setVisibleSections(3), 250));
+        timers.push(setTimeout(() => setVisibleSections(4), 350));
+        timers.push(setTimeout(() => setVisibleSections(5), 450));
+      }, 500);
+
+      timers.push(loadTimer);
+    } else {
+      const initTimer = setTimeout(() => {
+        setIsLoadingDetail(false);
+        setVisibleSections(0);
+        setIsPlayingVideo(false);
+      }, 0);
+      timers.push(initTimer);
+    }
+
+    return () => {
+      timers.forEach(t => clearTimeout(t));
+    };
+  }, [activeDetailedFestival]);
+
   const {
     favorites,
     toggleFavorite,

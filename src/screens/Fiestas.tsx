@@ -223,6 +223,52 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 170, // Increased bottom padding to prevent overlap with audio player
   },
+  filterTabsContainer: {
+    paddingHorizontal: Theme.spacing.md,
+    paddingVertical: Theme.spacing.sm,
+    flexDirection: 'row',
+  },
+  filterTab: {
+    backgroundColor: Theme.colors.white,
+    paddingHorizontal: Theme.spacing.md,
+    paddingVertical: Theme.spacing.xs - 2,
+    borderRadius: Theme.roundness.round,
+    marginRight: 8,
+    borderWidth: 1,
+    borderColor: Theme.colors.border,
+  },
+  filterTabActive: {
+    backgroundColor: Theme.colors.primary,
+    borderColor: Theme.colors.primary,
+  },
+  filterTabText: {
+    fontSize: Theme.typography.sizes.sm - 1,
+    color: Theme.colors.textSecondary,
+    fontWeight: Theme.typography.weights.medium,
+  },
+  listSection: {
+    paddingHorizontal: Theme.spacing.md,
+    marginTop: Theme.spacing.lg,
+  },
+  routeGroup: {
+    marginBottom: Theme.spacing.lg,
+  },
+  routeHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: Theme.spacing.md,
+  },
+  routeIndicatorCircle: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    marginRight: Theme.spacing.sm,
+  },
+  routeGroupTitle: {
+    fontSize: Theme.typography.sizes.md,
+    fontWeight: Theme.typography.weights.bold,
+    color: Theme.colors.text,
+  },
   searchSection: {
     paddingHorizontal: Theme.spacing.md,
     marginTop: Theme.spacing.md,
