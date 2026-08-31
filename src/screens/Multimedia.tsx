@@ -30,7 +30,7 @@ const MOCK_VIDEOS = [
     title: 'Clase Magistral: Cómo trenzar el Chicharrón',
     duration: '05:32',
     instructor: 'Don Sosa de San Luis del Palmar',
-    thumbnail: 'https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=500&auto=format&fit=crop&q=70',
+    thumbnail: 'https://images.unsplash.com/photo-1596797882942-f44024409337?w=500&auto=format&fit=crop&q=80',
     description: 'Aprende el arte ancestral de trenzar la carne de falda con grasa vacuna y rebozarla con gofio correntino para cocinarla al fuego.',
     festivalRelacionado: '3'
   },
@@ -39,7 +39,7 @@ const MOCK_VIDEOS = [
     title: 'Cocción del Chipá Mbocá a las brasas',
     duration: '03:45',
     instructor: 'Abuela Cata de San Cosme',
-    thumbnail: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=500&auto=format&fit=crop&q=70',
+    thumbnail: 'https://images.unsplash.com/photo-1534482421-64566f976cfa?w=500&auto=format&fit=crop&q=80',
     description: 'El secreto de envolver la masa del chipá en una caña tacuara y dorarlo lentamente al calor del espinillo.',
     festivalRelacionado: '1'
   },
@@ -48,19 +48,19 @@ const MOCK_VIDEOS = [
     title: 'Elaboración del Mbaipy de Maíz Criollo',
     duration: '08:12',
     instructor: 'Panchi Quevedo (Cocinero de Estero)',
-    thumbnail: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=500&auto=format&fit=crop&q=70',
+    thumbnail: 'https://images.unsplash.com/photo-1541832676-9b763b0239ab?w=500&auto=format&fit=crop&q=80',
     description: 'Paso a paso de la polenta guaraní original, utilizando maíz colorado molido a mano en mortero de madera.',
     festivalRelacionado: '2'
   }
 ];
 
 const MOCK_PHOTOS = [
-  { id: 'f1', title: 'Esteros del Iberá al amanecer', url: 'https://images.unsplash.com/photo-1542362567-b07eac79094f?w=600&auto=format&fit=crop&q=70' },
-  { id: 'f2', title: 'Fuego lento en olla de hierro', url: 'https://images.unsplash.com/photo-1516259762381-22954d7d3ad2?w=600&auto=format&fit=crop&q=70' },
-  { id: 'f3', title: 'Amasado de chipá casero', url: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=600&auto=format&fit=crop&q=70' },
-  { id: 'f4', title: 'Pescados del Paraná listos para asar', url: 'https://images.unsplash.com/photo-1534482421-64566f976cfa?w=600&auto=format&fit=crop&q=70' },
-  { id: 'f5', title: 'Mandioca fresca recién cosechada', url: 'https://images.unsplash.com/photo-1608686207856-001b95cf60ca?w=600&auto=format&fit=crop&q=70' },
-  { id: 'f6', title: 'Frutos dorados del mamón', url: 'https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?w=600&auto=format&fit=crop&q=70' }
+  { id: 'f1', title: 'Esteros del Iberá al amanecer', url: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=600&auto=format&fit=crop&q=80' },
+  { id: 'f2', title: 'Fuego lento en olla de hierro', url: 'https://images.unsplash.com/photo-1534482421-64566f976cfa?w=600&auto=format&fit=crop&q=80' },
+  { id: 'f3', title: 'Amasado de chipá casero', url: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=600&auto=format&fit=crop&q=80' },
+  { id: 'f4', title: 'Pescados del Paraná listos para asar', url: 'https://images.unsplash.com/photo-1534604973900-c43ab4c2e0ab?w=600&auto=format&fit=crop&q=80' },
+  { id: 'f5', title: 'Mandioca fresca recién cosechada', url: 'https://images.unsplash.com/photo-1585238342024-78d387f4a707?w=600&auto=format&fit=crop&q=80' },
+  { id: 'f6', title: 'Frutos dorados del mamón', url: 'https://images.unsplash.com/photo-1618228514589-9a2c3a59df74?w=600&auto=format&fit=crop&q=80' }
 ];
 
 export const MultimediaScreen: React.FC = () => {

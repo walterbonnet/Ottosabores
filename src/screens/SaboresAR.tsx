@@ -59,7 +59,7 @@ const AR_ITEMS: ARItem[] = [
       '150g de queso rallado sardo',
       '1 cucharada de jugo de naranja natural'
     ],
-    video: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=60',
+    video: 'https://images.unsplash.com/photo-1590137876181-2a5a7e340308?w=600&auto=format&fit=crop&q=80',
     audioTrackId: 'p1', // El Secreto del Almidón de Mandioca
     platterColor: '#E6D7C3', // Light wood
     foodItems: [
@@ -86,7 +86,7 @@ const AR_ITEMS: ARItem[] = [
       '300g de queso criollo correntino',
       'Caldo de verduras caliente (1 litro)'
     ],
-    video: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=600&auto=format&fit=crop&q=60',
+    video: 'https://images.unsplash.com/photo-1541832676-9b763b0239ab?w=600&auto=format&fit=crop&q=80',
     audioTrackId: 'p2', // El Sonido del Fuego y el Mbaipy
     platterColor: '#8D5B4C', // Clay/redwood
     foodItems: [
@@ -112,7 +112,7 @@ const AR_ITEMS: ARItem[] = [
       '1 cucharada de pimentón dulce correntino',
       'Caldo de carne caliente (1 litro)'
     ],
-    video: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=600&auto=format&fit=crop&q=60',
+    video: 'https://images.unsplash.com/photo-1608039829572-78524f79c4c7?w=600&auto=format&fit=crop&q=80',
     audioTrackId: 'p3', // El Gofio y el Chicharrón Trenzado
     platterColor: '#3E3A33', // Iron dark wood
     foodItems: [
@@ -138,7 +138,7 @@ const AR_ITEMS: ARItem[] = [
       '3 clavos de olor',
       'Esencia de vainilla'
     ],
-    video: 'https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?w=600&auto=format&fit=crop&q=60',
+    video: 'https://images.unsplash.com/photo-1618228514589-9a2c3a59df74?w=600&auto=format&fit=crop&q=80',
     audioTrackId: 'p4', // Pescados del Paraná
     platterColor: '#DFB15B', // Light gold wood
     foodItems: [

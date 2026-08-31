@@ -23,6 +23,7 @@ interface LocalQuestion {
   options: string[];
   correctAnswer: number;
   explanation: string;
+  image?: string;
 }
 
 const LOCAL_QUESTIONS: LocalQuestion[] = [
@@ -33,7 +34,8 @@ const LOCAL_QUESTIONS: LocalQuestion[] = [
     question: '¿Cuál es el ingrediente principal, libre de gluten, utilizado para elaborar la masa del Chipá tradicional?',
     options: ['Harina de trigo', 'Almidón de mandioca', 'Harina de maíz', 'Semolín'],
     correctAnswer: 1,
-    explanation: 'El almidón de mandioca (extraído de la raíz de mandioca, un tubérculo nativo) es la base del chipá. Esto le da esa consistencia elástica única y lo hace libre de gluten de forma natural.'
+    explanation: 'El almidón de mandioca (extraído de la raíz de mandioca, un tubérculo nativo) es la base del chipá. Esto le da esa consistencia elástica única y lo hace libre de gluten de forma natural.',
+    image: 'https://images.unsplash.com/photo-1590137876181-2a5a7e340308?w=500&auto=format&fit=crop&q=80'
   },
   {
     id: 'q2',
@@ -41,7 +43,8 @@ const LOCAL_QUESTIONS: LocalQuestion[] = [
     question: '¿Cómo se le llama a la infusión de yerba mate preparada con agua helada y hierbas medicinales aromáticas típicas?',
     options: ['Mate cocido', 'Chimarrão', 'Tereré', 'Mate dulce'],
     correctAnswer: 2,
-    explanation: 'El Tereré es la infusión helada por excelencia para combatir el calor del verano correntino. Se prepara con agua helada, yerba mate y "yuyos" machacados (como menta peperina, boldo, etc.).'
+    explanation: 'El Tereré es la infusión helada por excelencia para combatir el calor del verano correntino. Se prepara con agua helada, yerba mate y "yuyos" machacados (como menta peperina, boldo, etc.).',
+    image: 'https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?w=500&auto=format&fit=crop&q=80'
   },
   {
     id: 'q3',
@@ -49,7 +52,8 @@ const LOCAL_QUESTIONS: LocalQuestion[] = [
     question: '¿Qué fruta cítrica es sumamente abundante en la provincia de Corrientes y se usa para jugos, postres y dulces tradicionales?',
     options: ['Naranja', 'Manzana', 'Plátano', 'Frutilla'],
     correctAnswer: 0,
-    explanation: 'La naranja (tanto agria como dulce) es uno de los frutos cítricos más abundantes y tradicionales en el litoral correntino, base de múltiples postres.'
+    explanation: 'La naranja (tanto agria como dulce) es uno de los frutos cítricos más abundantes y tradicionales en el litoral correntino, base de múltiples postres.',
+    image: 'https://images.unsplash.com/photo-1547514701-42782101795e?w=500&auto=format&fit=crop&q=80'
   },
   // MEDIA (3, 4, 5)
   {
@@ -58,7 +62,8 @@ const LOCAL_QUESTIONS: LocalQuestion[] = [
     question: '¿En qué localidad de Corrientes se realiza anualmente el famoso "Festival del Guiso de Arroz"?',
     options: ['Goya', 'Esquina', 'Mercedes', 'Riachuelo'],
     correctAnswer: 3,
-    explanation: 'El Festival del Guiso de Arroz se lleva a cabo en la localidad de Riachuelo, reuniendo a cocineros de toda la región que preparan su versión del guiso en grandes ollas de hierro a leña.'
+    explanation: 'El Festival del Guiso de Arroz se lleva a cabo en la localidad de Riachuelo, reuniendo a cocineros de toda la región que preparan su versión del guiso en grandes ollas de hierro a leña.',
+    image: 'https://images.unsplash.com/photo-1608039829572-78524f79c4c7?w=500&auto=format&fit=crop&q=80'
   },
   {
     id: 'q5',
@@ -71,7 +76,8 @@ const LOCAL_QUESTIONS: LocalQuestion[] = [
       'Un chipá frito en grasa de cerdo.'
     ],
     correctAnswer: 2,
-    explanation: 'El Chipá Mbocá se cocina enrollando la masa alrededor de una rama de caña o madera tacuara y haciéndolo girar sobre las brasas ardientes. Es sumamente tradicional y aromático.'
+    explanation: 'El Chipá Mbocá se cocina enrollando la masa alrededor de una rama de caña o madera tacuara y haciéndolo girar sobre las brasas ardientes. Es sumamente tradicional y aromático.',
+    image: 'https://images.unsplash.com/photo-1534482421-64566f976cfa?w=500&auto=format&fit=crop&q=80'
   },
   {
     id: 'q6',
@@ -84,7 +90,8 @@ const LOCAL_QUESTIONS: LocalQuestion[] = [
       'Es una salsa densa para acompañar pescados.'
     ],
     correctAnswer: 2,
-    explanation: 'A pesar de llamarse sopa, es una preparación sólida. Nació de un error culinario y se convirtió en una torta salada esponjosa a base de harina de maíz, cebolla caramelizada y queso criollo.'
+    explanation: 'A pesar de llamarse sopa, es una preparación sólida. Nació de un error culinario y se convirtió en una torta salada esponjosa a base de harina de maíz, cebolla caramelizada y queso criollo.',
+    image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=500&auto=format&fit=crop&q=80'
   },
   // DIFÍCIL (6, 7, 8)
   {
@@ -98,7 +105,8 @@ const LOCAL_QUESTIONS: LocalQuestion[] = [
       'Un pan plano horneado bajo cenizas.'
     ],
     correctAnswer: 2,
-    explanation: 'El Mbaipy es una preparación cremosa y calórica de origen prehispánico (guaraní), elaborada con harina de maíz de molienda casera, queso criollo y carne (pollo de campo, charqui o cordero).'
+    explanation: 'El Mbaipy es una preparación cremosa y calórica de origen prehispánico (guaraní), elaborada con harina de maíz de molienda casera, queso criollo y carne (pollo de campo, charqui o cordero).',
+    image: 'https://images.unsplash.com/photo-1541832676-9b763b0239ab?w=500&auto=format&fit=crop&q=80'
   },
   {
     id: 'q8',
@@ -111,7 +119,8 @@ const LOCAL_QUESTIONS: LocalQuestion[] = [
       'Es pan de maíz trenzado con grasa.'
     ],
     correctAnswer: 1,
-    explanation: 'El Chicharrón Trenzado se elabora trenzando tiras finas de falda o matambre vacuno, cocidas lentamente en ollas de hierro con sal y jugo de naranja agria hasta dorarse en su grasa.'
+    explanation: 'El Chicharrón Trenzado se elabora trenzando tiras finas de falda o matambre vacuno, cocidas lentamente en ollas de hierro con sal y jugo de naranja agria hasta dorarse en su grasa.',
+    image: 'https://images.unsplash.com/photo-1596797882942-f44024409337?w=500&auto=format&fit=crop&q=80'
   },
   {
     id: 'q9',
@@ -124,7 +133,8 @@ const LOCAL_QUESTIONS: LocalQuestion[] = [
       'De las corrientes migratorias andinas.'
     ],
     correctAnswer: 0,
-    explanation: 'El almíbar es una técnica europea de conservación introducida por los jesuitas en las reducciones, la cual se aplicó con éxito al mamón silvestre (carica papaya) abundante del litoral.'
+    explanation: 'El almíbar es una técnica europea de conservación introducida por los jesuitas en las reducciones, la cual se aplicó con éxito al mamón silvestre (carica papaya) abundante del litoral.',
+    image: 'https://images.unsplash.com/photo-1618228514589-9a2c3a59df74?w=500&auto=format&fit=crop&q=80'
   }
 ];
 
@@ -144,7 +154,7 @@ const CURIOSITIES: CuriosityItem[] = [
     subtitle: 'Un dichoso error de cocina',
     shortDesc: 'Cómo un cocinero arruinó una sopa líquida y creó el bizcochuelo salado más famoso del mundo.',
     content: 'A mediados del siglo XIX, el cocinero de don Carlos Antonio López (presidente del Paraguay) intentó hacer una sopa líquida de harina de maíz. Se le pasó la mano con la harina, quedando sumamente espesa. Decidió cocinarla al horno de barro y servirla como un pan sólido. Al presidente le encantó y la bautizó "sopa paraguaya". En Corrientes, esta tradición se adaptó incorporándole abundante queso criollo y cebollas caramelizadas.',
-    image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=500&auto=format&fit=crop&q=60'
+    image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=500&auto=format&fit=crop&q=80'
   },
   {
     id: 'c2',
@@ -152,7 +162,7 @@ const CURIOSITIES: CuriosityItem[] = [
     subtitle: 'Cocinado al calor de las brasas',
     shortDesc: 'El chipá en caña tacuara que gira al ritmo del chamamé.',
     content: 'El Chipá Mbocá es una de las técnicas culinarias más tradicionales y vistosas de Corrientes. En lugar de hornearse, la masa elástica de almidón y queso se enrolla alrededor de una caña tacuara húmeda. Se hace girar manualmente sobre un fogón de brasas encendidas. El resultado es un chipá crocante por fuera y tierno por dentro, con un aroma ahumado único.',
-    image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=500&auto=format&fit=crop&q=60'
+    image: 'https://images.unsplash.com/photo-1534482421-64566f976cfa?w=500&auto=format&fit=crop&q=80'
   },
   {
     id: 'c3',
@@ -160,7 +170,7 @@ const CURIOSITIES: CuriosityItem[] = [
     subtitle: 'El pan del guaraní',
     shortDesc: 'El cultivo sagrado precolombino que define cada plato de nuestra mesa.',
     content: 'Para las comunidades guaraníes, la mandioca ("mandiog") era un regalo de los dioses. A diferencia del trigo europeo, prospera en la tierra roja y calurosa del litoral. Es rica en almidón y libre de gluten. Se come hervida como acompañamiento ("mandioca cali"), frita, o procesada en almidón para chipás y mbaipy, siendo el pilar fundamental del patrimonio alimentario regional.',
-    image: 'https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?w=500&auto=format&fit=crop&q=60'
+    image: 'https://images.unsplash.com/photo-1585238342024-78d387f4a707?w=500&auto=format&fit=crop&q=80'
   },
   {
     id: 'c4',
@@ -168,7 +178,7 @@ const CURIOSITIES: CuriosityItem[] = [
     subtitle: 'Energía campesina pura',
     shortDesc: 'La densa crema de maíz que reconfortaba a los mensajeros del estero.',
     content: 'El Mbaipy es el plato preferido para los días frescos del invierno correntino. Heredado de la molienda guaraní, se prepara en grandes ollas de tres patas de hierro fundido sobre leña. Consiste en una harina de maíz disuelta en caldo hirviendo, batida enérgicamente hasta espesar, enriquecida con abundante queso criollo, pollo de granja o charqui (carne secada al sol).',
-    image: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=500&auto=format&fit=crop&q=60'
+    image: 'https://images.unsplash.com/photo-1541832676-9b763b0239ab?w=500&auto=format&fit=crop&q=80'
   },
   {
     id: 'c5',
@@ -176,7 +186,7 @@ const CURIOSITIES: CuriosityItem[] = [
     subtitle: 'Legado de los huertos de las misiones',
     shortDesc: 'Cómo la técnica de conservación europea se adaptó a los frutos silvestres.',
     content: 'Los misioneros jesuitas trajeron al Taragüí la técnica de cocción de frutas en almíbar denso para conservarlas en el clima húmedo. Los guaraníes aplicaron esto al mamón (carica papaya), la guayaba y el andai (calabaza), creando postres dulces que hoy son el broche de oro de cualquier almuerzo correntino, usualmente acompañados con una rodaja de queso criollo.',
-    image: 'https://images.unsplash.com/photo-1587314168485-3236d6710814?w=500&auto=format&fit=crop&q=60'
+    image: 'https://images.unsplash.com/photo-1618228514589-9a2c3a59df74?w=500&auto=format&fit=crop&q=80'
   }
 ];
 
@@ -424,6 +434,14 @@ export const TriviaScreen: React.FC = () => {
 
                 {/* Question Card */}
                 <Card style={[styles.questionCard, { backgroundColor: colors.surface, borderLeftColor: activeTheme.primaryColor }]} elevation="sm">
+                  {currentQuestion.image && (
+                    <Image 
+                      source={{ uri: currentQuestion.image }} 
+                      style={styles.questionImage} 
+                      contentFit="cover"
+                      transition={250}
+                    />
+                  )}
                   <Text style={[styles.questionText, { color: colors.text }]}>{currentQuestion.question}</Text>
                 </Card>
 
@@ -877,6 +895,12 @@ const styles = StyleSheet.create({
     borderRadius: Theme.roundness.md,
     marginBottom: Theme.spacing.md,
     borderLeftWidth: 4,
+  },
+  questionImage: {
+    width: '100%',
+    height: 160,
+    borderRadius: Theme.roundness.md,
+    marginBottom: Theme.spacing.md,
   },
   questionText: {
     fontSize: Theme.typography.sizes.md + 1,
