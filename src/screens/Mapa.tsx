@@ -32,13 +32,13 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const FESTIVAL_COORDINATES: { [key: string]: { x: number; y: number } } = {
   '1': { x: 48, y: 22 },  // Caá Catí - Búfalo (Carnes)
   '2': { x: 52, y: 55 },  // Mercedes - Cordero (Carnes)
-  '3': { x: 58, y: 30 },  // Loreto - Lechón (Carnes)
+  '3': { x: 29, y: 45 },  // Pago de los Deseos - Lechón (Carnes)
   '4': { x: 22, y: 36 },  // Empedrado - Asado (Carnes)
   '5': { x: 62, y: 40 },  // Santa Rosa - Chipá (Guaraní)
-  '6': { x: 88, y: 22 },  // Gobernador Virasoro - Chipacuerito (Guaraní)
-  '7': { x: 55, y: 34 },  // San Miguel - Mbejú y Mbaipy (Guaraní)
-  '8': { x: 65, y: 15 },  // Itá Ibaté - Mandioca (Guaraní)
-  '9': { x: 59, y: 27 },  // Loreto - Almidón (Guaraní)
+  '6': { x: 59, y: 38 },  // Tabay - Chipacuerito (Guaraní)
+  '7': { x: 24, y: 24 },  // El Sombrero - Mbejú y Mbaipy (Guaraní)
+  '8': { x: 88, y: 22 },  // Gobernador Virasoro - Mandioca (Guaraní)
+  '9': { x: 29, y: 14 },  // San Cosme - Almidón (Guaraní)
   '10': { x: 32, y: 42 }, // Saladas - Miel (Naturales)
   '11': { x: 28, y: 18 }, // Santa Ana - Mango (Naturales)
   '12': { x: 18, y: 80 }, // Esquina - Sandía (Naturales)
@@ -58,13 +58,13 @@ const ORIGIN_CITIES: OriginOption[] = [
   { name: 'Corrientes (Capital)', latitude: -27.4696, longitude: -58.8306, x: 23, y: 19 },
   { name: 'Caá Catí', latitude: -27.5333, longitude: -57.6333, x: 48, y: 22 },
   { name: 'Mercedes', latitude: -29.1833, longitude: -58.0833, x: 52, y: 55 },
-  { name: 'Pago de los Deseos', latitude: -28.2333, longitude: -58.8333, x: 58, y: 30 },
+  { name: 'Pago de los Deseos', latitude: -28.2333, longitude: -58.8333, x: 29, y: 45 },
   { name: 'Empedrado', latitude: -27.9000, longitude: -58.8000, x: 22, y: 36 },
   { name: 'Santa Rosa', latitude: -28.2667, longitude: -58.1167, x: 62, y: 40 },
-  { name: 'Tabay', latitude: -28.2667, longitude: -58.2833, x: 88, y: 22 },
-  { name: 'El Sombrero', latitude: -27.6000, longitude: -58.7833, x: 55, y: 34 },
-  { name: 'Gobernador Virasoro', latitude: -28.0500, longitude: -56.0167, x: 65, y: 15 },
-  { name: 'San Cosme', latitude: -27.3667, longitude: -58.5167, x: 59, y: 27 },
+  { name: 'Tabay', latitude: -28.2667, longitude: -58.2833, x: 59, y: 38 },
+  { name: 'El Sombrero', latitude: -27.6000, longitude: -58.7833, x: 24, y: 24 },
+  { name: 'Gobernador Virasoro', latitude: -28.0500, longitude: -56.0167, x: 88, y: 22 },
+  { name: 'San Cosme', latitude: -27.3667, longitude: -58.5167, x: 29, y: 14 },
   { name: 'Saladas', latitude: -28.2500, longitude: -58.7667, x: 32, y: 42 },
   { name: 'Santa Ana de los Guácaras', latitude: -27.4667, longitude: -58.7167, x: 28, y: 18 },
   { name: 'Esquina', latitude: -30.0167, longitude: -59.5333, x: 18, y: 80 },
@@ -74,10 +74,10 @@ const ORIGIN_CITIES: OriginOption[] = [
 
 const IBERA_ROUTE_SEGMENTS = [
   { x1: 52, y1: 55, x2: 32, y2: 42 },   // Mercedes a Saladas
-  { x1: 32, y1: 42, x2: 58, y2: 30 },   // Saladas a Pago de los Deseos
-  { x1: 58, y1: 30, x2: 55, y2: 34 },   // Pago de los Deseos a El Sombrero
-  { x1: 55, y1: 34, x2: 59, y2: 27 },   // El Sombrero a San Cosme
-  { x1: 59, y1: 27, x2: 65, y2: 15 },   // San Cosme a Gobernador Virasoro
+  { x1: 32, y1: 42, x2: 29, y2: 45 },   // Saladas a Pago de los Deseos
+  { x1: 29, y1: 45, x2: 24, y2: 24 },   // Pago de los Deseos a El Sombrero
+  { x1: 24, y1: 24, x2: 29, y2: 14 },   // El Sombrero a San Cosme
+  { x1: 29, y1: 14, x2: 88, y2: 22 },   // San Cosme a Gobernador Virasoro
 ];
 
 const IBERA_FESTIVAL_IDS = ['2', '3', '7', '8', '9', '10'];
@@ -836,8 +836,12 @@ export const MapaScreen: React.FC = () => {
                 <View style={[styles.sheetHeaderLayout, isExpanded && styles.sheetHeaderLayoutExpanded]}>
                   <Image 
                     source={{ uri: selectedFestival.galeria[0] }} 
-                    style={isExpanded || isDesktop ? styles.sheetHeroImage : styles.sheetThumbnailImage} 
+                    style={[
+                      isExpanded || isDesktop ? styles.sheetHeroImage : styles.sheetThumbnailImage,
+                      { backgroundColor: colors.border }
+                    ]} 
                     contentFit="cover"
+                    transition={200}
                   />
                   <View style={styles.sheetHeaderText}>
                     <Text style={[styles.sheetCategoryText, { color: getRouteColor(selectedFestival.rutaGastronomica) }]}>
