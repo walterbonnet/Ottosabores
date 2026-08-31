@@ -29,6 +29,8 @@ export interface Festival {
   productoDestacado: string;
   descripcionCorta: string;
   rutaGastronomica: 'Carnes Tradicionales' | 'Herencia Guaraní' | 'Sabores Naturales';
+  latitud?: number;
+  longitud?: number;
 }
 
 export interface MultimediaItem {

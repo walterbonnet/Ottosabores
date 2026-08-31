@@ -473,7 +473,9 @@ export const FESTIVALS: Festival[] = [
     categoría: 'Carnes Tradicionales',
     productoDestacado: 'Búfalo',
     descripcionCorta: 'Disfrutá de los mejores cortes de carne de búfalo cocinados a la estaca por expertos asadores camperos.',
-    rutaGastronomica: 'Carnes Tradicionales'
+    rutaGastronomica: 'Carnes Tradicionales',
+    latitud: -27.5333,
+    longitud: -57.6333
   },
   {
     id: '2',
@@ -491,7 +493,9 @@ export const FESTIVALS: Festival[] = [
     categoría: 'Carnes Tradicionales',
     productoDestacado: 'Cordero Mercedeño',
     descripcionCorta: 'Tradicional asado de cordero a la estaca rociado con salmuera de romero y ajo, un manjar criollo del Iberá.',
-    rutaGastronomica: 'Carnes Tradicionales'
+    rutaGastronomica: 'Carnes Tradicionales',
+    latitud: -29.1833,
+    longitud: -58.0833
   },
   {
     id: '3',
@@ -509,7 +513,9 @@ export const FESTIVALS: Festival[] = [
     categoría: 'Carnes Tradicionales',
     productoDestacado: 'Lechón Artesanal',
     descripcionCorta: 'Exquisitos lechones asados a fuego lento en hornos de barro tradicionales con aroma a leña de espinillo.',
-    rutaGastronomica: 'Carnes Tradicionales'
+    rutaGastronomica: 'Carnes Tradicionales',
+    latitud: -28.2333,
+    longitud: -58.8333
   },
   {
     id: '4',
@@ -527,7 +533,9 @@ export const FESTIVALS: Festival[] = [
     categoría: 'Carnes Tradicionales',
     productoDestacado: 'Asado Criollo',
     descripcionCorta: 'Grandes costillares vacunos dorados lentamente a las brasas con leña seleccionada y adobo tradicional.',
-    rutaGastronomica: 'Carnes Tradicionales'
+    rutaGastronomica: 'Carnes Tradicionales',
+    latitud: -27.9000,
+    longitud: -58.8000
   },
   {
     id: '5',
@@ -545,7 +553,9 @@ export const FESTIVALS: Festival[] = [
     categoría: 'Herencia Guaraní',
     productoDestacado: 'Chipá',
     descripcionCorta: 'Celebración y degustación del pan emblemático correntino elaborado con almidón de mandioca y queso.',
-    rutaGastronomica: 'Herencia Guaraní'
+    rutaGastronomica: 'Herencia Guaraní',
+    latitud: -28.2667,
+    longitud: -58.1167
   },
   {
     id: '6',
@@ -563,7 +573,9 @@ export const FESTIVALS: Festival[] = [
     categoría: 'Herencia Guaraní',
     productoDestacado: 'Chipacuerito',
     descripcionCorta: 'La clásica torta frita correntina en grasa vacuna. La compañía perfecta de un buen mate chamamecero.',
-    rutaGastronomica: 'Herencia Guaraní'
+    rutaGastronomica: 'Herencia Guaraní',
+    latitud: -28.2667,
+    longitud: -58.2833
   },
   {
     id: '7',
@@ -581,7 +593,9 @@ export const FESTIVALS: Festival[] = [
     categoría: 'Herencia Guaraní',
     productoDestacado: 'Mbejú y Mbaipy',
     descripcionCorta: 'Ancestrales preparaciones calientes a base de harina de maíz y almidón de mandioca con queso criollo.',
-    rutaGastronomica: 'Herencia Guaraní'
+    rutaGastronomica: 'Herencia Guaraní',
+    latitud: -27.6000,
+    longitud: -58.7833
   },
   {
     id: '8',
@@ -599,7 +613,9 @@ export const FESTIVALS: Festival[] = [
     categoría: 'Herencia Guaraní',
     productoDestacado: 'Mandioca',
     descripcionCorta: 'Homenaje al cultivo estrella de las chacras correntinas, base de toda la comida tradicional de la región.',
-    rutaGastronomica: 'Herencia Guaraní'
+    rutaGastronomica: 'Herencia Guaraní',
+    latitud: -28.0500,
+    longitud: -56.0167
   },
   {
     id: '9',
@@ -617,7 +633,9 @@ export const FESTIVALS: Festival[] = [
     categoría: 'Herencia Guaraní',
     productoDestacado: 'Almidón Artesanal',
     descripcionCorta: 'Demostración del proceso artesanal de extracción del almidón de mandioca y su uso culinario tradicional.',
-    rutaGastronomica: 'Herencia Guaraní'
+    rutaGastronomica: 'Herencia Guaraní',
+    latitud: -27.3667,
+    longitud: -58.5167
   },
   {
     id: '10',
@@ -635,7 +653,9 @@ export const FESTIVALS: Festival[] = [
     categoría: 'Sabores Naturales',
     productoDestacado: 'Miel',
     descripcionCorta: 'Degustación y venta de mieles multiflorales extraídas directamente de los montes nativos correntinos.',
-    rutaGastronomica: 'Sabores Naturales'
+    rutaGastronomica: 'Sabores Naturales',
+    latitud: -28.2500,
+    longitud: -58.7667
   },
   {
     id: '11',
@@ -653,7 +673,9 @@ export const FESTIVALS: Festival[] = [
     categoría: 'Sabores Naturales',
     productoDestacado: 'Mango',
     descripcionCorta: 'Frescos dulces, helados, mermeladas y platos dulces a base del mango cosechado en los antiguos patios locales.',
-    rutaGastronomica: 'Sabores Naturales'
+    rutaGastronomica: 'Sabores Naturales',
+    latitud: -27.4667,
+    longitud: -58.7167
   },
   {
     id: '12',
@@ -671,7 +693,9 @@ export const FESTIVALS: Festival[] = [
     categoría: 'Sabores Naturales',
     productoDestacado: 'Sandía',
     descripcionCorta: 'Disfrutá de refrescantes postres, jugos y el tradicional clericó elaborados con sandías esquinenses gigantes.',
-    rutaGastronomica: 'Sabores Naturales'
+    rutaGastronomica: 'Sabores Naturales',
+    latitud: -30.0167,
+    longitud: -59.5333
   },
   {
     id: '13',
@@ -689,7 +713,9 @@ export const FESTIVALS: Festival[] = [
     categoría: 'Sabores Naturales',
     productoDestacado: 'Yatay',
     descripcionCorta: 'Artesanales licores, conservas en almíbar y dulces tradicionales de yatay elaborados en base a recetas históricas.',
-    rutaGastronomica: 'Sabores Naturales'
+    rutaGastronomica: 'Sabores Naturales',
+    latitud: -28.6167,
+    longitud: -58.8333
   },
   {
     id: '14',
@@ -707,7 +733,9 @@ export const FESTIVALS: Festival[] = [
     categoría: 'Sabores Naturales',
     productoDestacado: 'Batata',
     descripcionCorta: 'Tradicionales postres dulces en almíbar, pasteles y purés elaborados con la batata dulce correntina.',
-    rutaGastronomica: 'Sabores Naturales'
+    rutaGastronomica: 'Sabores Naturales',
+    latitud: -28.4667,
+    longitud: -58.9833
   }
 ];
 

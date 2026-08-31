@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import Theme from '../theme';
 import Card from '../components/Card';
 import Header from '../components/Header';
@@ -41,7 +41,20 @@ const getGrandmaTip = (recipeId: string): string => {
 
 export const RecetasScreen: React.FC = () => {
   const router = useRouter();
+  const params = useLocalSearchParams<{ id?: string }>();
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
+
+  useEffect(() => {
+    if (params.id) {
+      const found = RECIPES.find(r => r.id === params.id);
+      if (found) {
+        const timer = setTimeout(() => {
+          setSelectedRecipe(found);
+        }, 0);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [params.id]);
   const [activeCategory, setActiveCategory] = useState<string>('Todos');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
