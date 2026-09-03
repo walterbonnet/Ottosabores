@@ -35,7 +35,7 @@ const LOCAL_QUESTIONS: LocalQuestion[] = [
     options: ['Harina de trigo', 'Almidón de mandioca', 'Harina de maíz', 'Semolín'],
     correctAnswer: 1,
     explanation: 'El almidón de mandioca (extraído de la raíz de mandioca, un tubérculo nativo) es la base del chipá. Esto le da esa consistencia elástica única y lo hace libre de gluten de forma natural.',
-    image: 'https://images.unsplash.com/photo-1590137876181-2a5a7e340308?w=500&auto=format&fit=crop&q=80'
+    image: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=800&auto=format&fit=crop&q=85'
   },
   {
     id: 'q2',
@@ -44,7 +44,7 @@ const LOCAL_QUESTIONS: LocalQuestion[] = [
     options: ['Mate cocido', 'Chimarrão', 'Tereré', 'Mate dulce'],
     correctAnswer: 2,
     explanation: 'El Tereré es la infusión helada por excelencia para combatir el calor del verano correntino. Se prepara con agua helada, yerba mate y "yuyos" machacados (como menta peperina, boldo, etc.).',
-    image: 'https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?w=500&auto=format&fit=crop&q=80'
+    image: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=800&auto=format&fit=crop&q=85'
   },
   {
     id: 'q3',
@@ -53,7 +53,7 @@ const LOCAL_QUESTIONS: LocalQuestion[] = [
     options: ['Naranja', 'Manzana', 'Plátano', 'Frutilla'],
     correctAnswer: 0,
     explanation: 'La naranja (tanto agria como dulce) es uno de los frutos cítricos más abundantes y tradicionales en el litoral correntino, base de múltiples postres.',
-    image: 'https://images.unsplash.com/photo-1547514701-42782101795e?w=500&auto=format&fit=crop&q=80'
+    image: 'https://images.unsplash.com/photo-1547514701-42782101795e?w=800&auto=format&fit=crop&q=85'
   },
   // MEDIA (3, 4, 5)
   {
@@ -63,7 +63,7 @@ const LOCAL_QUESTIONS: LocalQuestion[] = [
     options: ['Goya', 'Esquina', 'Mercedes', 'Riachuelo'],
     correctAnswer: 3,
     explanation: 'El Festival del Guiso de Arroz se lleva a cabo en la localidad de Riachuelo, reuniendo a cocineros de toda la región que preparan su versión del guiso en grandes ollas de hierro a leña.',
-    image: 'https://images.unsplash.com/photo-1608039829572-78524f79c4c7?w=500&auto=format&fit=crop&q=80'
+    image: 'https://images.unsplash.com/photo-1541832676-9b763b0239ab?w=800&auto=format&fit=crop&q=85'
   },
   {
     id: 'q5',
@@ -77,7 +77,7 @@ const LOCAL_QUESTIONS: LocalQuestion[] = [
     ],
     correctAnswer: 2,
     explanation: 'El Chipá Mbocá se cocina enrollando la masa alrededor de una rama de caña o madera tacuara y haciéndolo girar sobre las brasas ardientes. Es sumamente tradicional y aromático.',
-    image: 'https://images.unsplash.com/photo-1534482421-64566f976cfa?w=500&auto=format&fit=crop&q=80'
+    image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800&auto=format&fit=crop&q=85'
   },
   {
     id: 'q6',
@@ -91,7 +91,7 @@ const LOCAL_QUESTIONS: LocalQuestion[] = [
     ],
     correctAnswer: 2,
     explanation: 'A pesar de llamarse sopa, es una preparación sólida. Nació de un error culinario y se convirtió en una torta salada esponjosa a base de harina de maíz, cebolla caramelizada y queso criollo.',
-    image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=500&auto=format&fit=crop&q=80'
+    image: 'https://images.unsplash.com/photo-1598511757337-fe2cad93585f?w=800&auto=format&fit=crop&q=85'
   },
   // DIFÍCIL (6, 7, 8)
   {
@@ -106,7 +106,7 @@ const LOCAL_QUESTIONS: LocalQuestion[] = [
     ],
     correctAnswer: 2,
     explanation: 'El Mbaipy es una preparación cremosa y calórica de origen prehispánico (guaraní), elaborada con harina de maíz de molienda casera, queso criollo y carne (pollo de campo, charqui o cordero).',
-    image: 'https://images.unsplash.com/photo-1541832676-9b763b0239ab?w=500&auto=format&fit=crop&q=80'
+    image: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=800&auto=format&fit=crop&q=85'
   },
   {
     id: 'q8',
@@ -120,7 +120,7 @@ const LOCAL_QUESTIONS: LocalQuestion[] = [
     ],
     correctAnswer: 1,
     explanation: 'El Chicharrón Trenzado se elabora trenzando tiras finas de falda o matambre vacuno, cocidas lentamente en ollas de hierro con sal y jugo de naranja agria hasta dorarse en su grasa.',
-    image: 'https://images.unsplash.com/photo-1596797882942-f44024409337?w=500&auto=format&fit=crop&q=80'
+    image: 'https://images.unsplash.com/photo-1596797882942-f44024409337?w=800&auto=format&fit=crop&q=85'
   },
   {
     id: 'q9',
@@ -133,8 +133,8 @@ const LOCAL_QUESTIONS: LocalQuestion[] = [
       'De las corrientes migratorias andinas.'
     ],
     correctAnswer: 0,
-    explanation: 'El almíbar es una técnica europea de conservación introducida por los jesuitas en las reducciones, la cual se aplicó con éxito al mamón silvestre (carica papaya) abundante del litoral.',
-    image: 'https://images.unsplash.com/photo-1618228514589-9a2c3a59df74?w=500&auto=format&fit=crop&q=80'
+    explanation: 'El almíbar es una técnica europea de conservación introducida por los jesuitas en las reducciones, la cual se applied con éxito al mamón silvestre (carica papaya) abundante del litoral.',
+    image: 'https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?w=800&auto=format&fit=crop&q=85'
   }
 ];
 

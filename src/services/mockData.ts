@@ -746,7 +746,7 @@ export const MULTIMEDIA_ITEMS: MultimediaItem[] = [
     artist: 'Abuela Cata de San Cosme',
     duration: '04:12',
     type: 'podcast',
-    image: 'https://images.unsplash.com/photo-1608686207856-001b95cf60ca?w=400&auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1585238342024-78d387f4a707?w=800&auto=format&fit=crop&q=85',
     festivalRelacionado: '9' // Fiesta del Almidón Artesanal
   },
   {
@@ -755,7 +755,7 @@ export const MULTIMEDIA_ITEMS: MultimediaItem[] = [
     artist: 'Panchi Quevedo (Cocinero de Estero)',
     duration: '06:45',
     type: 'recipe_audio',
-    image: 'https://images.unsplash.com/photo-1541832676-9b763b0239ab?w=400&auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=800&auto=format&fit=crop&q=85',
     festivalRelacionado: '7' // Festival del Mbejú y el Mbaipy
   },
   {
@@ -764,7 +764,7 @@ export const MULTIMEDIA_ITEMS: MultimediaItem[] = [
     artist: 'Don Sosa de Empedrado',
     duration: '12:30',
     type: 'podcast',
-    image: 'https://images.unsplash.com/photo-1529692236671-f1f6e9481b2b?w=400&auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&auto=format&fit=crop&q=85',
     festivalRelacionado: '4' // Festival del Asado Criollo
   },
   {
@@ -773,7 +773,7 @@ export const MULTIMEDIA_ITEMS: MultimediaItem[] = [
     artist: 'Cocineros de Mercedes',
     duration: '08:15',
     type: 'recipe_audio',
-    image: 'https://images.unsplash.com/photo-1602498456745-e9503b30470b?w=400&auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=800&auto=format&fit=crop&q=85',
     festivalRelacionado: '2' // Fiesta del Cordero Mercedeño
   }
 ];
