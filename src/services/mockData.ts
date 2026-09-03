@@ -487,7 +487,7 @@ export const FESTIVALS: Festival[] = [
     recetaRelacionada: 'r5',
     galeria: [
       'https://images.unsplash.com/photo-1544025162-d76694265947?w=800&auto=format&fit=crop&q=85',
-      'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&auto=format&fit=crop&q=85'
+      'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&auto=format&fit=crop&q=85'
     ],
     video: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=800&auto=format&fit=crop&q=85',
     categoría: 'Carnes Tradicionales',
@@ -507,7 +507,7 @@ export const FESTIVALS: Festival[] = [
     recetaRelacionada: 'r11',
     galeria: [
       'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&auto=format&fit=crop&q=85',
-      'https://images.unsplash.com/photo-1544025162-d76694265947?w=800&auto=format&fit=crop&q=85'
+      'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800&auto=format&fit=crop&q=85'
     ],
     video: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&auto=format&fit=crop&q=85',
     categoría: 'Carnes Tradicionales',
@@ -526,10 +526,10 @@ export const FESTIVALS: Festival[] = [
     historia: 'A orillas del imponente río Paraná y rodeado de las barrancas de Empedrado, este festival reúne a los mejores parrilleros y asadores de la región para competir por el gran título. Con fogones a leña viva esparcidos en la costa, se cocinan costillares vacunos, vacíos y chinchulines, acompañados de música litoraleña en vivo.',
     recetaRelacionada: 'r12',
     galeria: [
-      'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&auto=format&fit=crop&q=85',
-      'https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=800&auto=format&fit=crop&q=85'
+      'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&auto=format&fit=crop&q=85',
+      'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=800&auto=format&fit=crop&q=85'
     ],
-    video: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&auto=format&fit=crop&q=85',
+    video: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&auto=format&fit=crop&q=85',
     categoría: 'Carnes Tradicionales',
     productoDestacado: 'Asado Criollo',
     descripcionCorta: 'Grandes costillares vacunos dorados lentamente a las brasas con leña seleccionada y adobo tradicional.',
@@ -567,7 +567,7 @@ export const FESTIVALS: Festival[] = [
     recetaRelacionada: 'r6',
     galeria: [
       'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=800&auto=format&fit=crop&q=85',
-      'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800&auto=format&fit=crop&q=85'
+      'https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=800&auto=format&fit=crop&q=85'
     ],
     video: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=800&auto=format&fit=crop&q=85',
     categoría: 'Herencia Guaraní',
@@ -586,10 +586,10 @@ export const FESTIVALS: Festival[] = [
     historia: 'El Sombrero reúne anualmente a miles de comensales en torno a dos comidas guaraníes de fuerte arraigo invernal: el Mbaipy (crema espesa de maíz con quesos y carnes) y el Mbejú (pan plano de almidón y queso tostado). Cocineros de toda la provincia compiten cocinando en gigantescas ollas de hierro y sartenes a fuego de leña.',
     recetaRelacionada: 'r2',
     galeria: [
-      'https://images.unsplash.com/photo-1541832676-9b763b0239ab?w=400&auto=format&fit=crop&q=60',
-      'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=400&auto=format&fit=crop&q=60'
+      'https://images.unsplash.com/photo-1547592180-85f173990554?w=800&auto=format&fit=crop&q=85',
+      'https://images.unsplash.com/photo-1541832676-9b763b0239ab?w=800&auto=format&fit=crop&q=85'
     ],
-    video: 'https://images.unsplash.com/photo-1541832676-9b763b0239ab?w=600&auto=format&fit=crop&q=60',
+    video: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=800&auto=format&fit=crop&q=85',
     categoría: 'Herencia Guaraní',
     productoDestacado: 'Mbejú y Mbaipy',
     descripcionCorta: 'Ancestrales preparaciones calientes a base de harina de maíz y almidón de mandioca con queso criollo.',
@@ -606,10 +606,10 @@ export const FESTIVALS: Festival[] = [
     historia: 'La mandioca es el tubérculo sagrado y la base del sustento alimenticio guaraní en todo el litoral. Virasoro le rinde homenaje con esta fiesta popular que expone los mejores cultivos del año de las chacras de la región, complementada con muestras culinarias que van desde la simple mandioca hervida y frita hasta sofisticados postres.',
     recetaRelacionada: 'r14',
     galeria: [
-      'https://images.unsplash.com/photo-1585238342024-78d387f4a707?w=400&auto=format&fit=crop&q=60',
-      'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=400&auto=format&fit=crop&q=60'
+      'https://images.unsplash.com/photo-1585238342024-78d387f4a707?w=800&auto=format&fit=crop&q=85',
+      'https://images.unsplash.com/photo-1590779033100-9f60a05a013d?w=800&auto=format&fit=crop&q=85'
     ],
-    video: 'https://images.unsplash.com/photo-1585238342024-78d387f4a707?w=600&auto=format&fit=crop&q=60',
+    video: 'https://images.unsplash.com/photo-1585238342024-78d387f4a707?w=800&auto=format&fit=crop&q=85',
     categoría: 'Herencia Guaraní',
     productoDestacado: 'Mandioca',
     descripcionCorta: 'Homenaje al cultivo estrella de las chacras correntinas, base de toda la comida tradicional de la región.',
@@ -626,10 +626,10 @@ export const FESTIVALS: Festival[] = [
     historia: 'En San Cosme, las familias artesanas demuestran de generación en generación cómo extraer el almidón puro de mandioca rallando las raíces en ralladores tradicionales de chapa y lavándolas en tamices de lienzo. El festival celebra este insumo imprescindible con muestras de cocina en vivo de chipas, mbejú y dulces regionales.',
     recetaRelacionada: 'r13',
     galeria: [
-      'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=400&auto=format&fit=crop&q=60',
-      'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=400&auto=format&fit=crop&q=60'
+      'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800&auto=format&fit=crop&q=85',
+      'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=800&auto=format&fit=crop&q=85'
     ],
-    video: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=600&auto=format&fit=crop&q=60',
+    video: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800&auto=format&fit=crop&q=85',
     categoría: 'Herencia Guaraní',
     productoDestacado: 'Almidón Artesanal',
     descripcionCorta: 'Demostración del proceso artesanal de extracción del almidón de mandioca y su uso culinario tradicional.',
@@ -646,10 +646,10 @@ export const FESTIVALS: Festival[] = [
     historia: 'Saladas rinde tributo a la labor apícola regional con la Fiesta de la Miel. La zona, rica en montes nativos y flores silvestres, produce una miel oscura y aromática muy valorada. El festival ofrece degustaciones de mieles puras, concursos de platos dulces y salados que incorporan la miel, y espectáculos musicales chamameceros en el anfiteatro municipal.',
     recetaRelacionada: 'r15',
     galeria: [
-      'https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=400&auto=format&fit=crop&q=60',
-      'https://images.unsplash.com/photo-1516259762381-22954d7d3ad2?w=400&auto=format&fit=crop&q=60'
+      'https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=800&auto=format&fit=crop&q=85',
+      'https://images.unsplash.com/photo-1471943311424-646960669fbc?w=800&auto=format&fit=crop&q=85'
     ],
-    video: 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=600&auto=format&fit=crop&q=60',
+    video: 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=800&auto=format&fit=crop&q=85',
     categoría: 'Sabores Naturales',
     productoDestacado: 'Miel',
     descripcionCorta: 'Degustación y venta de mieles multiflorales extraídas directamente de los montes nativos correntinos.',
@@ -666,10 +666,10 @@ export const FESTIVALS: Festival[] = [
     historia: 'Santa Ana de los Guácaras se caracteriza por sus calles de tierra con frondosos e históricos árboles de mango. Cada verano, la Fiesta del Mango celebra la enorme cosecha de este fruto exótico y dorado con una gran feria gastronómica de jugos naturales, licores, tartas dulces, empanadas agridulces y conservas artesanales en almíbar.',
     recetaRelacionada: 'r16',
     galeria: [
-      'https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?w=400&auto=format&fit=crop&q=60',
-      'https://images.unsplash.com/photo-1553279768-865429fa0078?w=400&auto=format&fit=crop&q=60'
+      'https://images.unsplash.com/photo-1553279768-865429fa0078?w=800&auto=format&fit=crop&q=85',
+      'https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?w=800&auto=format&fit=crop&q=85'
     ],
-    video: 'https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?w=600&auto=format&fit=crop&q=60',
+    video: 'https://images.unsplash.com/photo-1553279768-865429fa0078?w=800&auto=format&fit=crop&q=85',
     categoría: 'Sabores Naturales',
     productoDestacado: 'Mango',
     descripcionCorta: 'Frescos dulces, helados, mermeladas y platos dulces a base del mango cosechado en los antiguos patios locales.',
@@ -686,10 +686,10 @@ export const FESTIVALS: Festival[] = [
     historia: 'Esquina es una gran zona de producción de sandías de primicia en la Argentina, cosechando frutos sumamente dulces y jugosos. El festival premia anualmente a los productores que presentan los ejemplares más pesados y dulces de la cosecha de verano. Hay desfiles de carrozas, ferias artesanales de postres frescos y peñas folclóricas.',
     recetaRelacionada: 'r17',
     galeria: [
-      'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8?w=400&auto=format&fit=crop&q=60',
-      'https://images.unsplash.com/photo-1534482421-64566f976cfa?w=400&auto=format&fit=crop&q=60'
+      'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8?w=800&auto=format&fit=crop&q=85',
+      'https://images.unsplash.com/photo-1587049352851-8d4e89133924?w=800&auto=format&fit=crop&q=85'
     ],
-    video: 'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8?w=600&auto=format&fit=crop&q=60',
+    video: 'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8?w=800&auto=format&fit=crop&q=85',
     categoría: 'Sabores Naturales',
     productoDestacado: 'Sandía',
     descripcionCorta: 'Disfrutá de refrescantes postres, jugos y el tradicional clericó elaborados con sandías esquinenses gigantes.',
@@ -706,10 +706,10 @@ export const FESTIVALS: Festival[] = [
     historia: 'Mantilla rinde tributo a las palmeras yatay, un elemento identitario del paisaje y la cultura correntina. Los frutos del yatay, de un sabor agridulce muy particular, se cosechan en el verano para elaborar artesanalmente licores espirituosos, jaleas, dulces espesos en almíbar y vinagres saborizados muy apreciados en la cocina regional.',
     recetaRelacionada: 'r18',
     galeria: [
-      'https://images.unsplash.com/photo-1595981267035-7b04ca84a82d?w=400&auto=format&fit=crop&q=60',
-      'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400&auto=format&fit=crop&q=60'
+      'https://images.unsplash.com/photo-1595981267035-7b04ca84a82d?w=800&auto=format&fit=crop&q=85',
+      'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop&q=85'
     ],
-    video: 'https://images.unsplash.com/photo-1595981267035-7b04ca84a82d?w=600&auto=format&fit=crop&q=60',
+    video: 'https://images.unsplash.com/photo-1595981267035-7b04ca84a82d?w=800&auto=format&fit=crop&q=85',
     categoría: 'Sabores Naturales',
     productoDestacado: 'Yatay',
     descripcionCorta: 'Artesanales licores, conservas en almíbar y dulces tradicionales de yatay elaborados en base a recetas históricas.',
@@ -726,10 +726,10 @@ export const FESTIVALS: Festival[] = [
     historia: 'Tres de Abril es el epicentro de la producción hortícola de batatas dulces de Corrientes. En esta fiesta regional, las familias productoras exponen sus batatas blancas y coloradas de sabor dulce incomparable. Se realiza una gran cena comunitaria con platos salados que incorporan la batata, asados criollos y excelentes dulces caseros en almíbar.',
     recetaRelacionada: 'r19',
     galeria: [
-      'https://images.unsplash.com/photo-1599940824399-b87987ceb72a?w=400&auto=format&fit=crop&q=60',
-      'https://images.unsplash.com/photo-1547592180-85f173990554?w=400&auto=format&fit=crop&q=60'
+      'https://images.unsplash.com/photo-1599940824399-b87987ceb72a?w=800&auto=format&fit=crop&q=85',
+      'https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?w=800&auto=format&fit=crop&q=85'
     ],
-    video: 'https://images.unsplash.com/photo-1599940824399-b87987ceb72a?w=600&auto=format&fit=crop&q=60',
+    video: 'https://images.unsplash.com/photo-1599940824399-b87987ceb72a?w=800&auto=format&fit=crop&q=85',
     categoría: 'Sabores Naturales',
     productoDestacado: 'Batata',
     descripcionCorta: 'Tradicionales postres dulces en almíbar, pasteles y purés elaborados con la batata dulce correntina.',
