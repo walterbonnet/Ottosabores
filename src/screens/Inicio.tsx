@@ -23,6 +23,8 @@ import SkeletonLoader from '../components/SkeletonLoader';
 import RecipeDetailModal from '../components/RecipeDetailModal';
 import FestivalDetailModal from '../components/FestivalDetailModal';
 
+const HERO_BANNER_IMAGE = require('../../assets/images/inicio/hero_banner.jpg');
+
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 const CURIOSITIES = [
@@ -297,21 +299,21 @@ export const InicioScreen: React.FC = () => {
         desc: 'Navegá por las localidades correntinas, descubriendo sus platos típicos y secretos gastronómicos únicos.',
         icon: 'map-outline',
         color: colors.primary,
-        image: 'https://images.unsplash.com/photo-1542362567-b07eac79094f?w=600&auto=format&fit=crop&q=80',
+        image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&auto=format&fit=crop&q=85',
       },
       {
         title: 'Saberes Tradicionales',
         desc: 'Accedé a recetas ancestrales con listas de control inteligentes y sumá puntos de experiencia cocinando.',
         icon: 'restaurant-outline',
         color: colors.secondary,
-        image: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=600&auto=format&fit=crop&q=80',
+        image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800&auto=format&fit=crop&q=85',
       },
       {
         title: 'Realidad Aumentada',
         desc: 'Escaneá códigos QR para proyectar platos tradicionales en 3D y escuchar relatos de la historia correntina.',
         icon: 'qr-code-outline',
         color: colors.accent,
-        image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=80',
+        image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=800&auto=format&fit=crop&q=85',
       },
     ];
 
@@ -408,7 +410,7 @@ export const InicioScreen: React.FC = () => {
       >
         {/* Hero Principal con Imagen de Fondo y Eslogan */}
         <ImageBackground 
-          source={{ uri: 'https://images.unsplash.com/photo-1516259762381-22954d7d3ad2?w=1000&auto=format&fit=crop&q=80' }} 
+          source={HERO_BANNER_IMAGE} 
           style={styles.heroBackground}
         >
           <View style={styles.heroOverlay}>

@@ -27,7 +27,7 @@ export const RECIPES: Recipe[] = [
     ],
     duración: '45 min',
     dificultad: 'Fácil',
-    video: 'https://images.unsplash.com/photo-1590137876181-2a5a7e340308?w=600&auto=format&fit=crop&q=80'
+    video: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=800&auto=format&fit=crop&q=85'
   },
   {
     id: 'r2',
@@ -57,7 +57,7 @@ export const RECIPES: Recipe[] = [
     ],
     duración: '60 min',
     dificultad: 'Media',
-    video: 'https://images.unsplash.com/photo-1541832676-9b763b0239ab?w=600&auto=format&fit=crop&q=80'
+    video: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=800&auto=format&fit=crop&q=85'
   },
   {
     id: 'r3',
@@ -84,7 +84,7 @@ export const RECIPES: Recipe[] = [
     ],
     duración: '50 min',
     dificultad: 'Fácil',
-    video: 'https://images.unsplash.com/photo-1608039829572-78524f79c4c7?w=600&auto=format&fit=crop&q=80'
+    video: 'https://images.unsplash.com/photo-1541832676-9b763b0239ab?w=800&auto=format&fit=crop&q=85'
   },
   {
     id: 'r4',
@@ -111,7 +111,7 @@ export const RECIPES: Recipe[] = [
     ],
     duración: '120 min',
     dificultad: 'Media',
-    video: 'https://images.unsplash.com/photo-1618228514589-9a2c3a59df74?w=600&auto=format&fit=crop&q=80'
+    video: 'https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?w=800&auto=format&fit=crop&q=85'
   },
   {
     id: 'r5',
@@ -135,7 +135,7 @@ export const RECIPES: Recipe[] = [
     ],
     duración: '270 min',
     dificultad: 'Difícil',
-    video: 'https://images.unsplash.com/photo-1602498456745-e9503b30470b?w=600&auto=format&fit=crop&q=80'
+    video: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=800&auto=format&fit=crop&q=85'
   },
   {
     id: 'r6',
@@ -158,7 +158,7 @@ export const RECIPES: Recipe[] = [
     ],
     duración: '30 min',
     dificultad: 'Fácil',
-    video: 'https://images.unsplash.com/photo-1598511757337-fe2cad93585f?w=600&auto=format&fit=crop&q=80'
+    video: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=800&auto=format&fit=crop&q=85'
   },
   {
     id: 'r7',
@@ -184,7 +184,7 @@ export const RECIPES: Recipe[] = [
     ],
     duración: '50 min',
     dificultad: 'Fácil',
-    video: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=600&auto=format&fit=crop&q=80'
+    video: 'https://images.unsplash.com/photo-1598511757337-fe2cad93585f?w=800&auto=format&fit=crop&q=85'
   },
   {
     id: 'r8',
@@ -206,7 +206,7 @@ export const RECIPES: Recipe[] = [
     ],
     duración: '90 min',
     dificultad: 'Media',
-    video: 'https://images.unsplash.com/photo-1596797882942-f44024409337?w=600&auto=format&fit=crop&q=80'
+    video: 'https://images.unsplash.com/photo-1596797882942-f44024409337?w=800&auto=format&fit=crop&q=85'
   },
   {
     id: 'r9',
@@ -229,7 +229,7 @@ export const RECIPES: Recipe[] = [
     ],
     duración: '60 min',
     dificultad: 'Media',
-    video: 'https://images.unsplash.com/photo-1534604973900-c43ab4c2e0ab?w=600&auto=format&fit=crop&q=80'
+    video: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=800&auto=format&fit=crop&q=85'
   },
   {
     id: 'r10',
@@ -252,7 +252,7 @@ export const RECIPES: Recipe[] = [
     ],
     duración: '300 min',
     dificultad: 'Difícil',
-    video: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=80'
+    video: 'https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=800&auto=format&fit=crop&q=85'
   },
   {
     id: 'r11',
@@ -466,10 +466,10 @@ export const FESTIVALS: Festival[] = [
     historia: 'Esta festividad celebra el creciente desarrollo y la cría del búfalo en el norte de Corrientes. Caá Catí se viste de fiesta para recibir a productores y familias que disfrutan de demostraciones de destreza gaucha, peñas de chamamé y una inmensa feria culinaria donde la carne de búfalo es la estrella indiscutida en empanadas, asados y guisados.',
     recetaRelacionada: 'r10',
     galeria: [
-      'https://images.unsplash.com/photo-1560611580-b98b2d6f4387?w=400&auto=format&fit=crop&q=60',
-      'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&auto=format&fit=crop&q=60'
+      'https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=800&auto=format&fit=crop&q=85',
+      'https://images.unsplash.com/photo-1544025162-d76694265947?w=800&auto=format&fit=crop&q=85'
     ],
-    video: 'https://images.unsplash.com/photo-1560611580-b98b2d6f4387?w=600&auto=format&fit=crop&q=60',
+    video: 'https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=800&auto=format&fit=crop&q=85',
     categoría: 'Carnes Tradicionales',
     productoDestacado: 'Búfalo',
     descripcionCorta: 'Disfrutá de los mejores cortes de carne de búfalo cocinados a la estaca por expertos asadores camperos.',
@@ -486,10 +486,10 @@ export const FESTIVALS: Festival[] = [
     historia: 'El cordero de Mercedes es famoso en toda la Patagonia y el Litoral argentino por el particular sabor de la carne, alimentada en pastizales naturales únicos del Iberá. Anualmente, la Fiesta del Cordero rinde homenaje a los trabajadores rurales con una multitudinaria competencia de asadores a la estaca, ferias artesanales y espectáculos artísticos chamameceros.',
     recetaRelacionada: 'r5',
     galeria: [
-      'https://images.unsplash.com/photo-1602498456745-e9503b30470b?w=400&auto=format&fit=crop&q=60',
-      'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400&auto=format&fit=crop&q=60'
+      'https://images.unsplash.com/photo-1544025162-d76694265947?w=800&auto=format&fit=crop&q=85',
+      'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&auto=format&fit=crop&q=85'
     ],
-    video: 'https://images.unsplash.com/photo-1602498456745-e9503b30470b?w=600&auto=format&fit=crop&q=60',
+    video: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=800&auto=format&fit=crop&q=85',
     categoría: 'Carnes Tradicionales',
     productoDestacado: 'Cordero Mercedeño',
     descripcionCorta: 'Tradicional asado de cordero a la estaca rociado con salmuera de romero y ajo, un manjar criollo del Iberá.',
@@ -506,10 +506,10 @@ export const FESTIVALS: Festival[] = [
     historia: 'Un homenaje directo a la producción porcina artesanal del centro de la provincia de Corrientes. En esta fiesta popular, los pequeños productores exponen sus mejores lechones, que luego son cocinados a fuego lento en hornos de barro o a la parrilla para deleite de miles de comensales que se reúnen bajo la sombra de los algarrobos.',
     recetaRelacionada: 'r11',
     galeria: [
-      'https://images.unsplash.com/photo-1598103442097-8b743e43a5c6?w=400&auto=format&fit=crop&q=60',
-      'https://images.unsplash.com/photo-1516259762381-22954d7d3ad2?w=400&auto=format&fit=crop&q=60'
+      'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&auto=format&fit=crop&q=85',
+      'https://images.unsplash.com/photo-1544025162-d76694265947?w=800&auto=format&fit=crop&q=85'
     ],
-    video: 'https://images.unsplash.com/photo-1598103442097-8b743e43a5c6?w=600&auto=format&fit=crop&q=60',
+    video: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&auto=format&fit=crop&q=85',
     categoría: 'Carnes Tradicionales',
     productoDestacado: 'Lechón Artesanal',
     descripcionCorta: 'Exquisitos lechones asados a fuego lento en hornos de barro tradicionales con aroma a leña de espinillo.',
@@ -526,10 +526,10 @@ export const FESTIVALS: Festival[] = [
     historia: 'A orillas del imponente río Paraná y rodeado de las barrancas de Empedrado, este festival reúne a los mejores parrilleros y asadores de la región para competir por el gran título. Con fogones a leña viva esparcidos en la costa, se cocinan costillares vacunos, vacíos y chinchulines, acompañados de música litoraleña en vivo.',
     recetaRelacionada: 'r12',
     galeria: [
-      'https://images.unsplash.com/photo-1529692236671-f1f6e9481b2b?w=400&auto=format&fit=crop&q=60',
-      'https://images.unsplash.com/photo-1516259762381-22954d7d3ad2?w=400&auto=format&fit=crop&q=60'
+      'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&auto=format&fit=crop&q=85',
+      'https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=800&auto=format&fit=crop&q=85'
     ],
-    video: 'https://images.unsplash.com/photo-1529692236671-f1f6e9481b2b?w=600&auto=format&fit=crop&q=60',
+    video: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&auto=format&fit=crop&q=85',
     categoría: 'Carnes Tradicionales',
     productoDestacado: 'Asado Criollo',
     descripcionCorta: 'Grandes costillares vacunos dorados lentamente a las brasas con leña seleccionada y adobo tradicional.',
@@ -546,10 +546,10 @@ export const FESTIVALS: Festival[] = [
     historia: 'Santa Rosa es una de las cunas de la elaboración artesanal e industrial del chipá en Corrientes. Su festival nacional rinde homenaje a las familias panificadoras tradicionales que conservan la receta heredada de los guaraníes, elaborando el chipá con el mejor almidón de mandioca de sus plantaciones y quesos locales.',
     recetaRelacionada: 'r1',
     galeria: [
-      'https://images.unsplash.com/photo-1590137876181-2a5a7e340308?w=400&auto=format&fit=crop&q=60',
-      'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=400&auto=format&fit=crop&q=60'
+      'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=800&auto=format&fit=crop&q=85',
+      'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800&auto=format&fit=crop&q=85'
     ],
-    video: 'https://images.unsplash.com/photo-1590137876181-2a5a7e340308?w=600&auto=format&fit=crop&q=60',
+    video: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=800&auto=format&fit=crop&q=85',
     categoría: 'Herencia Guaraní',
     productoDestacado: 'Chipá',
     descripcionCorta: 'Celebración y degustación del pan emblemático correntino elaborado con almidón de mandioca y queso.',
@@ -566,10 +566,10 @@ export const FESTIVALS: Festival[] = [
     historia: 'El chipacuerito es la torta frita con sello correntino. Su festival en Tabay convoca a cientos de familias que compiten en grandes ollas de hierro a leña por preparar la masa más esponjosa y el frito más seco. Es la comida de campo tradicional que alegra los días fríos del litoral argentino.',
     recetaRelacionada: 'r6',
     galeria: [
-      'https://images.unsplash.com/photo-1598511757337-fe2cad93585f?w=400&auto=format&fit=crop&q=60',
-      'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=400&auto=format&fit=crop&q=60'
+      'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=800&auto=format&fit=crop&q=85',
+      'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800&auto=format&fit=crop&q=85'
     ],
-    video: 'https://images.unsplash.com/photo-1598511757337-fe2cad93585f?w=600&auto=format&fit=crop&q=60',
+    video: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=800&auto=format&fit=crop&q=85',
     categoría: 'Herencia Guaraní',
     productoDestacado: 'Chipacuerito',
     descripcionCorta: 'La clásica torta frita correntina en grasa vacuna. La compañía perfecta de un buen mate chamamecero.',
