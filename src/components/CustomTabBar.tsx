@@ -96,11 +96,15 @@ export const CustomTabBar: React.FC<any> = ({
               key={route.key}
               accessibilityRole="button"
               accessibilityState={isFocused ? { selected: true } : {}}
-              accessibilityLabel={options.tabBarAccessibilityLabel}
+              accessibilityLabel={options.tabBarAccessibilityLabel || `Pestaña ${label}`}
               onPress={onPress}
-              style={styles.tabButton}
+              style={({ pressed }) => [
+                styles.tabButton,
+                pressed && styles.pressed,
+                Platform.OS === 'web' && (styles as any).webHover,
+              ]}
             >
-              <View style={[styles.iconWrapper, isFocused && styles.activeIconWrapper, isFocused && { backgroundColor: isDarkMode ? 'rgba(200, 92, 56, 0.16)' : 'rgba(200, 92, 56, 0.08)' }]}>
+              <View style={[styles.iconWrapper, isFocused && styles.activeIconWrapper, isFocused && { backgroundColor: isDarkMode ? 'rgba(214, 104, 67, 0.18)' : 'rgba(200, 92, 56, 0.1)' }]}>
                 <Ionicons
                   name={isFocused ? icon : (`${icon}-outline` as any)}
                   size={22}
@@ -134,8 +138,8 @@ const styles = StyleSheet.create({
     right: 12,
     height: 72,
     borderRadius: Theme.roundness.xl,
-    borderWidth: 1.5,
-    ...Theme.shadows.md,
+    borderWidth: 1,
+    ...Theme.shadows.lg,
     overflow: 'hidden',
   },
   scrollContent: {
@@ -150,19 +154,23 @@ const styles = StyleSheet.create({
     paddingVertical: Theme.spacing.xs,
     position: 'relative',
   },
+  pressed: {
+    opacity: 0.85,
+  },
   iconWrapper: {
-    padding: Theme.spacing.xs,
+    paddingHorizontal: Theme.spacing.sm + 2,
+    paddingVertical: Theme.spacing.xs,
     borderRadius: Theme.roundness.md,
     justifyContent: 'center',
     alignItems: 'center',
   },
   activeIconWrapper: {
-    backgroundColor: 'rgba(200, 92, 56, 0.08)',
+    backgroundColor: 'rgba(200, 92, 56, 0.1)',
   },
   tabLabel: {
     fontSize: Theme.typography.sizes.xs - 1,
     fontWeight: Theme.typography.weights.medium,
-    marginTop: 2,
+    marginTop: 3,
     letterSpacing: -0.2,
   },
   activeTabLabel: {
@@ -171,11 +179,16 @@ const styles = StyleSheet.create({
   activeIndicator: {
     position: 'absolute',
     bottom: 4,
-    width: 24,
+    width: 28,
     height: 3,
     backgroundColor: Theme.colors.accent,
     borderRadius: Theme.roundness.round,
   },
+  ...(Platform.OS === 'web' ? {
+    webHover: {
+      cursor: 'pointer',
+    }
+  } : {})
 });
 
 export default CustomTabBar;

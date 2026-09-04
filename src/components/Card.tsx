@@ -1,6 +1,7 @@
 import React from 'react';
-import { StyleSheet, View, Pressable, ViewStyle, StyleProp } from 'react-native';
+import { StyleSheet, View, Pressable, ViewStyle, StyleProp, Platform } from 'react-native';
 import Theme from '../theme';
+import { useGlobalState } from '../services/GlobalStateContext';
 
 interface CardProps {
   children: React.ReactNode;
@@ -25,10 +26,14 @@ export const Card: React.FC<CardProps> = ({
   accessibilityHint,
   accessibilityState,
 }) => {
+  const { colors, isDarkMode } = useGlobalState();
+
   const cardStyle = [
     styles.card,
+    { backgroundColor: colors.surface, borderColor: colors.border },
     border && styles.border,
-    elevation !== 'none' && Theme.shadows[elevation],
+    elevation !== 'none' && !isDarkMode && Theme.shadows[elevation],
+    isDarkMode && styles.darkBorderHighlight,
     style,
   ];
 
@@ -39,8 +44,9 @@ export const Card: React.FC<CardProps> = ({
         style={({ pressed }) => [
           cardStyle,
           pressed && styles.pressed,
+          Platform.OS === 'web' && (styles as any).webHover,
         ]}
-        accessibilityRole={accessibilityRole}
+        accessibilityRole={accessibilityRole || 'button'}
         accessibilityLabel={accessibilityLabel}
         accessibilityHint={accessibilityHint}
         accessibilityState={accessibilityState}
@@ -65,19 +71,26 @@ export const Card: React.FC<CardProps> = ({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: Theme.colors.cardBg,
-    borderRadius: Theme.roundness.md,
+    borderRadius: Theme.roundness.lg,
     padding: Theme.spacing.md,
     overflow: 'hidden',
   },
   border: {
     borderWidth: 1,
-    borderColor: Theme.colors.border,
+  },
+  darkBorderHighlight: {
+    borderWidth: 1,
   },
   pressed: {
-    opacity: 0.9,
-    transform: [{ scale: 0.98 }],
+    opacity: 0.92,
+    transform: [{ scale: 0.985 }],
   },
+  ...(Platform.OS === 'web' ? {
+    webHover: {
+      cursor: 'pointer',
+      transitionDuration: '200ms',
+    }
+  } : {})
 });
 
 export default Card;

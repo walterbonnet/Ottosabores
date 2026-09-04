@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, Pressable } from 'react-native';
+import { StyleSheet, Text, View, Pressable, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Theme from '../theme';
 import { useGlobalState } from '../services/GlobalStateContext';
@@ -26,9 +26,14 @@ export const Header: React.FC<HeaderProps> = ({
         </View>
         <Pressable 
           onPress={toggleDarkMode} 
-          style={styles.toggleBtn}
+          style={({ pressed }) => [
+            styles.toggleBtn,
+            { backgroundColor: isDarkMode ? 'rgba(214, 104, 67, 0.16)' : 'rgba(200, 92, 56, 0.08)' },
+            pressed && styles.pressed,
+            Platform.OS === 'web' && (styles as any).webHover,
+          ]}
           accessibilityRole="button"
-          accessibilityLabel="Cambiar tema de color"
+          accessibilityLabel={isDarkMode ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
         >
           <Ionicons 
             name={isDarkMode ? "sunny" : "moon"} 
@@ -49,8 +54,8 @@ export const Header: React.FC<HeaderProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: Theme.spacing.lg,
-    paddingBottom: Theme.spacing.sm,
+    paddingTop: Theme.spacing.lg + 4,
+    paddingBottom: Theme.spacing.sm + 4,
     paddingHorizontal: Theme.spacing.md,
     borderBottomWidth: 1,
   },
@@ -64,17 +69,20 @@ const styles = StyleSheet.create({
     marginRight: Theme.spacing.sm,
   },
   toggleBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(200, 92, 56, 0.08)',
+  },
+  pressed: {
+    opacity: 0.85,
+    transform: [{ scale: 0.95 }],
   },
   title: {
     fontSize: Theme.typography.sizes.xxl,
     fontWeight: Theme.typography.weights.bold,
-    letterSpacing: -0.5,
+    letterSpacing: Theme.typography.letterSpacing.tight,
   },
   subtitle: {
     fontSize: Theme.typography.sizes.sm,
@@ -84,7 +92,7 @@ const styles = StyleSheet.create({
   dividerContainer: {
     flexDirection: 'row',
     height: 3,
-    marginTop: Theme.spacing.sm,
+    marginTop: Theme.spacing.sm + 2,
     borderRadius: Theme.roundness.xs,
     overflow: 'hidden',
   },
@@ -94,6 +102,11 @@ const styles = StyleSheet.create({
   dividerAccent: {
     flex: 1,
   },
+  ...(Platform.OS === 'web' ? {
+    webHover: {
+      cursor: 'pointer',
+    }
+  } : {})
 });
 
 export default Header;

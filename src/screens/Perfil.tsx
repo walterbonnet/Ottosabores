@@ -286,8 +286,8 @@ export const PerfilScreen: React.FC = () => {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <Header 
-        title="Perfil Cultural" 
-        subtitle="Tu bitácora y logros en la cocina de Corrientes" 
+        title="Pasaporte Gastronómico" 
+        subtitle="Tu bitácora cultural y sellos de exploración del Taragüí" 
         showDivider={true}
       />
 
@@ -301,13 +301,17 @@ export const PerfilScreen: React.FC = () => {
             <Pressable
               key={tab}
               onPress={() => setProfileTab(tab)}
-              style={[
+              style={({ pressed }) => [
                 styles.profileTabBtn,
-                profileTab === tab && [styles.profileTabBtnActive, { borderBottomColor: colors.primary }]
+                profileTab === tab && [styles.profileTabBtnActive, { borderBottomColor: colors.primary }],
+                pressed && { opacity: 0.8 },
+                Platform.OS === 'web' && ({ cursor: 'pointer' } as any),
               ]}
+              accessibilityRole="tab"
+              accessibilityState={{ selected: profileTab === tab }}
             >
               <Text style={[styles.profileTabBtnText, { color: colors.textSecondary }, profileTab === tab && [styles.profileTabBtnTextActive, { color: colors.primary }]]}>
-                {tab === 'progreso' ? 'Mi Progreso' : tab === 'actividad' ? 'Actividad' : tab === 'descubrimiento' ? 'Descubrir' : 'El Proyecto'}
+                {tab === 'progreso' ? 'Pasaporte' : tab === 'actividad' ? 'Actividad' : tab === 'descubrimiento' ? 'Descubrir' : 'El Proyecto'}
               </Text>
             </Pressable>
           ))}
@@ -317,31 +321,36 @@ export const PerfilScreen: React.FC = () => {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
         >
-          {/* TAB 1: MI PROGRESO */}
+          {/* TAB 1: PASAPORTE GASTRONÓMICO & PROGRESO */}
           {profileTab === 'progreso' && (
             <View style={styles.tabContent}>
-              {/* Level card */}
+              {/* Passport Header Card */}
               <Card style={[styles.levelCard, { backgroundColor: colors.surface, borderColor: colors.border }]} elevation="md" border={true}>
+                <View style={styles.passportHeaderBadge}>
+                  <Ionicons name="ribbon" size={14} color={Theme.colors.accent} />
+                  <Text style={styles.passportHeaderText}>PASAPORTE GASTRONÓMICO OFICIAL</Text>
+                </View>
+
                 <View style={styles.avatarRow}>
-                  <View style={[styles.avatarCircle, { borderColor: colors.primary, backgroundColor: isDarkMode ? 'rgba(200, 92, 56, 0.16)' : 'rgba(200, 92, 56, 0.08)' }]}>
+                  <View style={[styles.avatarCircle, { borderColor: colors.primary, backgroundColor: isDarkMode ? 'rgba(214, 104, 67, 0.16)' : 'rgba(200, 92, 56, 0.08)' }]}>
                     <Text style={styles.avatarText}>🧑‍🍳</Text>
                   </View>
                   <View style={styles.avatarMeta}>
-                    <Text style={[styles.userName, { color: colors.text }]}>Gourmet del Litoral</Text>
+                    <Text style={[styles.userName, { color: colors.text }]}>Viajero Culinario</Text>
                     <Text style={[styles.userTitle, { color: colors.primary }]}>{levelInfo.title}</Text>
                   </View>
                 </View>
 
                 <View style={styles.xpProgressRow}>
                   <View style={styles.xpTextRow}>
-                    <Text style={[styles.xpLabel, { color: colors.textSecondary }]}>Puntos de Cultura</Text>
+                    <Text style={[styles.xpLabel, { color: colors.textSecondary }]}>Puntos de Experiencia Culinaria</Text>
                     <Text style={[styles.xpValue, { color: colors.text }]}>{totalXP} / {levelInfo.maxXp} XP</Text>
                   </View>
                   <View style={[styles.xpTrack, { backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(232, 226, 213, 0.5)' }]}>
                     <View style={[styles.xpBar, { width: `${levelProgress * 100}%`, backgroundColor: colors.primary }]} />
                   </View>
                   <Text style={[styles.xpSubtext, { color: colors.textSecondary }]}>
-                    {levelInfo.level === 4 ? '¡Felicidades, alcanzaste el rango máximo!' : `Faltan ${levelInfo.maxXp - totalXP} XP para ascender a ${levelInfo.nextTitle}`}
+                    {levelInfo.level === 4 ? '¡Felicidades, alcanzaste el máximo rango del Taragüí!' : `Faltan ${levelInfo.maxXp - totalXP} XP para ascender a ${levelInfo.nextTitle}`}
                   </Text>
                 </View>
               </Card>
@@ -1834,5 +1843,24 @@ const styles = StyleSheet.create({
   sectionHelpText: {
     fontSize: Theme.typography.sizes.xs + 1,
     fontStyle: 'italic',
+  },
+  passportHeaderBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(223, 177, 91, 0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(223, 177, 91, 0.35)',
+    borderRadius: Theme.roundness.round,
+    paddingHorizontal: Theme.spacing.sm + 2,
+    paddingVertical: Theme.spacing.xs - 1,
+    marginBottom: Theme.spacing.sm,
+  },
+  passportHeaderText: {
+    fontSize: 9.5,
+    fontWeight: Theme.typography.weights.bold,
+    color: '#9E7A1C',
+    letterSpacing: 1.2,
+    marginLeft: 4,
   },
 });

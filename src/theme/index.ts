@@ -1,8 +1,11 @@
 export const Theme = {
   colors: {
-    primary: '#C85C38',      // Terracota
-    secondary: '#2E6F40',    // Verde natural
-    accent: '#DFB15B',       // Dorado suave
+    primary: '#C85C38',      // Terracota Litoraleño
+    primaryHover: '#B24D2C', // Terracota oscuro para hover
+    secondary: '#2E6F40',    // Verde natural / Espinillo
+    secondaryHover: '#235732',
+    accent: '#DFB15B',       // Dorado suave / Sol correntino
+    accentLight: '#F5E6C4',  // Dorado ultra claro
     background: '#F8F6F0',   // Arena (Warm Sand Light)
     surface: '#FFFDF9',      // Marfil (Warm Ivory White)
     surfaceDark: '#EDE8DF',  // Arena Oscuro (for borders and section dividers)
@@ -15,6 +18,20 @@ export const Theme = {
     incorrect: '#C85C38',    // Quiz error
     white: '#FFFFFF',
     shadow: '#4E483F',
+    
+    // Dark Editorial Palette (Warm obsidian & dark charcoal, avoiding pure blacks)
+    dark: {
+      background: '#181513',   // Warm obsidian
+      surface: '#24201D',      // Warm charcoal
+      surfaceElevated: '#302B27', // Elevated cards in dark mode
+      border: '#3D3631',       // Warm subtle border
+      text: '#F7F4EF',         // Warm ivory text
+      textSecondary: '#B8B0A6',// Warm muted text
+      textLight: '#8A8278',    // Caption text
+      primary: '#D66843',      // Vibrant Terracota for dark mode
+      secondary: '#3B8B52',    // Vibrant green for dark mode
+      accent: '#E5BD6B',       // Warm Gold
+    }
   },
   spacing: {
     xs: 4,
@@ -23,35 +40,36 @@ export const Theme = {
     lg: 24,
     xl: 32,
     xxl: 40,
+    xxxl: 48,
   },
   roundness: {
-    xs: 4,
-    sm: 8,
-    md: 12,
-    lg: 16,
-    xl: 24,
+    xs: 6,
+    sm: 10,
+    md: 14,
+    lg: 20,
+    xl: 26,
     round: 9999,
   },
   shadows: {
     sm: {
-      shadowColor: '#4E483F',
-      shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.15,
-      shadowRadius: 2,
+      shadowColor: '#3E3A33',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.08,
+      shadowRadius: 4,
       elevation: 2,
     },
     md: {
-      shadowColor: '#4E483F',
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.18,
-      shadowRadius: 6,
+      shadowColor: '#3E3A33',
+      shadowOffset: { width: 0, height: 6 },
+      shadowOpacity: 0.12,
+      shadowRadius: 10,
       elevation: 4,
     },
     lg: {
-      shadowColor: '#4E483F',
-      shadowOffset: { width: 0, height: 8 },
-      shadowOpacity: 0.22,
-      shadowRadius: 12,
+      shadowColor: '#3E3A33',
+      shadowOffset: { width: 0, height: 12 },
+      shadowOpacity: 0.16,
+      shadowRadius: 20,
       elevation: 8,
     },
   },
@@ -62,9 +80,10 @@ export const Theme = {
       sm: 14,
       md: 16,
       lg: 18,
-      xl: 20,
-      xxl: 24,
-      xxxl: 32,
+      xl: 22,
+      xxl: 26,
+      xxxl: 34,
+      hero: 42,
     },
     weights: {
       light: '300' as const,
@@ -72,7 +91,15 @@ export const Theme = {
       medium: '500' as const,
       semibold: '600' as const,
       bold: '700' as const,
+      black: '800' as const,
     },
+    letterSpacing: {
+      tight: -0.5,
+      normal: 0,
+      wide: 0.5,
+      wider: 1.2,
+      caps: 1.8,
+    }
   },
 };
 

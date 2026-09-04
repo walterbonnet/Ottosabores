@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, Animated, Platform } from 'react-native';
 import Theme from '../theme';
 import { useGlobalState } from '../services/GlobalStateContext';
@@ -8,27 +8,27 @@ interface SkeletonLoaderProps {
 }
 
 export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({ type = 'card' }) => {
-  const { colors } = useGlobalState();
-  const [opacityAnim] = useState(() => new Animated.Value(0.4));
+  const { colors, isDarkMode } = useGlobalState();
+  const [opacityAnim] = useState(() => new Animated.Value(0.35));
 
   useEffect(() => {
     Animated.loop(
       Animated.sequence([
         Animated.timing(opacityAnim, {
-          toValue: 0.9,
-          duration: 750,
+          toValue: 0.85,
+          duration: 800,
           useNativeDriver: Platform.OS !== 'web',
         }),
         Animated.timing(opacityAnim, {
-          toValue: 0.4,
-          duration: 750,
+          toValue: 0.35,
+          duration: 800,
           useNativeDriver: Platform.OS !== 'web',
         })
       ])
     ).start();
   }, [opacityAnim]);
 
-  const skeletonColor = colors.surfaceDark;
+  const skeletonColor = isDarkMode ? colors.border : colors.surfaceDark;
 
   return (
     <Animated.View style={[styles.container, { opacity: opacityAnim }]}>
@@ -77,65 +77,65 @@ const styles = StyleSheet.create({
     marginVertical: Theme.spacing.xs,
   },
   cardContainer: {
-    borderWidth: 1.5,
-    borderRadius: Theme.roundness.md,
+    borderWidth: 1,
+    borderRadius: Theme.roundness.lg,
     overflow: 'hidden',
-    padding: Theme.spacing.sm,
+    padding: Theme.spacing.sm + 2,
   },
   imagePlaceholder: {
-    height: 120,
+    height: 140,
     width: '100%',
-    borderRadius: Theme.roundness.sm,
+    borderRadius: Theme.roundness.md,
     marginBottom: Theme.spacing.sm,
   },
   textBlock: {
     paddingHorizontal: 2,
   },
   textLineLong: {
-    height: 14,
+    height: 16,
     width: '80%',
-    borderRadius: 3,
+    borderRadius: Theme.roundness.xs,
     marginBottom: Theme.spacing.xs + 2,
   },
   textLineShort: {
-    height: 10,
+    height: 12,
     width: '50%',
-    borderRadius: 3,
+    borderRadius: Theme.roundness.xs,
   },
   listContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 1.5,
-    borderRadius: Theme.roundness.md,
-    padding: Theme.spacing.sm,
+    borderWidth: 1,
+    borderRadius: Theme.roundness.lg,
+    padding: Theme.spacing.sm + 2,
   },
   avatarPlaceholder: {
-    width: 44,
-    height: 44,
-    borderRadius: 6,
+    width: 48,
+    height: 48,
+    borderRadius: Theme.roundness.sm,
     marginRight: Theme.spacing.md,
   },
   listTextCol: {
     flex: 1,
   },
   miniBtnPlaceholder: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
   },
   detailContainer: {
     padding: Theme.spacing.md,
   },
   largeImgPlaceholder: {
-    height: 180,
+    height: 200,
     width: '100%',
-    borderRadius: Theme.roundness.lg,
+    borderRadius: Theme.roundness.xl,
     marginBottom: Theme.spacing.md,
   },
   titlePlaceholder: {
-    height: 24,
-    width: '60%',
-    borderRadius: 4,
+    height: 28,
+    width: '65%',
+    borderRadius: Theme.roundness.xs,
     marginBottom: Theme.spacing.lg,
   },
   detailsChecklist: {
@@ -147,15 +147,15 @@ const styles = StyleSheet.create({
     marginBottom: Theme.spacing.sm,
   },
   checkSquare: {
-    width: 18,
-    height: 18,
-    borderRadius: 3,
+    width: 20,
+    height: 20,
+    borderRadius: Theme.roundness.xs,
     marginRight: Theme.spacing.sm,
   },
   checkTextLine: {
-    height: 12,
-    width: '70%',
-    borderRadius: 3,
+    height: 14,
+    width: '75%',
+    borderRadius: Theme.roundness.xs,
   },
 });
 

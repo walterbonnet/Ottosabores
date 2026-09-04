@@ -408,12 +408,17 @@ export const InicioScreen: React.FC = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* Hero Principal con Imagen de Fondo y Eslogan */}
+        {/* Hero Principal con Imagen de Fondo y Eslogan Editorial */}
         <ImageBackground 
           source={HERO_BANNER_IMAGE} 
           style={styles.heroBackground}
+          imageStyle={{ borderRadius: Theme.roundness.lg }}
         >
           <View style={styles.heroOverlay}>
+            <View style={styles.editorialBadge}>
+              <Ionicons name="flame" size={14} color={Theme.colors.accent} />
+              <Text style={styles.editorialBadgeText}>PATRIMONIO CULTURAL Y GASTRONÓMICO</Text>
+            </View>
             <View style={styles.logoRow}>
               <View style={styles.logoCircle}>
                 <Ionicons name="restaurant" size={20} color={colors.primary} />
@@ -421,13 +426,45 @@ export const InicioScreen: React.FC = () => {
               <Text style={styles.heroBrandName}>Sabores 4.0</Text>
             </View>
             <View style={styles.heroTitleContainer}>
-              <Text style={styles.heroTitle}>La gastronomía correntina</Text>
-              <Text style={styles.heroSubtitle}>en la palma de tu mano</Text>
+              <Text style={styles.heroTitle}>El Fuego del Taragüí</Text>
+              <Text style={styles.heroSubtitle}>Gastronomía ancestral de Corrientes</Text>
             </View>
             <View style={styles.heroDivider} />
-            <Text style={styles.heroSlogan}>Tradición, fuego y tierra del Taragüí</Text>
+            <Text style={styles.heroSlogan}>Tradición, fuego y sabiduría popular del litoral</Text>
+
+            <Pressable 
+              onPress={() => router.push('/recetas')}
+              style={({ pressed }) => [
+                styles.heroCtaBtn,
+                pressed && styles.heroCtaPressed,
+                Platform.OS === 'web' && (styles as any).webHover,
+              ]}
+              accessibilityRole="button"
+              accessibilityLabel="Explorar Recetas del Taragüí"
+            >
+              <Text style={styles.heroCtaText}>Explorar Recetas</Text>
+              <Ionicons name="arrow-forward" size={16} color={Theme.colors.white} style={{ marginLeft: 6 }} />
+            </Pressable>
           </View>
         </ImageBackground>
+
+        {/* Quick Stats Banner Floating below Hero */}
+        <View style={[styles.statsBannerRow, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          <View style={styles.statCol}>
+            <Text style={[styles.statNumber, { color: colors.primary }]}>19</Text>
+            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Recetas</Text>
+          </View>
+          <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
+          <View style={styles.statCol}>
+            <Text style={[styles.statNumber, { color: colors.secondary }]}>14</Text>
+            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Festivales</Text>
+          </View>
+          <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
+          <View style={styles.statCol}>
+            <Text style={[styles.statNumber, { color: colors.accent }]}>3</Text>
+            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Rutas</Text>
+          </View>
+        </View>
 
         {isLoading ? (
           <View style={styles.skeletonContainer}>
@@ -1793,6 +1830,79 @@ const styles = StyleSheet.create({
   skeletonContainer: {
     paddingHorizontal: Theme.spacing.md,
     paddingTop: Theme.spacing.sm,
+  },
+  editorialBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(0, 0, 0, 0.45)',
+    borderWidth: 1,
+    borderColor: 'rgba(223, 177, 91, 0.5)',
+    borderRadius: Theme.roundness.round,
+    paddingHorizontal: Theme.spacing.sm + 2,
+    paddingVertical: Theme.spacing.xs - 1,
+    marginBottom: Theme.spacing.xs,
+  },
+  editorialBadgeText: {
+    fontSize: 9.5,
+    fontWeight: Theme.typography.weights.bold,
+    color: Theme.colors.accent,
+    letterSpacing: 1.2,
+    marginLeft: 4,
+  },
+  heroCtaBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Theme.colors.primary,
+    paddingHorizontal: Theme.spacing.md + 4,
+    paddingVertical: Theme.spacing.sm + 2,
+    borderRadius: Theme.roundness.md,
+    marginTop: Theme.spacing.md,
+    alignSelf: 'flex-start',
+    ...Theme.shadows.sm,
+  },
+  heroCtaPressed: {
+    opacity: 0.9,
+    transform: [{ scale: 0.97 }],
+  },
+  heroCtaText: {
+    fontSize: Theme.typography.sizes.sm,
+    fontWeight: Theme.typography.weights.bold,
+    color: Theme.colors.white,
+    letterSpacing: 0.2,
+  },
+  statsBannerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    marginHorizontal: Theme.spacing.md,
+    marginTop: Theme.spacing.sm,
+    marginBottom: Theme.spacing.md,
+    paddingVertical: Theme.spacing.md,
+    borderRadius: Theme.roundness.lg,
+    borderWidth: 1,
+    ...Theme.shadows.sm,
+  },
+  statCol: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  statNumber: {
+    fontSize: Theme.typography.sizes.xl,
+    fontWeight: Theme.typography.weights.bold,
+    lineHeight: 24,
+  },
+  statLabel: {
+    fontSize: Theme.typography.sizes.xs - 1,
+    fontWeight: Theme.typography.weights.medium,
+    marginTop: 2,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  statDivider: {
+    width: 1,
+    height: 24,
   },
 });
 

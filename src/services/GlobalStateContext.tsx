@@ -144,18 +144,18 @@ export const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
   };
 
   const colors = {
-    primary: '#C85C38',
-    secondary: '#2E6F40',
-    accent: '#DFB15B',
+    primary: isDarkMode ? Theme.colors.dark.primary : Theme.colors.primary,
+    secondary: isDarkMode ? Theme.colors.dark.secondary : Theme.colors.secondary,
+    accent: isDarkMode ? Theme.colors.dark.accent : Theme.colors.accent,
     white: '#FFFFFF',
-    correct: '#2E6F40',
-    incorrect: '#C85C38',
-    background: isDarkMode ? '#1C1917' : '#F8F6F0',
-    surface: isDarkMode ? '#292524' : '#FFFDF9',
-    surfaceDark: isDarkMode ? '#3E3A33' : '#EDE8DF',
-    text: isDarkMode ? '#F5F5F4' : '#3E3A33',
-    textSecondary: isDarkMode ? '#A8A29E' : '#6E675F',
-    border: isDarkMode ? '#44403C' : '#E8E2D5',
+    correct: isDarkMode ? '#3B8B52' : '#2E6F40',
+    incorrect: isDarkMode ? '#E57373' : '#C85C38',
+    background: isDarkMode ? Theme.colors.dark.background : Theme.colors.background,
+    surface: isDarkMode ? Theme.colors.dark.surface : Theme.colors.surface,
+    surfaceDark: isDarkMode ? Theme.colors.dark.surfaceElevated : Theme.colors.surfaceDark,
+    text: isDarkMode ? Theme.colors.dark.text : Theme.colors.text,
+    textSecondary: isDarkMode ? Theme.colors.dark.textSecondary : Theme.colors.textSecondary,
+    border: isDarkMode ? Theme.colors.dark.border : Theme.colors.border,
   };
 
   // --- Persistent State ---
