@@ -10,6 +10,7 @@ import {
   SafeAreaView,
   Dimensions,
   Animated,
+  Platform,
 } from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';

@@ -29,14 +29,18 @@ export const festivalsRepository = {
           id: row.festival_code || row.id,
           nombre: row.name,
           localidad: row.location,
-          departamento: row.department,
+          ubicación: mockMatch?.ubicación || row.location,
           fecha: row.date_display,
           historia: row.history,
           productoDestacado: row.featured_product,
+          descripcionCorta: mockMatch?.descripcionCorta || row.history.slice(0, 100),
+          categoría: mockMatch?.categoría || row.gastronomic_route,
           rutaGastronomica: row.gastronomic_route as any,
           recetaRelacionada: row.related_recipe_code || undefined,
           galeria: mediaUrls.length > 0 ? mediaUrls : (mockMatch?.galeria || []),
-          video: row.video_url || mockMatch?.video,
+          video: row.video_url || mockMatch?.video || '',
+          latitud: mockMatch?.latitud,
+          longitud: mockMatch?.longitud,
         };
       });
     } catch (err) {
@@ -70,14 +74,18 @@ export const festivalsRepository = {
         id: data.festival_code || data.id,
         nombre: data.name,
         localidad: data.location,
-        departamento: data.department,
+        ubicación: mockFound?.ubicación || data.location,
         fecha: data.date_display,
         historia: data.history,
         productoDestacado: data.featured_product,
+        descripcionCorta: mockFound?.descripcionCorta || data.history.slice(0, 100),
+        categoría: mockFound?.categoría || data.gastronomic_route,
         rutaGastronomica: data.gastronomic_route as any,
         recetaRelacionada: data.related_recipe_code || undefined,
         galeria: mediaUrls.length > 0 ? mediaUrls : (mockFound?.galeria || []),
-        video: data.video_url || mockFound?.video,
+        video: data.video_url || mockFound?.video || '',
+        latitud: mockFound?.latitud,
+        longitud: mockFound?.longitud,
       };
     } catch (err) {
       return mockFound || null;

@@ -7,6 +7,7 @@ export interface Recipe {
   duración: string;
   dificultad: 'Fácil' | 'Media' | 'Difícil';
   video?: string;
+  audioTrackId?: string;
   categoría:
     | 'Carnes Tradicionales'
     | 'Sabores Guaraníes'
@@ -50,6 +51,7 @@ export interface TriviaQuestion {
   options: string[];
   correctAnswer: number; // Index of the correct answer
   explanation: string;
+  image?: string;
 }
 
 export interface DepartmentHotspot {
