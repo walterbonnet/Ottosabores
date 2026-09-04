@@ -56,8 +56,7 @@ export const triviaRepository = {
 
   async submitAnswer(
     questionId: string,
-    selectedOptionIndex: number,
-    userId?: string
+    selectedOptionIndex: number
   ): Promise<TriviaValidationResult> {
     if (!isSupabaseConfigured || !supabase) {
       // Fallback for local mock validation
@@ -76,7 +75,6 @@ export const triviaRepository = {
         body: {
           questionCode: questionId,
           selectedOptionIndex,
-          userId,
         },
       });
 

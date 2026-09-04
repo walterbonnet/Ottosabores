@@ -27,3 +27,7 @@ enable_signup = true
 [storage]
 enabled = true
 file_size_limit = "50MB"
+
+[functions.submit-trivia-answer]
+verify_jwt = true
+
