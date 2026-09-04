@@ -2,6 +2,9 @@ import React, { createContext, useContext, useState, useEffect, useRef } from 'r
 import { Platform } from 'react-native';
 import { MultimediaItem } from '../types';
 import { MULTIMEDIA_ITEMS } from './mockData';
+import { favoritesRepository } from './repositories/favoritesRepository';
+import { progressRepository } from './repositories/progressRepository';
+import { supabase, isSupabaseConfigured } from './supabase/client';
 
 // Custom URLs for audio loops (royalty free public MP3 files)
 const MOCK_AUDIO_URLS: { [key: string]: string } = {
@@ -259,10 +262,21 @@ export const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   // --- Actions ---
   const toggleFavorite = (recipeId: string) => {
-    if (favorites.includes(recipeId)) {
-      saveFavorites(favorites.filter(id => id !== recipeId));
-    } else {
-      saveFavorites([...favorites, recipeId]);
+    const isFav = favorites.includes(recipeId);
+    const newFavs = isFav ? favorites.filter(id => id !== recipeId) : [...favorites, recipeId];
+    saveFavorites(newFavs);
+
+    if (isSupabaseConfigured && supabase) {
+      supabase.auth.getUser().then(({ data }) => {
+        const uid = data?.user?.id;
+        if (uid) {
+          if (isFav) {
+            favoritesRepository.removeFavorite(uid, recipeId);
+          } else {
+            favoritesRepository.addFavorite(uid, recipeId);
+          }
+        }
+      });
     }
   };
 
@@ -283,15 +297,26 @@ export const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
       updatedIngredients = updatedIngredients.filter(idx => idx !== ingredientIndex);
     }
 
+    const updatedProgress: RecipeProgress = {
+      ...current,
+      completedIngredients: updatedIngredients,
+      lastUpdated: Date.now(),
+    };
+
     const updated = {
       ...recipeProgress,
-      [recipeId]: {
-        ...current,
-        completedIngredients: updatedIngredients,
-        lastUpdated: Date.now(),
-      },
+      [recipeId]: updatedProgress,
     };
     saveRecipeProgress(updated);
+
+    if (isSupabaseConfigured && supabase) {
+      supabase.auth.getUser().then(({ data }) => {
+        const uid = data?.user?.id;
+        if (uid) {
+          progressRepository.saveProgress(uid, recipeId, updatedProgress);
+        }
+      });
+    }
   };
 
   const updateStepProgress = (recipeId: string, stepIndex: number, isCompleted: boolean) => {
