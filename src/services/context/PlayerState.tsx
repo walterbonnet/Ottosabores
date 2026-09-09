@@ -49,6 +49,15 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (isWeb && typeof window !== 'undefined') {
       htmlAudioRef.current = new window.Audio();
     }
+
+    return () => {
+      if (simTimerRef.current) clearInterval(simTimerRef.current);
+      if (waveTimerRef.current) clearInterval(waveTimerRef.current);
+      if (isWeb && htmlAudioRef.current) {
+        htmlAudioRef.current.pause();
+        htmlAudioRef.current.src = '';
+      }
+    };
   }, []);
 
   const formatTime = (seconds: number): string => {
