@@ -4,6 +4,7 @@ import { favoritesRepository } from '../repositories/favoritesRepository';
 import { progressRepository } from '../repositories/progressRepository';
 import { StorageService } from '../storage/StorageService';
 import { useAuth } from './AuthState';
+import { Logger } from '../logger';
 
 interface UserContextType {
   favorites: string[];
@@ -87,7 +88,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (savedAudios) setPlayedAudios(JSON.parse(savedAudios));
         if (savedCuriosities) setReadCuriosities(JSON.parse(savedCuriosities));
       } catch (e) {
-        console.warn('UserState hydration warning:', e);
+        Logger.warn('UserState hydration warning:', e);
       }
     };
 

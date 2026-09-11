@@ -22,6 +22,7 @@ import Header from '../components/Header';
 import { FESTIVALS, RECIPES } from '../services/mockData';
 import { Festival, Recipe } from '../types';
 import { useGlobalState } from '../services/GlobalStateContext';
+import { Logger } from '../services/logger';
 import SkeletonLoader from '../components/SkeletonLoader';
 import RecipeDetailModal from '../components/RecipeDetailModal';
 import FestivalDetailModal from '../components/FestivalDetailModal';
@@ -114,24 +115,7 @@ const MapLine: React.FC<{ x1: number; y1: number; x2: number; y2: number; color:
 };
 
 
-const getGrandmaTip = (recipeId: string): string => {
-  switch (recipeId) {
-    case 'r1':
-      return 'El gran secreto de las abuelas correntinas es agregar una cucharada de jugo de naranja natural al amasar. Esto ayuda a que el chipá quede esponjoso.';
-    case 'r2':
-      return 'Revolver siempre en sentido de las agujas del reloj y usando una cuchara de madera de espinillo para que no se corte la textura.';
-    case 'r3':
-      return 'Para el guiso, agrega un chorrito de jugo de limón al apagar el fuego. Realza los sabores de la carne de manera espectacular.';
-    case 'r4':
-      return 'Servilo siempre bien frío del refrigerador con una rodaja gruesa de queso de campo correntino (queso criollo).';
-    case 'r5':
-      return 'Humedecer la carne constantemente con salmuera de romero y ajo para que conserve su jugosidad en la estaca.';
-    case 'r6':
-      return 'Pinchá varias veces con un tenedor el chipá cuerito antes de tirarlo al aceite hirviendo para que no se infle desparejo.';
-    default:
-      return 'Cocinar siempre con leña o fuego de carbón vegetal para conservar el aroma tradicional del litoral.';
-  }
-};
+import { getGrandmaTip } from '../config/constants';
 
 const getFestivalContext = (id: string) => {
   const data: { [key: string]: { caracteristicas: string; importancia: string } } = {
@@ -330,7 +314,7 @@ export const MapaScreen: React.FC = () => {
       const y = Math.min(95, Math.max(5, (((-27.0) - latitude) / 3.4) * 100));
       setUserLocation({ x, y });
     } catch (error) {
-      console.warn(error);
+      Logger.warn('Error fetching GPS location:', error);
       alert('No se pudo obtener la ubicación GPS. Selecciona tu origen manualmente.');
       setShowCityPicker(true);
     } finally {

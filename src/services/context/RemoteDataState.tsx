@@ -24,15 +24,21 @@ export const RemoteDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [festivals, setFestivals] = useState<Festival[]>(FESTIVALS);
   const [multimediaItems, setMultimediaItems] = useState<MultimediaItem[]>(MULTIMEDIA_ITEMS);
 
-  const [isLoadingRecipes, setIsLoadingRecipes] = useState<boolean>(true);
-  const [isLoadingFestivals, setIsLoadingFestivals] = useState<boolean>(true);
-  const [isLoadingMultimedia, setIsLoadingMultimedia] = useState<boolean>(true);
+  const [isLoadingRecipes, setIsLoadingRecipes] = useState<boolean>(false);
+  const [isLoadingFestivals, setIsLoadingFestivals] = useState<boolean>(false);
+  const [isLoadingMultimedia, setIsLoadingMultimedia] = useState<boolean>(false);
 
-  const refreshRecipes = async () => {
+  const [hasLoadedRecipes, setHasLoadedRecipes] = useState<boolean>(false);
+  const [hasLoadedFestivals, setHasLoadedFestivals] = useState<boolean>(false);
+  const [hasLoadedMultimedia, setHasLoadedMultimedia] = useState<boolean>(false);
+
+  const refreshRecipes = async (force: boolean = false) => {
+    if (hasLoadedRecipes && !force) return;
     setIsLoadingRecipes(true);
     try {
       const data = await recipesRepository.getAll();
       setRecipes(data.length > 0 ? data : RECIPES);
+      setHasLoadedRecipes(true);
     } catch (e) {
       setRecipes(RECIPES);
     } finally {
@@ -40,11 +46,13 @@ export const RemoteDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }
   };
 
-  const refreshFestivals = async () => {
+  const refreshFestivals = async (force: boolean = false) => {
+    if (hasLoadedFestivals && !force) return;
     setIsLoadingFestivals(true);
     try {
       const data = await festivalsRepository.getAll();
       setFestivals(data.length > 0 ? data : FESTIVALS);
+      setHasLoadedFestivals(true);
     } catch (e) {
       setFestivals(FESTIVALS);
     } finally {
@@ -52,11 +60,13 @@ export const RemoteDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }
   };
 
-  const refreshMultimedia = async () => {
+  const refreshMultimedia = async (force: boolean = false) => {
+    if (hasLoadedMultimedia && !force) return;
     setIsLoadingMultimedia(true);
     try {
       const data = await multimediaRepository.getAll();
       setMultimediaItems(data.length > 0 ? data : MULTIMEDIA_ITEMS);
+      setHasLoadedMultimedia(true);
     } catch (e) {
       setMultimediaItems(MULTIMEDIA_ITEMS);
     } finally {
@@ -64,10 +74,11 @@ export const RemoteDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }
   };
 
+  // On-demand initialization: set initial loading to false to present fallback content immediately
   useEffect(() => {
-    refreshRecipes();
-    refreshFestivals();
-    refreshMultimedia();
+    setIsLoadingRecipes(false);
+    setIsLoadingFestivals(false);
+    setIsLoadingMultimedia(false);
   }, []);
 
   const value: RemoteDataContextType = {

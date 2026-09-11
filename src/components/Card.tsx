@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, Pressable, ViewStyle, StyleProp, Platform } from 'react-native';
+import { StyleSheet, View, Pressable, ViewStyle, StyleProp, Platform, AccessibilityRole, AccessibilityState } from 'react-native';
 import Theme from '../theme';
 import { useGlobalState } from '../services/GlobalStateContext';
 
@@ -9,10 +9,10 @@ interface CardProps {
   onPress?: () => void;
   elevation?: 'none' | 'sm' | 'md' | 'lg';
   border?: boolean;
-  accessibilityRole?: any;
+  accessibilityRole?: AccessibilityRole;
   accessibilityLabel?: string;
   accessibilityHint?: string;
-  accessibilityState?: any;
+  accessibilityState?: AccessibilityState;
 }
 
 export const Card: React.FC<CardProps> = ({

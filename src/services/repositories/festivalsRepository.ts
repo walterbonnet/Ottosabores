@@ -1,6 +1,7 @@
 import { supabase, isSupabaseConfigured } from '../supabase/client';
 import { FESTIVALS } from '../mockData';
-import { Festival } from '../../types';
+import { Festival, FestivalMediaRow } from '../../types';
+import { Logger } from '../logger';
 
 export const festivalsRepository = {
   async getAll(): Promise<Festival[]> {
@@ -9,21 +10,23 @@ export const festivalsRepository = {
     }
 
     try {
+      // Explicit projection instead of select('*')
       const { data, error } = await supabase
         .from('festivals')
-        .select('*, festival_media(*)')
+        .select('id, festival_code, name, location, date_display, history, featured_product, gastronomic_route, related_recipe_code, video_url, festival_media(url, display_order)')
         .eq('is_published', true)
         .order('created_at', { ascending: true });
 
       if (error || !data || data.length === 0) {
+        Logger.warn('Supabase festivals fetch failed, using fallback mock:', error);
         return FESTIVALS;
       }
 
       return data.map((row) => {
         const mockMatch = FESTIVALS.find(f => f.id === row.festival_code || f.id === row.id);
-        const mediaUrls = (row.festival_media || [])
-          .sort((a: any, b: any) => a.display_order - b.display_order)
-          .map((m: any) => m.url);
+        const mediaUrls = ((row.festival_media as FestivalMediaRow[]) || [])
+          .sort((a, b) => (a.display_order || 0) - (b.display_order || 0))
+          .map((m) => m.url);
 
         return {
           id: row.festival_code || row.id,
@@ -35,7 +38,7 @@ export const festivalsRepository = {
           productoDestacado: row.featured_product,
           descripcionCorta: mockMatch?.descripcionCorta || row.history.slice(0, 100),
           categoría: mockMatch?.categoría || row.gastronomic_route,
-          rutaGastronomica: row.gastronomic_route as any,
+          rutaGastronomica: row.gastronomic_route as Festival['rutaGastronomica'],
           recetaRelacionada: row.related_recipe_code || undefined,
           galeria: mediaUrls.length > 0 ? mediaUrls : (mockMatch?.galeria || []),
           video: row.video_url || mockMatch?.video || '',
@@ -44,6 +47,7 @@ export const festivalsRepository = {
         };
       });
     } catch (err) {
+      Logger.warn('festivalsRepository.getAll error:', err);
       return FESTIVALS;
     }
   },
@@ -57,18 +61,19 @@ export const festivalsRepository = {
     try {
       const { data, error } = await supabase
         .from('festivals')
-        .select('*, festival_media(*)')
+        .select('id, festival_code, name, location, date_display, history, featured_product, gastronomic_route, related_recipe_code, video_url, festival_media(url, display_order)')
         .or(`festival_code.eq.${id},id.eq.${id}`)
         .eq('is_published', true)
         .single();
 
       if (error || !data) {
+        Logger.warn('festivalsRepository.getById failed or empty:', error);
         return mockFound || null;
       }
 
-      const mediaUrls = (data.festival_media || [])
-        .sort((a: any, b: any) => a.display_order - b.display_order)
-        .map((m: any) => m.url);
+      const mediaUrls = ((data.festival_media as FestivalMediaRow[]) || [])
+        .sort((a, b) => (a.display_order || 0) - (b.display_order || 0))
+        .map((m) => m.url);
 
       return {
         id: data.festival_code || data.id,
@@ -80,7 +85,7 @@ export const festivalsRepository = {
         productoDestacado: data.featured_product,
         descripcionCorta: mockFound?.descripcionCorta || data.history.slice(0, 100),
         categoría: mockFound?.categoría || data.gastronomic_route,
-        rutaGastronomica: data.gastronomic_route as any,
+        rutaGastronomica: data.gastronomic_route as Festival['rutaGastronomica'],
         recetaRelacionada: data.related_recipe_code || undefined,
         galeria: mediaUrls.length > 0 ? mediaUrls : (mockFound?.galeria || []),
         video: data.video_url || mockFound?.video || '',
@@ -88,6 +93,7 @@ export const festivalsRepository = {
         longitud: mockFound?.longitud,
       };
     } catch (err) {
+      Logger.warn('festivalsRepository.getById exception:', err);
       return mockFound || null;
     }
   },

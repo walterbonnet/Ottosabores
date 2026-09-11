@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   StyleSheet,
   Text,
   View,
   ScrollView,
+  FlatList,
+  ActivityIndicator,
+  Platform,
   TextInput,
   Pressable,
   SafeAreaView,
@@ -18,26 +21,11 @@ import SkeletonLoader from '../components/SkeletonLoader';
 import { RECIPES, FESTIVALS } from '../services/mockData';
 import { Recipe } from '../types';
 import { useGlobalState } from '../services/GlobalStateContext';
+import { recipesRepository } from '../services/repositories/recipesRepository';
+import { getGrandmaTip } from '../config/constants';
+import { Logger } from '../services/logger';
+import { AppError, classifyError } from '../services/errors/AppError';
 import RecipeDetailModal from '../components/RecipeDetailModal';
-
-const getGrandmaTip = (recipeId: string): string => {
-  switch (recipeId) {
-    case 'r1':
-      return 'El gran secreto de las abuelas correntinas es agregar una cucharada de jugo de naranja natural al amasar. Esto ayuda a que el chipá quede esponjoso.';
-    case 'r2':
-      return 'Revolver siempre en sentido de las agujas del reloj y usando una cuchara de madera de espinillo para que no se corte la textura.';
-    case 'r3':
-      return 'Para el guiso, agrega un chorrito de jugo de limón al apagar el fuego. Realza los sabores de la carne y el arroz de manera espectacular.';
-    case 'r4':
-      return 'Servilo siempre bien frío del refrigerador con una rodaja gruesa de queso de campo correntino (queso criollo).';
-    case 'r5':
-      return 'Humedecer la carne constantemente con salmuera de romero y ajo para que conserve su jugosidad en la estaca.';
-    case 'r6':
-      return 'Pinchá varias veces con un tenedor el chipá cuerito antes de tirarlo al aceite hirviendo para que no se infle desparejo.';
-    default:
-      return 'Cocinar siempre con leña o fuego de carbón vegetal para conservar el aroma tradicional del litoral.';
-  }
-};
 
 export const RecetasScreen: React.FC = () => {
   const router = useRouter();
@@ -57,43 +45,15 @@ export const RecetasScreen: React.FC = () => {
   }, [params.id]);
   const [activeCategory, setActiveCategory] = useState<string>('Todos');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [displayedRecipes, setDisplayedRecipes] = useState<Recipe[]>([]);
+  const [page, setPage] = useState<number>(0);
+  const [hasMore, setHasMore] = useState<boolean>(true);
+  const [isInitialLoading, setIsInitialLoading] = useState<boolean>(true);
+  const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const [isLoadingDetail, setIsLoadingDetail] = useState<boolean>(false);
   const [visibleSections, setVisibleSections] = useState<number>(0);
-
-  useEffect(() => {
-    let timers: any[] = [];
-    if (selectedRecipe) {
-      const initTimer = setTimeout(() => {
-        setIsLoadingDetail(true);
-        setVisibleSections(0);
-      }, 0);
-      timers.push(initTimer);
-      
-      const loadTimer = setTimeout(() => {
-        setIsLoadingDetail(false);
-        timers.push(setTimeout(() => setVisibleSections(1), 50));
-        timers.push(setTimeout(() => setVisibleSections(2), 150));
-        timers.push(setTimeout(() => setVisibleSections(3), 250));
-        timers.push(setTimeout(() => setVisibleSections(4), 350));
-        timers.push(setTimeout(() => setVisibleSections(5), 450));
-        timers.push(setTimeout(() => setVisibleSections(6), 550));
-        timers.push(setTimeout(() => setVisibleSections(7), 650));
-      }, 500);
-
-      timers.push(loadTimer);
-    } else {
-      const initTimer = setTimeout(() => {
-        setIsLoadingDetail(false);
-        setVisibleSections(0);
-      }, 0);
-      timers.push(initTimer);
-    }
-
-    return () => {
-      timers.forEach(t => clearTimeout(t));
-    };
-  }, [selectedRecipe]);
+  const [initialError, setInitialError] = useState<AppError | null>(null);
+  const [loadMoreError, setLoadMoreError] = useState<AppError | null>(null);
 
   const {
     favorites,
@@ -107,20 +67,98 @@ export const RecetasScreen: React.FC = () => {
     isDarkMode,
   } = useGlobalState();
 
+  const requestSeqRef = useRef<number>(0);
+
   useEffect(() => {
-    const timer1 = setTimeout(() => {
-      setIsLoading(true);
-    }, 0);
-    const timer2 = setTimeout(() => {
-      setIsLoading(false);
-    }, 600);
+    let timer: any;
+    if (selectedRecipe) {
+      setIsLoadingDetail(true);
+      setVisibleSections(0);
+      timer = setTimeout(() => {
+        setIsLoadingDetail(false);
+        setVisibleSections(7);
+      }, 150);
+    } else {
+      setIsLoadingDetail(false);
+      setVisibleSections(0);
+    }
+
     return () => {
-      clearTimeout(timer1);
-      clearTimeout(timer2);
+      if (timer) clearTimeout(timer);
     };
+  }, [selectedRecipe]);
+
+  const fetchRecipesPage = async (pageToFetch: number, resetList: boolean = false) => {
+    const currentSeq = ++requestSeqRef.current;
+    if (pageToFetch === 0) {
+      setIsInitialLoading(true);
+      setInitialError(null);
+    } else {
+      if (isLoadingMore || !hasMore) return;
+      setIsLoadingMore(true);
+      setLoadMoreError(null);
+    }
+
+    try {
+      const res = await recipesRepository.getPaginatedResult({
+        page: pageToFetch,
+        pageSize: 10,
+        searchQuery,
+        category: activeCategory,
+        favoriteIds: favorites,
+      });
+
+      if (currentSeq !== requestSeqRef.current) return;
+
+      if (res.ok) {
+        if (resetList || pageToFetch === 0) {
+          setDisplayedRecipes(res.data.data);
+          setInitialError(null);
+        } else {
+          setDisplayedRecipes((prev) => {
+            const existingIds = new Set(prev.map((r) => r.id));
+            const newItems = res.data.data.filter((r) => !existingIds.has(r.id));
+            return [...prev, ...newItems];
+          });
+          setLoadMoreError(null);
+        }
+        setPage(pageToFetch);
+        setHasMore(res.data.hasMore);
+      } else {
+        if (pageToFetch === 0) {
+          setInitialError(res.error);
+          setDisplayedRecipes([]);
+        } else {
+          setLoadMoreError(res.error);
+        }
+      }
+    } catch (err) {
+      if (currentSeq === requestSeqRef.current) {
+        const appErr = classifyError(err);
+        if (pageToFetch === 0) {
+          setInitialError(appErr);
+          setDisplayedRecipes([]);
+        } else {
+          setLoadMoreError(appErr);
+        }
+      }
+    } finally {
+      if (currentSeq === requestSeqRef.current) {
+        setIsInitialLoading(false);
+        setIsLoadingMore(false);
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchRecipesPage(0, true);
   }, [activeCategory, searchQuery]);
 
-
+  const handleLoadMore = () => {
+    if (!isLoadingMore && hasMore && !isInitialLoading) {
+      fetchRecipesPage(page + 1, false);
+    }
+  };
 
   const categories = [
     'Todos',
@@ -136,14 +174,6 @@ export const RecetasScreen: React.FC = () => {
     addRecentlyViewed(recipe.id, 'recipe');
     setSelectedRecipe(recipe);
   };
-
-  const filteredRecipes = RECIPES.filter(recipe => {
-    const matchesCategory = activeCategory === 'Todos' || 
-                           (activeCategory === 'Favoritos' ? favorites.includes(recipe.id) : recipe.categoría === activeCategory);
-    const matchesSearch = recipe.nombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          recipe.historia.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
 
   // Encuentra la receta con progreso para el banner de "Continuar lectura"
   const inProgressRecipes = Object.entries(recipeProgress)
@@ -552,198 +582,210 @@ export const RecetasScreen: React.FC = () => {
     );
   }
 
-  return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <Header 
-        title="Sabores Ancestrales" 
-        subtitle="Catálogo de recetas autóctonas y técnicas tradicionales" 
-        showDivider={true}
-      />
-      
-      <ScrollView 
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
-        {/* Search input */}
-        <View style={styles.searchBarContainer}>
-          <View style={[styles.searchInner, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-            <Ionicons name="search" size={18} color={colors.textSecondary} style={{ marginRight: 6 }} />
-            <TextInput
-              style={[styles.searchInput, { color: colors.text }]}
-              placeholder="Buscar receta por nombre o ingrediente..."
-              placeholderTextColor={colors.textSecondary}
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-            />
-            {searchQuery.length > 0 && (
-              <Pressable onPress={() => setSearchQuery('')}>
-                <Ionicons name="close-circle" size={16} color={colors.textSecondary} />
-              </Pressable>
-            )}
-          </View>
+  const renderListHeader = () => (
+    <View>
+      {/* Search input */}
+      <View style={styles.searchBarContainer}>
+        <View style={[styles.searchInner, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          <Ionicons name="search" size={18} color={colors.textSecondary} style={{ marginRight: 6 }} />
+          <TextInput
+            style={[styles.searchInput, { color: colors.text }]}
+            placeholder="Buscar receta por nombre o ingrediente..."
+            placeholderTextColor={colors.textSecondary}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+          {searchQuery.length > 0 && (
+            <Pressable onPress={() => setSearchQuery('')}>
+              <Ionicons name="close-circle" size={16} color={colors.textSecondary} />
+            </Pressable>
+          )}
         </View>
+      </View>
 
-        {/* Continuar Lectura Banner Section */}
-        {resumingItem && (
-          <View>
-            <Text style={[styles.sectionTitleLabel, { color: colors.textSecondary }]}>Retomar Preparación</Text>
-            <Card
-              style={[styles.resumeBanner, { backgroundColor: colors.surface, borderColor: colors.primary }]}
-              border={true}
-              elevation="sm"
-              onPress={() => handleOpenRecipe(resumingItem.recipe)}
-            >
-              <Image source={{ uri: resumingItem.recipe.video || 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600' }} style={styles.resumeImg} />
-              <View style={styles.resumeContent}>
-                <Text style={[styles.resumeLabel, { color: colors.primary }]}>Continuar Lectura</Text>
-                <Text style={[styles.resumeTitle, { color: colors.text }]} numberOfLines={1}>{resumingItem.recipe.nombre}</Text>
-                
-                {(() => {
-                  const rProg = resumingItem.progress;
-                  const done = rProg.completedSteps?.length || 0;
-                  const total = resumingItem.recipe.preparación.length;
-                  const rPercent = total > 0 ? Math.round((done / total) * 100) : 0;
-                  // Get next step text
-                  let nextStepText = 'Empezar preparación';
-                  for (let s = 0; s < total; s++) {
-                    if (!rProg.completedSteps.includes(s)) {
-                      nextStepText = `Paso ${s + 1}: ${resumingItem.recipe.preparación[s]}`;
-                      break;
-                    }
+      {/* Continuar Lectura Banner Section */}
+      {resumingItem && (
+        <View style={{ paddingHorizontal: Theme.spacing.md }}>
+          <Text style={[styles.sectionTitleLabel, { color: colors.textSecondary }]}>Retomar Preparación</Text>
+          <Card
+            style={[styles.resumeBanner, { backgroundColor: colors.surface, borderColor: colors.primary }]}
+            border={true}
+            elevation="sm"
+            onPress={() => handleOpenRecipe(resumingItem.recipe)}
+          >
+            <Image source={{ uri: resumingItem.recipe.video || 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600' }} style={styles.resumeImg} />
+            <View style={styles.resumeContent}>
+              <Text style={[styles.resumeLabel, { color: colors.primary }]}>Continuar Lectura</Text>
+              <Text style={[styles.resumeTitle, { color: colors.text }]} numberOfLines={1}>{resumingItem.recipe.nombre}</Text>
+              
+              {(() => {
+                const rProg = resumingItem.progress;
+                const done = rProg.completedSteps?.length || 0;
+                const total = resumingItem.recipe.preparación.length;
+                const rPercent = total > 0 ? Math.round((done / total) * 100) : 0;
+                let nextStepText = 'Empezar preparación';
+                for (let s = 0; s < total; s++) {
+                  if (!rProg.completedSteps.includes(s)) {
+                    nextStepText = `Paso ${s + 1}: ${resumingItem.recipe.preparación[s]}`;
+                    break;
                   }
-                  return (
-                    <View>
-                      <Text style={{ fontSize: 10, color: colors.textSecondary, marginTop: 2 }} numberOfLines={1}>
-                        {nextStepText}
-                      </Text>
-                      <View style={styles.resumeProgressRow}>
-                        <View style={[styles.resumeProgressTrack, { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(232, 226, 213, 0.5)' }]}>
-                          <View style={[styles.resumeProgressFill, { width: `${rPercent}%`, backgroundColor: colors.primary }]} />
-                        </View>
-                        <Text style={[styles.resumeProgressText, { color: colors.primary }]}>{rPercent}%</Text>
+                }
+                return (
+                  <View>
+                    <Text style={{ fontSize: 10, color: colors.textSecondary, marginTop: 2 }} numberOfLines={1}>
+                      {nextStepText}
+                    </Text>
+                    <View style={styles.resumeProgressRow}>
+                      <View style={[styles.resumeProgressTrack, { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(232, 226, 213, 0.5)' }]}>
+                        <View style={[styles.resumeProgressFill, { width: `${rPercent}%`, backgroundColor: colors.primary }]} />
                       </View>
+                      <Text style={[styles.resumeProgressText, { color: colors.primary }]}>{rPercent}%</Text>
                     </View>
-                  );
-                })()}
-              </View>
-              <View style={[styles.resumeBtn, { backgroundColor: 'rgba(200, 92, 56, 0.08)' }]}>
-                <Ionicons name="play" size={16} color={colors.primary} />
-              </View>
-            </Card>
-          </View>
-        )}
+                  </View>
+                );
+              })()}
+            </View>
+            <View style={[styles.resumeBtn, { backgroundColor: 'rgba(200, 92, 56, 0.08)' }]}>
+              <Ionicons name="play" size={16} color={colors.primary} />
+            </View>
+          </Card>
+        </View>
+      )}
 
-        {/* Category Tabs */}
-        <ScrollView 
-          horizontal 
-          showsHorizontalScrollIndicator={false} 
-          contentContainerStyle={styles.categoryContainer}
-        >
-          {categories.map((cat) => (
-            <Pressable
-              key={cat}
-              onPress={() => setActiveCategory(cat)}
+      {/* Category Tabs */}
+      <ScrollView 
+        horizontal 
+        showsHorizontalScrollIndicator={false} 
+        contentContainerStyle={styles.categoryContainer}
+      >
+        {categories.map((cat) => (
+          <Pressable
+            key={cat}
+            onPress={() => setActiveCategory(cat)}
+            style={[
+              styles.categoryBadge,
+              { backgroundColor: colors.surface, borderColor: colors.border },
+              activeCategory === cat && [styles.categoryBadgeActive, { backgroundColor: colors.primary, borderColor: colors.primary }]
+            ]}
+          >
+            <Text 
               style={[
-                styles.categoryBadge,
-                { backgroundColor: colors.surface, borderColor: colors.border },
-                activeCategory === cat && [styles.categoryBadgeActive, { backgroundColor: colors.primary, borderColor: colors.primary }]
+                styles.categoryBadgeText,
+                { color: colors.textSecondary },
+                activeCategory === cat && [styles.categoryBadgeTextActive, { color: colors.white }]
               ]}
             >
-              <Text 
-                style={[
-                  styles.categoryBadgeText,
-                  { color: colors.textSecondary },
-                  activeCategory === cat && [styles.categoryBadgeTextActive, { color: colors.white }]
-                ]}
-              >
-                {cat}
-              </Text>
+              {cat}
+            </Text>
+          </Pressable>
+        ))}
+      </ScrollView>
+    </View>
+  );
+
+  const renderRecipeItem = ({ item: recipe }: { item: Recipe }) => {
+    const isFav = favorites.includes(recipe.id);
+    const isSeen = recentlyViewed.some(i => i.id === recipe.id && i.type === 'recipe');
+    return (
+      <View style={{ paddingHorizontal: Theme.spacing.md }}>
+        <Card
+          key={recipe.id}
+          style={[styles.editorialCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
+          elevation="md"
+          border={true}
+          onPress={() => handleOpenRecipe(recipe)}
+        >
+          <View style={{ position: 'relative' }}>
+            <Image 
+              source={{ uri: recipe.video || 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600' }} 
+              style={styles.editorialImage} 
+              contentFit="cover"
+            />
+            {isSeen && (
+              <View style={styles.viewedBadge}>
+                <Ionicons name="checkmark-circle" size={10} color="#FFF" style={{ marginRight: 3 }} />
+                <Text style={styles.viewedBadgeText}>VISTA</Text>
+              </View>
+            )}
+            <Pressable 
+              style={styles.cardHeartIcon} 
+              onPress={(e) => { e.stopPropagation(); toggleFavorite(recipe.id); }}
+            >
+              <Ionicons 
+                name={isFav ? "heart" : "heart-outline"} 
+                size={20} 
+                color={isFav ? colors.primary : colors.white} 
+              />
             </Pressable>
-          ))}
-        </ScrollView>
+          </View>
 
-        {/* Editorial Recipe Cards Catalog */}
-        <View style={styles.catalogList}>
-          {isLoading ? (
-            <View style={{ width: '100%' }}>
-              <SkeletonLoader type="card" />
-              <SkeletonLoader type="card" />
+          <View style={styles.editorialBody}>
+            <View style={styles.cardHeaderRow}>
+              <Text style={[styles.recipeCategory, { color: colors.primary }]}>{recipe.categoría}</Text>
+              
+              <View style={styles.starsRow}>
+                <Ionicons name="star" size={12} color={colors.accent} />
+                <Ionicons name="star" size={12} color={colors.accent} />
+                <Ionicons name="star" size={12} color={colors.accent} />
+                <Ionicons name="star" size={12} color={colors.accent} />
+                <Ionicons name="star" size={12} color={colors.accent} />
+              </View>
             </View>
-          ) : filteredRecipes.length > 0 ? (
-            filteredRecipes.map((recipe) => {
-              const isFav = favorites.includes(recipe.id);
-              const isSeen = recentlyViewed.some(item => item.id === recipe.id && item.type === 'recipe');
-              return (
-                <Card
-                  key={recipe.id}
-                  style={[styles.editorialCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
-                  elevation="md"
-                  border={true}
-                  onPress={() => handleOpenRecipe(recipe)}
-                >
-                  <View style={{ position: 'relative' }}>
-                    <Image 
-                      source={{ uri: recipe.video || 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600' }} 
-                      style={styles.editorialImage} 
-                      contentFit="cover"
-                    />
-                    {isSeen && (
-                      <View style={styles.viewedBadge}>
-                        <Ionicons name="checkmark-circle" size={10} color="#FFF" style={{ marginRight: 3 }} />
-                        <Text style={styles.viewedBadgeText}>VISTA</Text>
-                      </View>
-                    )}
-                    <Pressable 
-                      style={styles.cardHeartIcon} 
-                      onPress={(e) => { e.stopPropagation(); toggleFavorite(recipe.id); }}
-                    >
-                      <Ionicons 
-                        name={isFav ? "heart" : "heart-outline"} 
-                        size={20} 
-                        color={isFav ? colors.primary : colors.white} 
-                      />
-                    </Pressable>
-                  </View>
-                
-                  <View style={styles.editorialBody}>
-                    <View style={styles.cardHeaderRow}>
-                      <Text style={[styles.recipeCategory, { color: colors.primary }]}>{recipe.categoría}</Text>
-                      
-                      <View style={styles.starsRow}>
-                        <Ionicons name="star" size={12} color={colors.accent} />
-                        <Ionicons name="star" size={12} color={colors.accent} />
-                        <Ionicons name="star" size={12} color={colors.accent} />
-                        <Ionicons name="star" size={12} color={colors.accent} />
-                        <Ionicons name="star" size={12} color={colors.accent} />
-                      </View>
-                    </View>
 
-                    <Text style={[styles.editorialTitle, { color: colors.text }]}>{recipe.nombre}</Text>
-                    <Text style={[styles.editorialDesc, { color: colors.textSecondary }]} numberOfLines={2}>
-                      {recipe.historia}
-                    </Text>
-                    
-                    <View style={[styles.metaDivider, { backgroundColor: colors.border }]} />
-                    
-                    <View style={styles.editorialMetaRow}>
-                      <View style={styles.metaItem}>
-                        <Ionicons name="time" size={14} color={colors.primary} />
-                        <Text style={[styles.metaText, { color: colors.textSecondary }]}>{recipe.duración}</Text>
-                      </View>
-                      <View style={styles.metaItem}>
-                        <Ionicons name="restaurant" size={14} color={colors.secondary} />
-                        <Text style={[styles.metaText, { color: colors.textSecondary }]}>{recipe.dificultad}</Text>
-                      </View>
-                      <View style={styles.viewRecipeBtn}>
-                        <Text style={[styles.viewRecipeBtnText, { color: colors.primary }]}>Ver Receta</Text>
-                        <Ionicons name="chevron-forward" size={12} color={colors.primary} />
-                      </View>
-                    </View>
-                  </View>
-                </Card>
-              );
-            })
-          ) : activeCategory === 'Favoritos' ? (
+            <Text style={[styles.editorialTitle, { color: colors.text }]}>{recipe.nombre}</Text>
+            <Text style={[styles.editorialDesc, { color: colors.textSecondary }]} numberOfLines={2}>
+              {recipe.historia}
+            </Text>
+            
+            <View style={[styles.metaDivider, { backgroundColor: colors.border }]} />
+            
+            <View style={styles.editorialMetaRow}>
+              <View style={styles.metaItem}>
+                <Ionicons name="time" size={14} color={colors.primary} />
+                <Text style={[styles.metaText, { color: colors.textSecondary }]}>{recipe.duración}</Text>
+              </View>
+              <View style={styles.metaItem}>
+                <Ionicons name="restaurant" size={14} color={colors.secondary} />
+                <Text style={[styles.metaText, { color: colors.textSecondary }]}>{recipe.dificultad}</Text>
+              </View>
+              <View style={styles.viewRecipeBtn}>
+                <Text style={[styles.viewRecipeBtnText, { color: colors.primary }]}>Ver Receta</Text>
+                <Ionicons name="chevron-forward" size={12} color={colors.primary} />
+              </View>
+            </View>
+          </View>
+        </Card>
+      </View>
+    );
+  };
+
+  const renderListFooter = () => {
+    if (isLoadingMore) {
+      return (
+        <View style={{ paddingVertical: Theme.spacing.md, alignItems: 'center' }}>
+          <ActivityIndicator size="small" color={colors.primary} />
+        </View>
+      );
+    }
+    if (loadMoreError) {
+      return (
+        <View style={{ paddingVertical: Theme.spacing.md, alignItems: 'center' }} testID="recipes-loadmore-error">
+          <Text style={{ color: colors.primary, fontSize: 13, marginBottom: 8 }}>Error al cargar más recetas</Text>
+          <Pressable
+            onPress={() => fetchRecipesPage(page + 1, false)}
+            style={[styles.retryBtnSmall, { backgroundColor: colors.primary }]}
+            accessibilityRole="button"
+            accessibilityLabel="Reintentar cargar más"
+          >
+            <Text style={{ color: colors.white, fontWeight: '600', fontSize: 12 }}>Reintentar</Text>
+          </Pressable>
+        </View>
+      );
+    }
+    if (displayedRecipes.length === 0 && !isInitialLoading) {
+      return (
+        <View style={{ paddingHorizontal: Theme.spacing.md }}>
+          {activeCategory === 'Favoritos' ? (
             <View style={[styles.emptyContainer, styles.emptyFavoritesCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
               <View style={[styles.emptyIconCircle, { backgroundColor: isDarkMode ? 'rgba(200, 92, 56, 0.16)' : 'rgba(200, 92, 56, 0.08)' }]}>
                 <Ionicons name="restaurant" size={48} color={colors.primary} />
@@ -760,7 +802,63 @@ export const RecetasScreen: React.FC = () => {
             </View>
           )}
         </View>
-      </ScrollView>
+      );
+    }
+    return <View style={{ height: 20 }} />;
+  };
+
+  return (
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <Header 
+        title="Sabores Ancestrales" 
+        subtitle="Catálogo de recetas autóctonas y técnicas tradicionales" 
+        showDivider={true}
+      />
+      
+      {isInitialLoading ? (
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <View style={{ paddingHorizontal: Theme.spacing.md, marginTop: Theme.spacing.md }}>
+            <SkeletonLoader type="card" />
+            <SkeletonLoader type="card" />
+          </View>
+        </ScrollView>
+      ) : initialError ? (
+        <View style={[styles.emptyContainer, { paddingHorizontal: Theme.spacing.md }]} testID="recipes-error-container">
+          <Ionicons name="cloud-offline-outline" size={48} color={colors.primary} />
+          <Text style={[styles.emptyTitle, { color: colors.text, marginTop: 12 }]}>
+            No se pudieron cargar las recetas
+          </Text>
+          <Text style={[styles.emptyText, { color: colors.textSecondary, marginBottom: 16 }]}>
+            {initialError.message}
+          </Text>
+          <Pressable
+            onPress={() => fetchRecipesPage(0, true)}
+            style={[styles.retryBtn, { backgroundColor: colors.primary }]}
+            accessibilityRole="button"
+            accessibilityLabel="Reintentar"
+            testID="retry-button"
+          >
+            <Ionicons name="refresh" size={18} color={colors.white} style={{ marginRight: 6 }} />
+            <Text style={styles.retryBtnText}>Reintentar</Text>
+          </Pressable>
+        </View>
+      ) : (
+        <FlatList
+          data={displayedRecipes}
+          keyExtractor={(item) => item.id}
+          renderItem={renderRecipeItem}
+          ListHeaderComponent={renderListHeader}
+          ListFooterComponent={renderListFooter}
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.4}
+          initialNumToRender={6}
+          maxToRenderPerBatch={10}
+          windowSize={5}
+          removeClippedSubviews={Platform.OS !== 'web'}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+        />
+      )}
 
       {/* Recipe Detail Modal */}
       <RecipeDetailModal
@@ -1368,6 +1466,23 @@ const styles = StyleSheet.create({
     fontWeight: Theme.typography.weights.bold,
     color: '#FFF',
     letterSpacing: 0.5,
+  },
+  retryBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: Theme.spacing.md,
+    paddingVertical: Theme.spacing.sm + 2,
+    borderRadius: Theme.roundness.sm,
+  },
+  retryBtnText: {
+    color: '#FFF',
+    fontWeight: Theme.typography.weights.bold,
+    fontSize: Theme.typography.sizes.sm,
+  },
+  retryBtnSmall: {
+    paddingHorizontal: Theme.spacing.md,
+    paddingVertical: 6,
+    borderRadius: Theme.roundness.xs,
   },
 });
 

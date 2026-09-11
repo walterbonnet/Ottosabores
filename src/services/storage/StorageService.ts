@@ -1,5 +1,6 @@
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Logger } from '../logger';
 
 const isServer = typeof window === 'undefined';
 
@@ -12,7 +13,7 @@ export const StorageService = {
       }
       return await AsyncStorage.getItem(key);
     } catch (error) {
-      console.warn(`StorageService.getItem error for key "${key}":`, error);
+      Logger.warn(`StorageService.getItem error for key "${key}":`, error);
       return null;
     }
   },
@@ -25,7 +26,7 @@ export const StorageService = {
       }
       await AsyncStorage.setItem(key, value);
     } catch (error) {
-      console.warn(`StorageService.setItem error for key "${key}":`, error);
+      Logger.warn(`StorageService.setItem error for key "${key}":`, error);
     }
   },
 
@@ -37,7 +38,7 @@ export const StorageService = {
       }
       await AsyncStorage.removeItem(key);
     } catch (error) {
-      console.warn(`StorageService.removeItem error for key "${key}":`, error);
+      Logger.warn(`StorageService.removeItem error for key "${key}":`, error);
     }
   },
 };

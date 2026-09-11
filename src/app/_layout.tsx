@@ -4,11 +4,12 @@ import { View, Text, Pressable, StyleSheet, Platform } from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import CustomTabBar from '../components/CustomTabBar';
-import { GlobalStateProvider, useGlobalState } from '../services/GlobalStateContext';
+import { GlobalStateProvider } from '../services/GlobalStateContext';
+import { usePlayer } from '../services/context/PlayerState';
 import Theme from '../theme';
 
 function FloatingGlobalPlayer() {
-  const { currentAudio, isPlaying, audioProgress, pauseAudio, resumeAudio, stopAudio } = useGlobalState();
+  const { currentAudio, isPlaying, audioProgress, pauseAudio, resumeAudio, stopAudio } = usePlayer();
   const pathname = usePathname();
 
   if (!currentAudio || pathname?.includes('multimedia') || pathname?.includes('saboresar')) return null;

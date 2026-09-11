@@ -1,6 +1,8 @@
 import { supabase, isSupabaseConfigured } from '../supabase/client';
 import { TRIVIA_QUESTIONS } from '../mockData';
-import { TriviaQuestion } from '../../types';
+import { TriviaQuestion, TriviaOptionRow } from '../../types';
+import { Logger } from '../logger';
+import { Result, createSuccessResult, createErrorResult } from '../errors/AppError';
 
 export interface PublicTriviaQuestion {
   id: string;
@@ -18,25 +20,30 @@ export interface TriviaValidationResult {
 }
 
 export const triviaRepository = {
-  async getQuestions(): Promise<TriviaQuestion[]> {
+  async getQuestionsResult(): Promise<Result<TriviaQuestion[]>> {
     if (!isSupabaseConfigured || !supabase) {
-      return TRIVIA_QUESTIONS;
+      return createSuccessResult(TRIVIA_QUESTIONS, true);
     }
 
     try {
-      // Query from client_trivia_questions view (which excludes correct_answer_idx for security)
       const { data, error } = await supabase
         .from('client_trivia_questions')
         .select('*, trivia_answers(*)');
 
-      if (error || !data || data.length === 0) {
-        return TRIVIA_QUESTIONS;
+      if (error) {
+        Logger.warn('triviaRepository.getQuestionsResult error:', error);
+        return createErrorResult('SERVER_ERROR', error.message, true, error);
       }
 
-      return data.map((row: any) => {
-        const options = (row.trivia_answers || [])
-          .sort((a: any, b: any) => a.option_index - b.option_index)
-          .map((o: any) => o.option_text);
+      if (!data || data.length === 0) {
+        return createSuccessResult([], false);
+      }
+
+      const questions = data.map((row) => {
+        const answers = (row.trivia_answers as TriviaOptionRow[]) || [];
+        const options = answers
+          .sort((a, b) => (a.option_index || 0) - (b.option_index || 0))
+          .map((o) => o.option_text);
 
         const mockMatch = TRIVIA_QUESTIONS.find(q => q.id === row.question_code || q.id === row.id);
 
@@ -44,15 +51,25 @@ export const triviaRepository = {
           id: row.question_code || row.id,
           question: row.question,
           options: options.length > 0 ? options : (mockMatch?.options || []),
-          correctAnswer: mockMatch?.correctAnswer || 0, // Fallback for offline/local simulation
+          correctAnswer: mockMatch?.correctAnswer || 0,
           explanation: row.explanation,
           image: row.image_url || mockMatch?.image,
         };
       });
+
+      return createSuccessResult(questions);
     } catch (err) {
-      return TRIVIA_QUESTIONS;
+      Logger.warn('triviaRepository.getQuestionsResult exception:', err);
+      return createErrorResult('NETWORK_ERROR', err instanceof Error ? err.message : String(err), true, err);
     }
   },
+
+  async getQuestions(): Promise<TriviaQuestion[]> {
+    const res = await this.getQuestionsResult();
+    if (res.ok && res.data.length > 0) return res.data;
+    return TRIVIA_QUESTIONS;
+  },
+
 
   async submitAnswer(
     questionId: string,
@@ -79,6 +96,7 @@ export const triviaRepository = {
       });
 
       if (error || !data) {
+        Logger.warn('Edge Function submit-trivia-answer failed, using fallback:', error);
         const mockQuestion = TRIVIA_QUESTIONS.find(q => q.id === questionId);
         return {
           isCorrect: mockQuestion ? mockQuestion.correctAnswer === selectedOptionIndex : false,
@@ -93,6 +111,7 @@ export const triviaRepository = {
         explanation: data.explanation,
       };
     } catch (err) {
+      Logger.warn('submitAnswer exception:', err);
       const mockQuestion = TRIVIA_QUESTIONS.find(q => q.id === questionId);
       return {
         isCorrect: mockQuestion ? mockQuestion.correctAnswer === selectedOptionIndex : false,

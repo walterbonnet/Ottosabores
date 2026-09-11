@@ -19,35 +19,24 @@ import SkeletonLoader from '../components/SkeletonLoader';
 import { FESTIVALS, RECIPES } from '../services/mockData';
 import { Festival, Recipe } from '../types';
 import { useGlobalState } from '../services/GlobalStateContext';
+import { useRemoteData } from '../services/context/RemoteDataState';
 import FestivalDetailModal from '../components/FestivalDetailModal';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
-const getGrandmaTip = (recipeId: string): string => {
-  switch (recipeId) {
-    case 'r1':
-      return 'El gran secreto de las abuelas correntinas es agregar una cucharada de jugo de naranja natural al amasar. Esto ayuda a que el chipá quede esponjoso.';
-    case 'r2':
-      return 'Revolver siempre en sentido de las agujas del reloj y usando una cuchara de madera de espinillo para que no se corte la textura.';
-    case 'r3':
-      return 'Para el guiso, agrega un chorrito de jugo de limón al apagar el fuego. Realza los sabores de la carne and el arroz de manera espectacular.';
-    case 'r4':
-      return 'Servilo siempre bien frío del refrigerador con una rodaja gruesa de queso de campo correntino (queso criollo).';
-    case 'r5':
-      return 'Humedecer la carne constantemente con salmuera de romero y ajo para que conserve su jugosidad en la estaca.';
-    case 'r6':
-      return 'Pinchá varias veces con un tenedor el chipá cuerito antes de tirarlo al aceite hirviendo para que no se infle desparejo.';
-    default:
-      return 'Cocinar siempre con leña o fuego de carbón vegetal para conservar el aroma tradicional del litoral.';
-  }
-};
+import { getGrandmaTip } from '../config/constants';
 
 export const FiestasScreen: React.FC = () => {
   const { colors, isDarkMode } = useGlobalState();
+  const { refreshFestivals } = useRemoteData();
   const params = useLocalSearchParams<{ id?: string }>();
   const [selectedRoute, setSelectedRoute] = useState<string>('Todas las Rutas');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedFestival, setSelectedFestival] = useState<Festival | null>(null);
+
+  useEffect(() => {
+    refreshFestivals();
+  }, []);
 
   useEffect(() => {
     if (params.id) {

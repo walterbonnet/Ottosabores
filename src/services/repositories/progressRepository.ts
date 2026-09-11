@@ -1,17 +1,22 @@
 import { supabase, isSupabaseConfigured } from '../supabase/client';
 import { RecipeProgress } from '../GlobalStateContext';
+import { Result, createSuccessResult, createErrorResult } from '../errors/AppError';
 
 export const progressRepository = {
-  async getRecipeProgress(userId: string): Promise<{ [recipeCode: string]: RecipeProgress }> {
-    if (!isSupabaseConfigured || !supabase || !userId) return {};
+  async getRecipeProgressResult(userId: string): Promise<Result<{ [recipeCode: string]: RecipeProgress }>> {
+    if (!isSupabaseConfigured || !supabase || !userId) return createSuccessResult({}, true);
 
     try {
       const { data, error } = await supabase
         .from('recipe_progress')
-        .select('*')
+        .select('recipe_code, completed_ingredients, completed_steps, last_step_index, updated_at')
         .eq('user_id', userId);
 
-      if (error || !data) return {};
+      if (error) {
+        return createErrorResult('SERVER_ERROR', error.message, true, error);
+      }
+
+      if (!data) return createSuccessResult({});
 
       const result: { [recipeCode: string]: RecipeProgress } = {};
       data.forEach((row) => {
@@ -23,18 +28,23 @@ export const progressRepository = {
         };
       });
 
-      return result;
+      return createSuccessResult(result);
     } catch (err) {
-      return {};
+      return createErrorResult('NETWORK_ERROR', err instanceof Error ? err.message : String(err), true, err);
     }
   },
 
-  async saveProgress(
+  async getRecipeProgress(userId: string): Promise<{ [recipeCode: string]: RecipeProgress }> {
+    const res = await this.getRecipeProgressResult(userId);
+    return res.ok ? res.data : {};
+  },
+
+  async saveProgressResult(
     userId: string,
     recipeCode: string,
     progress: RecipeProgress
-  ): Promise<boolean> {
-    if (!isSupabaseConfigured || !supabase || !userId) return false;
+  ): Promise<Result<boolean>> {
+    if (!isSupabaseConfigured || !supabase || !userId) return createSuccessResult(false, true);
 
     try {
       const { error } = await supabase
@@ -48,9 +58,20 @@ export const progressRepository = {
           updated_at: new Date(progress.lastUpdated).toISOString(),
         }, { onConflict: 'user_id, recipe_code' });
 
-      return !error;
+      if (error) return createErrorResult('SERVER_ERROR', error.message, true, error);
+      return createSuccessResult(true);
     } catch (err) {
-      return false;
+      return createErrorResult('NETWORK_ERROR', err instanceof Error ? err.message : String(err), true, err);
     }
   },
+
+  async saveProgress(
+    userId: string,
+    recipeCode: string,
+    progress: RecipeProgress
+  ): Promise<boolean> {
+    const res = await this.saveProgressResult(userId, recipeCode, progress);
+    return res.ok && res.data;
+  },
 };
+

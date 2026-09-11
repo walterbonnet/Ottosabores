@@ -9,9 +9,10 @@ export const multimediaRepository = {
     }
 
     try {
+      // Explicit column projection
       const { data, error } = await supabase
         .from('multimedia')
-        .select('*')
+        .select('id, item_code, title, artist, duration, type, image_url, audio_url, related_festival_code')
         .eq('is_published', true)
         .order('created_at', { ascending: true });
 

@@ -4,6 +4,7 @@ import {
   Text,
   View,
   ScrollView,
+  FlatList,
   Pressable,
   SafeAreaView,
   Platform,
@@ -16,8 +17,10 @@ import Theme from '../theme';
 import Card from '../components/Card';
 import Header from '../components/Header';
 import { MULTIMEDIA_ITEMS, FESTIVALS, RECIPES } from '../services/mockData';
-import { Festival, Recipe } from '../types';
+import { Festival, Recipe, MultimediaItem, VideoItem, PhotoItem } from '../types';
 import { useGlobalState } from '../services/GlobalStateContext';
+import { usePlayer } from '../services/context/PlayerState';
+import { useRemoteData } from '../services/context/RemoteDataState';
 import SkeletonLoader from '../components/SkeletonLoader';
 import RecipeDetailModal from '../components/RecipeDetailModal';
 import FestivalDetailModal from '../components/FestivalDetailModal';
@@ -69,6 +72,12 @@ export const MultimediaScreen: React.FC = () => {
 
   const {
     addRecentlyViewed,
+    markAudioPlayed,
+    colors,
+    isDarkMode
+  } = useGlobalState();
+
+  const {
     currentAudio,
     isPlaying,
     audioProgress,
@@ -81,10 +90,13 @@ export const MultimediaScreen: React.FC = () => {
     seekAudio,
     skipForward,
     skipBackward,
-    markAudioPlayed,
-    colors,
-    isDarkMode
-  } = useGlobalState();
+  } = usePlayer();
+
+  const { refreshMultimedia } = useRemoteData();
+
+  useEffect(() => {
+    refreshMultimedia();
+  }, []);
 
   useEffect(() => {
     const timer1 = setTimeout(() => {
@@ -171,8 +183,8 @@ export const MultimediaScreen: React.FC = () => {
     seekAudio(progress);
   };
 
-  return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+  const renderHeader = () => (
+    <View style={{ paddingBottom: 12 }}>
       <Header 
         title="Galería Multimedia" 
         subtitle="Videos, audios y postales con identidad litoraleña" 
@@ -207,153 +219,166 @@ export const MultimediaScreen: React.FC = () => {
         ))}
       </View>
 
-      <ScrollView 
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={[
-          styles.scrollContent,
-          activeTab === 'audios' ? { paddingBottom: 280 } : { paddingBottom: 170 }
-        ]}
-      >
-        {isLoading ? (
-          <View style={{ padding: Theme.spacing.md }}>
-            {activeTab === 'audios' && (
-              <>
-                <SkeletonLoader type="list" />
-                <SkeletonLoader type="list" />
-                <SkeletonLoader type="list" />
-                <SkeletonLoader type="list" />
-              </>
-            )}
-            {activeTab === 'videos' && (
-              <>
-                <SkeletonLoader type="card" />
-                <SkeletonLoader type="card" />
-              </>
-            )}
-            {activeTab === 'fotos' && (
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-                <View style={{ width: '48%' }}><SkeletonLoader type="card" /></View>
-                <View style={{ width: '48%' }}><SkeletonLoader type="card" /></View>
-                <View style={{ width: '48%' }}><SkeletonLoader type="card" /></View>
-                <View style={{ width: '48%' }}><SkeletonLoader type="card" /></View>
-              </View>
-            )}
-          </View>
-        ) : (
-          <>
-            {/* 1. AUDIOS SECTION */}
-            {activeTab === 'audios' && (
-              <View style={styles.section}>
-                <Text style={[styles.sectionTitle, { color: colors.text }]}>Relatos de Cocineros</Text>
-                {MULTIMEDIA_ITEMS.map((item) => {
-                  const isCurrent = activeAudio.id === item.id;
-                  const isItemPlaying = isCurrent && isPlaying;
-                  return (
-                    <Card
-                      key={item.id}
-                      style={[
-                        styles.audioItemCard, 
-                        { backgroundColor: colors.surface, borderColor: colors.border },
-                        isCurrent && [styles.audioItemCardActive, { borderColor: colors.primary, backgroundColor: isDarkMode ? 'rgba(200, 92, 56, 0.12)' : 'rgba(200, 92, 56, 0.04)' }]
-                      ]}
-                      elevation="sm"
-                      border={true}
-                      onPress={() => {
-                        playAudio(item);
-                        markAudioPlayed(item.id);
-                      }}
-                    >
-                      <View style={styles.audioRow}>
-                        <View style={styles.audioImageContainer}>
-                          <Image source={{ uri: item.image }} style={styles.audioImage} />
-                          {isItemPlaying && (
-                            <View style={styles.playingIndicatorMask}>
-                              <Ionicons name="volume-medium" size={20} color={colors.white} />
-                            </View>
-                          )}
-                        </View>
-                        <View style={styles.audioDetails}>
-                          <Text style={[styles.audioCategory, { color: colors.primary }]}>{item.type === 'podcast' ? 'Podcast' : 'Relato'}</Text>
-                          <Text style={[styles.audioCardTitle, { color: colors.text }, isCurrent && { color: colors.primary }]} numberOfLines={1}>
-                            {item.title}
-                          </Text>
-                          <Text style={[styles.audioArtist, { color: colors.textSecondary }]}>{item.artist}</Text>
-                        </View>
-                        {isItemPlaying ? (
-                          <View style={styles.listWaveform}>
-                            {waveHeights.slice(0, 6).map((h, i) => (
-                              <View 
-                                key={i} 
-                                style={[styles.listWaveBar, { backgroundColor: colors.primary, height: h * 0.5 }]} 
-                              />
-                            ))}
-                          </View>
-                        ) : (
-                          <Text style={[styles.audioTime, { color: colors.textSecondary }]}>{item.duration}</Text>
-                        )}
-                      </View>
-                    </Card>
-                  );
-                })}
-              </View>
-            )}
+      <View style={{ paddingHorizontal: Theme.spacing.md, paddingTop: Theme.spacing.md }}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>
+          {activeTab === 'audios' ? 'Relatos de Cocineros' : activeTab === 'videos' ? 'Clases de Cocina en Video' : 'Postales de Nuestra Tierra'}
+        </Text>
+      </View>
+    </View>
+  );
 
-            {/* 2. VIDEOS SECTION */}
-            {activeTab === 'videos' && (
-              <View style={styles.section}>
-                <Text style={[styles.sectionTitle, { color: colors.text }]}>Clases de Cocina en Video</Text>
-                {MOCK_VIDEOS.map((video) => (
-                  <Card
-                    key={video.id}
-                    style={[styles.videoCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
-                    elevation="sm"
-                    border={true}
-                    onPress={() => triggerPlayVideo(video)}
-                  >
-                    <View style={styles.videoThumbnailContainer}>
-                      <Image source={{ uri: video.thumbnail }} style={styles.videoImage} />
-                      <View style={styles.videoCardPlayOverlay}>
-                        <View style={[styles.videoMiniPlayCircle, { backgroundColor: colors.primary }]}>
-                          <Ionicons name="play" size={20} color={colors.white} style={{ marginLeft: 2 }} />
-                        </View>
-                      </View>
-                      <View style={styles.videoDurationBadge}>
-                        <Text style={styles.videoDurationText}>{video.duration}</Text>
-                      </View>
-                    </View>
-                    <View style={styles.videoTextBody}>
-                      <Text style={[styles.videoCardInstructor, { color: colors.primary }]}>Con {video.instructor}</Text>
-                      <Text style={[styles.videoCardTitle, { color: colors.text }]}>{video.title}</Text>
-                      <Text style={[styles.videoCardDesc, { color: colors.textSecondary }]} numberOfLines={2}>{video.description}</Text>
-                    </View>
-                  </Card>
-                ))}
-              </View>
-            )}
+  const getListData = () => {
+    if (activeTab === 'audios') return MULTIMEDIA_ITEMS;
+    if (activeTab === 'videos') return MOCK_VIDEOS;
+    return MOCK_PHOTOS;
+  };
 
-            {/* 3. FOTOS SECTION */}
-            {activeTab === 'fotos' && (
-              <View style={styles.section}>
-                <Text style={[styles.sectionTitle, { color: colors.text }]}>Postales de Nuestra Tierra</Text>
-                <View style={styles.photosGrid}>
-                  {MOCK_PHOTOS.map((photo) => (
-                    <Pressable
-                      key={photo.id}
-                      onPress={() => setSelectedPhoto(photo)}
-                      style={[styles.photoGridItem, { borderColor: colors.border }]}
-                    >
-                      <Image source={{ uri: photo.url }} style={styles.gridImage} />
-                      <View style={styles.photoLabelOverlay}>
-                        <Text style={styles.photoLabelText} numberOfLines={1}>{photo.title}</Text>
-                      </View>
-                    </Pressable>
+  const renderMediaItem = ({ item }: { item: any }) => {
+    if (activeTab === 'audios') {
+      const isCurrent = activeAudio.id === item.id;
+      const isItemPlaying = isCurrent && isPlaying;
+      return (
+        <View style={{ paddingHorizontal: Theme.spacing.md, marginBottom: 8 }}>
+          <Card
+            style={[
+              styles.audioItemCard, 
+              { backgroundColor: colors.surface, borderColor: colors.border },
+              isCurrent && [styles.audioItemCardActive, { borderColor: colors.primary, backgroundColor: isDarkMode ? 'rgba(200, 92, 56, 0.12)' : 'rgba(200, 92, 56, 0.04)' }]
+            ]}
+            elevation="sm"
+            border={true}
+            onPress={() => {
+              playAudio(item);
+              markAudioPlayed(item.id);
+            }}
+          >
+            <View style={styles.audioRow}>
+              <View style={styles.audioImageContainer}>
+                <Image source={{ uri: item.image }} style={styles.audioImage} />
+                {isItemPlaying && (
+                  <View style={styles.playingIndicatorMask}>
+                    <Ionicons name="volume-medium" size={20} color={colors.white} />
+                  </View>
+                )}
+              </View>
+              <View style={styles.audioDetails}>
+                <Text style={[styles.audioCategory, { color: colors.primary }]}>{item.type === 'podcast' ? 'Podcast' : 'Relato'}</Text>
+                <Text style={[styles.audioCardTitle, { color: colors.text }, isCurrent && { color: colors.primary }]} numberOfLines={1}>
+                  {item.title}
+                </Text>
+                <Text style={[styles.audioArtist, { color: colors.textSecondary }]}>{item.artist}</Text>
+              </View>
+              {isItemPlaying ? (
+                <View style={styles.listWaveform}>
+                  {waveHeights.slice(0, 6).map((h, i) => (
+                    <View 
+                      key={i} 
+                      style={[styles.listWaveBar, { backgroundColor: colors.primary, height: h * 0.5 }]} 
+                    />
                   ))}
                 </View>
+              ) : (
+                <Text style={[styles.audioTime, { color: colors.textSecondary }]}>{item.duration}</Text>
+              )}
+            </View>
+          </Card>
+        </View>
+      );
+    }
+
+    if (activeTab === 'videos') {
+      return (
+        <View style={{ paddingHorizontal: Theme.spacing.md, marginBottom: 12 }}>
+          <Card
+            style={[styles.videoCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
+            elevation="sm"
+            border={true}
+            onPress={() => triggerPlayVideo(item)}
+          >
+            <View style={styles.videoThumbnailContainer}>
+              <Image source={{ uri: item.thumbnail }} style={styles.videoImage} />
+              <View style={styles.videoCardPlayOverlay}>
+                <View style={[styles.videoMiniPlayCircle, { backgroundColor: colors.primary }]}>
+                  <Ionicons name="play" size={20} color={colors.white} style={{ marginLeft: 2 }} />
+                </View>
               </View>
-            )}
-          </>
-        )}
-      </ScrollView>
+              <View style={styles.videoDurationBadge}>
+                <Text style={styles.videoDurationText}>{item.duration}</Text>
+              </View>
+            </View>
+            <View style={styles.videoTextBody}>
+              <Text style={[styles.videoCardInstructor, { color: colors.primary }]}>Con {item.instructor}</Text>
+              <Text style={[styles.videoCardTitle, { color: colors.text }]}>{item.title}</Text>
+              <Text style={[styles.videoCardDesc, { color: colors.textSecondary }]} numberOfLines={2}>{item.description}</Text>
+            </View>
+          </Card>
+        </View>
+      );
+    }
+
+    // fotos grid item
+    return (
+      <View style={{ width: '48%', marginBottom: 12 }}>
+        <Pressable
+          onPress={() => setSelectedPhoto(item)}
+          style={[styles.photoGridItem, { borderColor: colors.border, width: '100%' }]}
+        >
+          <Image source={{ uri: item.url }} style={styles.gridImage} />
+          <View style={styles.photoLabelOverlay}>
+            <Text style={styles.photoLabelText} numberOfLines={1}>{item.title}</Text>
+          </View>
+        </Pressable>
+      </View>
+    );
+  };
+
+  return (
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      {isLoading ? (
+        <View style={{ padding: Theme.spacing.md }}>
+          <Header 
+            title="Galería Multimedia" 
+            subtitle="Videos, audios y postales con identidad litoraleña" 
+            showDivider={true}
+          />
+          {activeTab === 'audios' && (
+            <>
+              <SkeletonLoader type="list" />
+              <SkeletonLoader type="list" />
+              <SkeletonLoader type="list" />
+            </>
+          )}
+          {activeTab === 'videos' && (
+            <>
+              <SkeletonLoader type="card" />
+              <SkeletonLoader type="card" />
+            </>
+          )}
+          {activeTab === 'fotos' && (
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+              <View style={{ width: '48%' }}><SkeletonLoader type="card" /></View>
+              <View style={{ width: '48%' }}><SkeletonLoader type="card" /></View>
+              <View style={{ width: '48%' }}><SkeletonLoader type="card" /></View>
+              <View style={{ width: '48%' }}><SkeletonLoader type="card" /></View>
+            </View>
+          )}
+        </View>
+      ) : (
+        <FlatList
+          key={activeTab === 'fotos' ? 'fotos-grid-2' : 'single-col-1'}
+          data={getListData()}
+          keyExtractor={(item) => item.id}
+          numColumns={activeTab === 'fotos' ? 2 : 1}
+          columnWrapperStyle={activeTab === 'fotos' ? { justifyContent: 'space-between', paddingHorizontal: Theme.spacing.md } : undefined}
+          ListHeaderComponent={renderHeader}
+          renderItem={renderMediaItem}
+          contentContainerStyle={[
+            styles.scrollContent,
+            activeTab === 'audios' ? { paddingBottom: 280 } : { paddingBottom: 170 }
+          ]}
+          showsVerticalScrollIndicator={false}
+        />
+      )}
 
       {/* Floating Audio Controller (Only visible when audios tab is active or a song is playing) */}
       {activeTab === 'audios' && (

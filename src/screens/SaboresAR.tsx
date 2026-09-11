@@ -16,6 +16,7 @@ import Theme from '../theme';
 import Card from '../components/Card';
 import Header from '../components/Header';
 import { useGlobalState } from '../services/GlobalStateContext';
+import { Logger } from '../services/logger';
 import { MULTIMEDIA_ITEMS } from '../services/mockData';
 
 interface FoodSubItem {
@@ -199,7 +200,7 @@ export const SaboresARScreen: React.FC = () => {
         setCameraStream(stream);
         setHasCameraPermission(true);
       } catch (err) {
-        console.warn('Camera access error:', err);
+        Logger.warn('Camera access error:', err);
         setHasCameraPermission(false);
       }
     } else {
@@ -210,7 +211,7 @@ export const SaboresARScreen: React.FC = () => {
   useEffect(() => {
     if (Platform.OS === 'web' && cameraStream && videoRef.current) {
       videoRef.current.srcObject = cameraStream;
-      videoRef.current.play().catch((err: any) => console.log('Video auto-play blocked/error:', err));
+      videoRef.current.play().catch((err: any) => Logger.info('Video auto-play blocked/error:', err));
     }
   }, [cameraStream]);
 

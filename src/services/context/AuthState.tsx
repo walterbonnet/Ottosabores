@@ -1,9 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { User } from '@supabase/supabase-js';
 import { supabase, isSupabaseConfigured } from '../supabase/client';
 import { DbProfile, UserRole } from '../supabase/types';
+import { Logger } from '../logger';
 
 interface AuthContextType {
-  user: any | null;
+  user: User | null;
   profile: DbProfile | null;
   role: UserRole;
   isAuthenticated: boolean;
@@ -15,7 +17,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<any | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<DbProfile | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -32,7 +34,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setProfile(data as DbProfile);
       }
     } catch (e) {
-      console.warn('Profile fetch error:', e);
+      Logger.warn('Profile fetch error:', e);
     }
   };
 

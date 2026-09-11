@@ -4,6 +4,7 @@ import {
   Text,
   View,
   ScrollView,
+  FlatList,
   ImageBackground,
   TextInput,
   Pressable,
@@ -46,25 +47,7 @@ const CURIOSITIES = [
   }
 ];
 
-// Helper to provide grandma tips locally to keep visual system
-const getGrandmaTip = (recipeId: string): string => {
-  switch (recipeId) {
-    case 'r1':
-      return 'El gran secreto de las abuelas correntinas es agregar una cucharada de jugo de naranja natural al amasar. Esto ayuda a que el chipá quede esponjoso.';
-    case 'r2':
-      return 'Revolver siempre en sentido de las agujas del reloj y usando una cuchara de madera de espinillo para que no se corte la textura.';
-    case 'r3':
-      return 'Para el guiso, agrega un chorrito de jugo de limón al apagar el fuego. Realza los sabores de la carne y el arroz de manera espectacular.';
-    case 'r4':
-      return 'Servilo siempre bien frío del refrigerador con una rodaja gruesa de queso de campo correntino (queso criollo).';
-    case 'r5':
-      return 'Humedecer la carne constantemente con salmuera de romero y ajo para que conserve su jugosidad en la estaca.';
-    case 'r6':
-      return 'Pinchá varias veces con un tenedor el chipá cuerito antes de tirarlo al aceite hirviendo para que no se infle desparejo.';
-    default:
-      return 'Cocinar siempre con leña o fuego de carbón vegetal para conservar el aroma tradicional del litoral.';
-  }
-};
+import { getGrandmaTip } from '../config/constants';
 
 export const InicioScreen: React.FC = () => {
   const router = useRouter();
@@ -638,10 +621,14 @@ export const InicioScreen: React.FC = () => {
                 {recentlyViewedItems.length > 0 && (
                   <View style={styles.section}>
                     <Text style={[styles.sectionTitle, { color: colors.text }]}>Últimos vistos</Text>
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.recentScrollContent}>
-                      {recentlyViewedItems.map((item, idx) => (
+                    <FlatList
+                      horizontal
+                      data={recentlyViewedItems}
+                      keyExtractor={(item) => `${item.type}-${item.id}`}
+                      showsHorizontalScrollIndicator={false}
+                      contentContainerStyle={styles.recentScrollContent}
+                      renderItem={({ item }) => (
                         <Card
-                          key={idx}
                           style={[styles.recentCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
                           elevation="sm"
                           border={true}
@@ -664,8 +651,8 @@ export const InicioScreen: React.FC = () => {
                             <Text style={styles.recentTitle} numberOfLines={1}>{item.nombre}</Text>
                           </View>
                         </Card>
-                      ))}
-                    </ScrollView>
+                      )}
+                    />
                   </View>
                 )}
 

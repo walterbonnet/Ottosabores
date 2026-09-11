@@ -8,7 +8,6 @@ import {
   Dimensions,
   Platform,
 } from 'react-native';
-import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import Theme from '../theme';
 import { useGlobalState } from '../services/GlobalStateContext';

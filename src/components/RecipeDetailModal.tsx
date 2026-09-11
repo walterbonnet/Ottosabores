@@ -9,20 +9,7 @@ import { RECIPES, FESTIVALS } from '../services/mockData';
 import { useGlobalState } from '../services/GlobalStateContext';
 import SkeletonLoader from './SkeletonLoader';
 
-const getGrandmaTip = (recipeId: string): string => {
-  switch (recipeId) {
-    case 'r1':
-      return 'El gran secreto de las abuelas correntinas es agregar una cucharada de jugo de naranja natural al amasar. Esto ayuda a que el chipá quede esponjoso.';
-    case 'r2':
-      return 'Para un Mbaipy bien cremoso, cocinalo a fuego corona (muy lento) en olla de hierro y usá harina de maíz de molienda fina, hidratándola previamente.';
-    case 'r3':
-      return 'El guiso de arroz sale más sabroso si sofríes bien la carne hasta que dore en grasa de cerdo, y usas arroz largo fino de producción local.';
-    case 'r4':
-      return 'Para que los trozos de mamón queden firmes por fuera y cremosos por dentro, dejalos reposar en agua con bicarbonato de sodio unas horas antes de cocinar.';
-    default:
-      return 'Cociná siempre con paciencia, a fuego lento y con el corazón para honrar los saberes de nuestra tierra.';
-  }
-};
+import { getGrandmaTip } from '../config/constants';
 
 interface RecipeDetailModalProps {
   recipe: Recipe | null;

@@ -1,4 +1,4 @@
-import React, { createContext, useContext } from 'react';
+import React, { createContext, useContext, useMemo } from 'react';
 import { MultimediaItem } from '../types';
 import { Theme } from '../theme';
 import { AuthProvider, useAuth } from './context/AuthState';
@@ -89,7 +89,8 @@ const GlobalStateConsolidator: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const isDarkMode = userState.isDarkMode;
 
-  const colors = {
+  // Memoize colors object reference to prevent un-needed context object invalidations
+  const colors = useMemo(() => ({
     primary: isDarkMode ? Theme.colors.dark.primary : Theme.colors.primary,
     secondary: isDarkMode ? Theme.colors.dark.secondary : Theme.colors.secondary,
     accent: isDarkMode ? Theme.colors.dark.accent : Theme.colors.accent,
@@ -102,9 +103,9 @@ const GlobalStateConsolidator: React.FC<{ children: React.ReactNode }> = ({ chil
     text: isDarkMode ? Theme.colors.dark.text : Theme.colors.text,
     textSecondary: isDarkMode ? Theme.colors.dark.textSecondary : Theme.colors.textSecondary,
     border: isDarkMode ? Theme.colors.dark.border : Theme.colors.border,
-  };
+  }), [isDarkMode]);
 
-  const consolidatedValue: GlobalStateContextType = {
+  const consolidatedValue: GlobalStateContextType = useMemo(() => ({
     favorites: userState.favorites,
     recipeProgress: userState.recipeProgress,
     recentlyViewed: userState.recentlyViewed,
@@ -141,7 +142,21 @@ const GlobalStateConsolidator: React.FC<{ children: React.ReactNode }> = ({ chil
     nextAudio: playerState.nextAudio,
     prevAudio: playerState.prevAudio,
     stopAudio: playerState.stopAudio,
-  };
+  }), [
+    userState,
+    colors,
+    playerState.currentAudio,
+    playerState.isPlaying,
+    playerState.playAudio,
+    playerState.pauseAudio,
+    playerState.resumeAudio,
+    playerState.seekAudio,
+    playerState.skipForward,
+    playerState.skipBackward,
+    playerState.nextAudio,
+    playerState.prevAudio,
+    playerState.stopAudio,
+  ]);
 
   return (
     <GlobalStateContext.Provider value={consolidatedValue}>

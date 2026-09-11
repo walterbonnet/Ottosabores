@@ -7,6 +7,9 @@ import {
   Pressable,
   SafeAreaView,
   Modal,
+  StyleProp,
+  ViewStyle,
+  TextStyle,
 } from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
@@ -451,9 +454,9 @@ export const TriviaScreen: React.FC = () => {
                     const isSelected = selectedOpt === idx;
                     const isCorrectAns = idx === currentQuestion.correctAnswer;
                     
-                    let optionStyle: any[] = [styles.optionBtn, { backgroundColor: colors.surface, borderColor: colors.border }];
-                    let optionTextStyle: any[] = [styles.optionBtnText, { color: colors.text }];
-                    let iconName: any = "ellipse-outline";
+                    let optionStyle: StyleProp<ViewStyle>[] = [styles.optionBtn, { backgroundColor: colors.surface, borderColor: colors.border }];
+                    let optionTextStyle: StyleProp<TextStyle>[] = [styles.optionBtnText, { color: colors.text }];
+                    let iconName: keyof typeof Ionicons.glyphMap = "ellipse-outline";
                     let iconColor = colors.textSecondary;
 
                     if (gameState === 'answered') {
